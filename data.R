@@ -1,6 +1,6 @@
-library(data.table)
-
-source("species.R")
+library(dplyr)
+library(readr)
+library(tibble)
 
 #' Load and preprocess input data from `path`.
 #'
@@ -13,7 +13,7 @@ load_data_cached <- function(path) {
 
     if (!file.exists(cache_file)) {
         # If the cache file doesn't exist, we have to do the computation.
-        data <- load_data("input")
+        data <- load_data(path)
 
         # The results are cached for the next run.
         saveRDS(data, cache_file)
@@ -25,52 +25,61 @@ load_data_cached <- function(path) {
     }
 }
 
-#' Merge genome data from files in `path` into `data.table`s.
+#' Merge genome data from files in `path` into `tibble`s.
 #'
-#' The result will be a list with two items:
+#' The result will be a list with two named elements:
 #' - `genes` will be a table with one row per unique `geneid` and multiple
-#'   columns per species containing the data of interest. 
-#' - `species` will contain information that is useful to be accessed by
-#'   species.
+#'   columns per species containing the data of interest.
+#' - `species` will contain additional information on each species.
 #'
 #' @seealso [load_data_cached()]
 load_data <- function(path) {
+    # The resulting table for information by species.
+    species <- read_csv(paste(path, "species.csv", sep = "/"))
+
     # The resulting table for information by gene. For each species, columns
     # will be appended.
-    genes_table <- data.table(geneid = integer())
+    genes <- tibble(geneid = integer())
 
-    # The resulting table for information by species. This will result in a
-    # warning, because all median_distance values will be filled with `NA`
-    # (correctly).
-    species_table <- data.table(species, median_distance = numeric())
-
+    # Each file will contain data on one species.
     file_names <- list.files(path, "*_raw.txt")
+
+    # Table containing additional columns to be added to the species table.
+    species_computed <- tibble(
+        id = character(),
+        median_distance = numeric()
+    )
 
     for (file_name in file_names) {
         species_id <- strsplit(file_name, split = "_")[[1]][1]
-        genes_table_for_species <- fread(paste(path, file_name, sep = "/"))
+        genes_for_species <- read_tsv(paste(path, file_name, sep = "/"))
 
-        # Fill in the new column of the species table (`median_distance`).
-        species_table[
-            id == species_id,
-            median_distance := median(genes_table_for_species[, dist])
-        ]
+        # Compute the median distance across all genes of this species.
+        median_distance <- genes_for_species %>%
+            select(dist) %>%
+            summarise(median_distance = median(dist)) %>%
+            pull(median_distance)
+
+        # Cache the values to be added to the species table.
+        species_computed <- species_computed %>% add_row(
+            id = species_id,
+            median_distance = median_distance,
+        )
 
         # Column names have to be unique for each species.
-        colnames(genes_table_for_species)[c(2, 3, 4)] <- c(
-            paste(species_id, c("dist", "name", "chromosome"), sep = "_")
+        genes_for_species <- rename_with(
+            genes_for_species,
+            ~ paste(species_id, .x, sep = "_"),
+            c(dist, name, chromosome)
         )
 
-        # Add new genes as rows as well as new columns for this species.
-        genes_table <- merge(
-            genes_table,
-            genes_table_for_species,
-            all = TRUE
-        )
+        genes <- full_join(genes, genes_for_species)
     }
 
+    species <- left_join(species, species_computed)
+
     list(
-        genes = genes_table,
-        species = species_table
+        genes = genes,
+        species = species
     )
 }
