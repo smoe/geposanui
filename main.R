@@ -1,4 +1,6 @@
-source("data.R")
+library(shiny)
 
-data <- load_data_cached("input")
-print(data)
+source("server.R")
+source("ui.R")
+
+runApp(shinyApp(ui, server))
