@@ -1,6 +1,4 @@
-library(dplyr)
-library(readr)
-library(tibble)
+library(data.table)
 
 #' Load and preprocess input data from `path`.
 #'
@@ -25,7 +23,7 @@ load_data_cached <- function(path) {
     }
 }
 
-#' Merge genome data from files in `path` into `tibble`s.
+#' Merge genome data from files in `path` into `data.table`s.
 #'
 #' The result will be a list with named elements:
 #' - `genes` will be a table with metadata on human genes.
@@ -34,47 +32,43 @@ load_data_cached <- function(path) {
 #'
 #' @seealso [load_data_cached()]
 load_data <- function(path) {
-    genes <- read_tsv(paste(path, "genes.tsv", sep = "/"))
-    species <- read_csv(paste(path, "species.csv", sep = "/"))
-    distances <- tibble(geneid = integer())
+    genes <- fread(paste(path, "genes.tsv", sep = "/"))
+    original_species <- fread(paste(path, "species.csv", sep = "/"))
+
+    species <- data.table(
+        id = character(),
+        label = character(),
+        median_distance = numeric()
+    )
+
+    distances <- data.table(geneid = integer())
 
     # Each file will contain data on one species.
     file_names <- list.files(paste(path, "genomes", sep = "/"))
 
-    # Table containing additional columns to be added to the species table
-    # later.
-    species_computed <- tibble(
-        id = character(),
-        median_distance = numeric()
-    )
-
     for (file_name in file_names) {
         species_id <- strsplit(file_name, split = ".", fixed = TRUE)[[1]][1]
-        species_path <- paste(path, "genomes", file_name, sep = "/")
-        species_distances <- read_tsv(species_path)
 
-        # Compute the median distance across all genes of this species.
-        median_distance <- species_distances %>%
-            select(dist) %>%
-            summarise(median_distance = median(dist)) %>%
-            pull(median_distance)
+        # Only continue for replicatively aging species.
+        # TODO: Which other species should be included?
+        if (original_species[id == species_id, group] == "replicative") {
+            species_path <- paste(path, "genomes", file_name, sep = "/")
+            species_distances <- fread(species_path)
 
-        # Cache the values to be added to the species table.
-        species_computed <- species_computed %>% add_row(
-            id = species_id,
-            median_distance = median_distance,
-        )
+            # Compute the median distance across all genes of this species and
+            # add it to the species table along other static data.
+            species <- rbindlist(list(species, data.table(
+                id = species_id,
+                label = original_species[id == species_id, label],
+                median_distance = median(species_distances[, dist])
+            )))
 
-        # Column names have to be unique for each species.
-        # TODO: How to create a dynamic column name using `rename()`?
-        species_distances <- species_distances %>%
-            rename_with(function(x) species_id, dist)
+            # Column names have to be unique for each species.
+            setnames(species_distances, "dist", species_id)
 
-        distances <- full_join(distances, species_distances)
+            distances <- merge(distances, species_distances, all = TRUE)
+        }
     }
-
-    # Add additional columns to the original species table.
-    species <- left_join(species, species_computed)
 
     list(
         genes = genes,
