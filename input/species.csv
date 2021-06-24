@@ -1,0 +1,231 @@
+id,group,label
+abrachyrhynchus,unknown,Pink-footed goose
+acalliptera,unknown,Eastern happy
+acarolinensis,shortlived,Anole lizard
+acchrysaetos,unknown,Golden eagle
+acitrinellus,unknown,Midas child
+amelanoleuca,positive,Panda
+amexicanus,leaveout,Mexican tetra
+anancymaae,unknown,Ma's night monkey
+aocellaris,unknown,Clown anemonefish
+apercula,unknown,Orange clownfish
+aplatyrhynchos,shortlived,Duck
+apolyacanthus,unknown,Spiny chromis
+applatyrhynchos,unknown,Duck
+atestudineus,unknown,Climbing perch
+bbbison,unknown,American bison
+bgrunniens,unknown,Yak
+bihybrid,replicative,Bos indicus hybrid
+bmusculus,unknown,Blue whale
+bmutus,unknown,Wild yak
+bsplendens,unknown,Siamese fighting fish
+btaurus,replicative,Cow
+bthybrid,replicative,Bos taurus hybrid
+cabingdonii,unknown,Abington island giant tortoise
+capalliatus,unknown,Angola colobus
+caperea,unknown,Brazilian guinea pig
+catys,unknown,Sooty mangabey
+cauratus,unknown,Goldfish
+ccaeruleus,unknown,Blue tit
+ccapucinus,unknown,Capuchin
+ccarpio,unknown,Common carp
+cdromedarius,unknown,Arabian camel
+celegans,shortlived,Worm
+cfamiliaris,replicative,Dog
+cgchok1gshd,unknown,Chinese hamster
+cgobio,unknown,Channel bull blenny
+cgpicr,unknown,Chinese hamster (PICR)
+charengus,unknown,Atlantic herring
+chircus,replicative,Goat
+choffmanni,positive,Sloth
+chyarkandensis,unknown,Yarkand deer
+cintestinalis,leaveout,Ciona intestinalis
+cjacchus,replicative,Marmoset
+cjaponica,unknown,Japanese quail
+clanigera,unknown,Long-tailed chinchilla
+cldingo,unknown,Dingo
+clfamiliaris,replicative,Dog
+clumpus,unknown,Lumpfish
+cmilii,unknown,Elephant shark
+cpbellii,unknown,Painted turtle
+cporcellus,shortlived,Guinea pig
+cporosus,unknown,Australian saltwater crocodile
+cpugnax,unknown,Ruff
+csabaeus,replicative,African Green Monkey
+csavignyi,negative,Ciona savignyi
+csemilaevis,unknown,Tongue sole
+csyrichta,unknown,Tarsier
+cvariegatus,unknown,Sheepshead minnow
+cwagneri,unknown,Chacoan peccary
+dclupeoides,unknown,Denticle herring
+dlabrax,unknown,European seabass
+dleucas,unknown,Beluga whale
+dmelanogaster,shortlived,Fruitfly
+dnovemcinctus,negative,Armadillo
+dordii,shortlived,Kangaroo rat
+drerio,shortlived,Zebrafish
+eaasinus,unknown,Donkey
+eburgeri,unknown,Hagfish
+ecaballus,replicative,Horse
+ecalabaricus,unknown,Reedfish
+eelectricus,unknown,Electric eel
+eeuropaeus,shortlived,Hedgehog
+elucius,unknown,Northern pike
+enaucrates,unknown,Live sharksucker
+etelfairi,shortlived,Lesser hedgehog tenrec
+falbicollis,leaveout,Flycatcher
+fcatus,replicative,Cat
+fheteroclitus,unknown,Mummichog
+gaculeatus,leaveout,Stickleback
+gaffinis,unknown,Western mosquitofish
+gevgoodei,unknown,Goodes thornscrub tortoise
+gfortis,unknown,Medium gound-finch
+ggallus,shortlived,Chicken
+ggorilla,replicative,Gorilla
+gmorhua,leaveout,Cod
+gwilldenowi,unknown,Blunt-snouted clingfish
+hburtoni,unknown,Burton's mouthbrooder
+hcomes,unknown,Tiger sail seahorse
+hgfemale,unknown,Naked mole-rat female
+hhucho,unknown,Huchen
+hsapiens,replicative,Human
+ipunctatus,unknown,Channel catfish
+itridecemlineatus,shortlived,Squirrel
+jhyemalis,unknown,Dark-eyed junco
+jjaculus,unknown,Lesser Egyptian jerboa
+kmarmoratus,unknown,Mangrove rivulus
+lafricana,replicative,Elefant
+lbergylta,unknown,Ballan wrasse
+lcalcarifer,unknown,Barramundi perch
+lcanadensis,unknown,Lynx
+lchalumnae,leaveout,Coelacanth
+lcrocea,unknown,Large yellow croaker
+llaticaudata,unknown,Blue-ringed sea krait
+lleishanense,unknown,Leishan spiny toad
+loculatus,leaveout,Spotted gar
+marmatus,unknown,Zig-zag eel
+mauratus,unknown,Golden Hamster
+mcaroli,unknown,Ryukyu mouse
+mdomestica,leaveout,Mus m. domesticus
+meugenii,negative,Wallaby
+mfascicularis,replicative,Crab-eating macaque
+mfuro,shortlived,Ferret
+mgallopavo,shortlived,Turkey
+mleucophaeus,unknown,Drill
+mlucifugus,shortlived,Microbat
+mmmarmota,unknown,Alpine marmot
+mmola,unknown,Ocean sunfish
+mmonoceros,unknown,Narwhal
+mmoschiferus,unknown,Siberian musk deer
+mmulatta,replicative,Macaque
+mmurdjan,unknown,Pinecone soldierfish
+mmurinus,replicative,Lemur
+mmusculus,negative,Mouse
+mnemestrina,replicative,Pig-tailed macaque
+mochrogaster,unknown,Prairie vole
+mpahari,unknown,Shrew mouse
+mpfuro,unknown,Ferret
+mspicilegus,unknown,Steppe mouse
+mspretus,unknown,Algerian mouse
+mundulatus,unknown,Budgerigar
+mvitellinus,unknown,Golden-collared manakin
+mzebra,unknown,Zebra mbuna
+nbrichardi,unknown,Lyretail cichlid
+neugenii,unknown,Wallaby
+nfurzeri,unknown,Turquoise killifish
+ngalili,unknown,Upper Galilee mountains blind mole rat
+nleucogenys,replicative,Gibbon
+nmeleagris,unknown,Helmeted guineafowl
+nnaja,unknown,Indian cobra
+nscutatus,unknown,Mainland tiger snake
+nvison,unknown,American mink
+oanatinus,negative,Platypus
+oarambouillet,unknown,Sheep
+oaries,replicative,Sheep (texel)
+ocuniculus,unknown,Rabbit
+odegus,unknown,Degu
+ogarnettii,positive,Bushbaby
+ojavanicus,unknown,Javanese ricefish
+okisutch,unknown,Coho salmon
+olatipes,leaveout,Japahese rice fish
+olhni,unknown,Japanese rice fish (HNI)
+olhsok,unknown,Japanese rice fish
+omelastigma,unknown,Indian rice fish
+omykiss,unknown,Oncorhynchus mykiss
+oniloticus,leaveout,Nile tilapia
+oprinceps,shortlived,Pika
+osinensis,unknown,Chinese medaka
+otshawytscha,unknown,Chinook salmon
+pabelii,replicative,Orang utan
+panubis,replicative,Olive baboon
+pcapensis,shortlived,Hyrax
+pcatodon,unknown,Sperm whale
+pcinereus,unknown,Koala
+pcoquereli,unknown,Coquerel's sifaka
+pformosa,leaveout,Amazon mollie
+pkingsleyae,unknown,P. kingsleyae
+platipinna,unknown,Sailfin molly
+pleo,unknown,Lion
+pmajor,unknown,Great Tit
+pmarinus,leaveout,Lamprey
+pmbairdii,unknown,Northern American deer mouse
+pmuralis,unknown,Common wall lizard
+pnattereri,unknown,Red-bellied piranha
+pnyererei,unknown,Makobe Island cichlid
+ppaniscus,replicative,Bonobo
+ppardus,unknown,Leopard
+pranga,unknown,Indian glassy fish
+preticulata,unknown,Guppy
+psimus,unknown,Greater bamboo lemur
+psinensis,maybe,Chinese softshell turtle
+psinus,unknown,Vaquita
+ptaltaica,unknown,Tiger
+ptephrosceles,unknown,Ugandan red Colobus
+ptextilis,unknown,Eastern brown snake
+ptroglodytes,replicative,Chimp
+pvampyrus,unknown,Megabat
+rbieti,unknown,Black snub-nosed monkey
+rferrumequinum,unknown,Greater horseshoe bat
+rnorvegicus,negative,Rat
+rroxellana,unknown,Golden snub-nosed monkey
+saraneus,shortlived,Shrew
+saurata,unknown,Gilthead seabream
+sbboliviensis,unknown,Bolivian squirrel monkey
+scanaria,unknown,Common canary
+scaustralis,unknown,African austrich
+scerevisiae,shortlived,Yeast
+sdumerili,unknown,Greater amberjack
+sfasciatus,unknown,Jewelled Blenny
+sformosus,unknown,Asian arowana
+sgrahami,unknown,Golden-line barbel
+shabroptila,unknown,Kakapo (parrot)
+sharrisii,shoatlived,Tasmanian devil
+sldorsalis,unknown,Yellowtail amberjack
+slucioperca,unknown,Pike-perch
+smaximus,unknown,Turbot
+smerianae,unknown,Argentine black and white tegu
+sorbicularis,unknown,Orbiculate cardinalfish
+spunctatus,unknown,Tuatara
+spartitus,unknown,Bicolor damselfish
+ssalar,unknown,Atlantic salmon
+sscrofa,replicative,Pig
+strutta,unknown,River trout
+svulgaris,unknown,Eurasian red squirrel
+tbelangeri,leaveout,Tree shrew
+tctriunguis,unknown,Three-toad box turtle
+tgelada,replicative,Gelada
+tguttata,shortlived,Zebra finch
+tnigroviridis,leaveout,Tetraodon
+trubripes,leaveout,Fugu
+tsyrichta,leaveout,Tarsius/Carlito syrichta
+ttruncatus,maybe,Dolphin
+uamericanus,unknown,American black bear
+umaritimus,unknown,Polar bear
+uparryii,unknown,Arctic ground squirrel
+vpacos,maybe,Alpaca
+vursinus,unknown,Common wombat
+vvulpes,unknown,Red fox
+xcouchianus,unknown,Monterrey platyfish
+xmaculatus,shortlived,Platyfish 
+xtropicalis,shortlived,Frog
+zalbicollis,unknown,White-throated sparrow
