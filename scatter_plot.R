@@ -45,29 +45,4 @@ scatter_plot <- function(gene_ids, data) {
     }
 
     plot
-    
-    # plot(
-    #     species[, median_distance] / 1000000,
-    #     type = "l",
-    #     xaxt = "n",
-    #     xlab = "",
-    #     ylab = "Distance to telomere (Mbp)",
-    #     bty = "n"
-    # )
-
-    # axis(
-    #     1,
-    #     at = seq_len(nrow(species)),
-    #     tick = FALSE,
-    #     labels = FALSE
-    # )
-
-    # mtext(
-    #     data$species[, label],
-    #     side = 1,
-    #     at = seq_len(nrow(species)),
-    #     las = 2,
-    #     # col = axis.labels.col,
-    #     adj = 1
-    # )
 }
