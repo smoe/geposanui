@@ -41,7 +41,11 @@ load_data <- function(path) {
         median_distance = numeric()
     )
 
-    distances <- data.table(geneid = integer())
+    distances <- data.table(
+        species = character(),
+        gene = integer(),
+        distance = integer()
+    )
 
     # Each file will contain data on one species.
     file_names <- list.files(paste(path, "genomes", sep = "/"))
@@ -63,12 +67,18 @@ load_data <- function(path) {
                 median_distance = median(species_distances[, dist])
             )))
 
-            # Column names have to be unique for each species.
-            setnames(species_distances, "dist", species_id)
+            species_distances <- data.table(
+                species = species_id,
+                gene = species_distances[, geneid],
+                distance = species_distances[, dist]
+            )
 
-            distances <- merge(distances, species_distances, all = TRUE)
+            distances <- rbindlist(list(distances, species_distances))
         }
     }
+
+    # Order species by there median distance.
+    setorder(species, median_distance)
 
     list(
         genes = genes,

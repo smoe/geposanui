@@ -3,44 +3,28 @@ library(ggplot2)
 
 #' Draw a scatter plot containing gene positions.
 scatter_plot <- function(gene_ids, data) {
-    species <- data$species
-    setorder(species, median_distance)
-
-    distances <- data$distances[geneid %in% gene_ids]
-
     plot <- ggplot() +
-        scale_x_continuous(
+        scale_x_discrete(
             name = "Species",
-            breaks = seq_len(nrow(species)),
-            labels = species$label
+            breaks = data$species$id,
+            labels = data$species$label
         ) +
-        scale_y_continuous(name = "Distance to telomeres [Mbp]") +
-        geom_line(
-            species,
-            mapping = aes(
-                x = as.numeric(rownames(species)),
-                y = median_distance / 1000000
-            )
-        )
+        scale_y_continuous(name = "Distance to telomeres [Mbp]")
 
     colors <- rainbow(length(gene_ids))
 
     for (i in seq_len(length(gene_ids))) {
         gene_id <- gene_ids[i]
 
-        gene_distances <- data.table(
-            index = as.numeric(rownames(species)),
-            distance = unlist(distances[geneid == gene_id, -1])
-        )
-
         plot <- plot +
             geom_point(
-                gene_distances,
+                data$distances[gene == gene_id],
                 mapping = aes(
-                    x = index,
+                    x = species,
                     y = distance / 1000000,
                 ),
-                color = colors[i]
+                color = colors[i],
+                size = 4
             )
     }
 
