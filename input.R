@@ -15,6 +15,7 @@ load_input <- function(path) {
 
     species <- data.table(
         id = character(),
+        group = character(),
         label = character(),
         median_distance = numeric()
     )
@@ -44,6 +45,7 @@ load_input <- function(path) {
         # add it to the species table along other static data.
         species <- rbindlist(list(species, data.table(
             id = species_id,
+            group = original_species[id == species_id, group],
             label = original_species[id == species_id, label],
             median_distance = median(species_distances[, dist])
         )))
