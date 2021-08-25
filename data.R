@@ -1,4 +1,5 @@
 library(data.table)
+library(rlog)
 
 #' Merge genome data from files in `path` into `data.table`s.
 #'
@@ -26,35 +27,37 @@ load_data <- function(path) {
 
     # Each file will contain data on one species.
     file_names <- list.files(paste(path, "genomes", sep = "/"))
+    n_species <- length(file_names)
 
-    for (file_name in file_names) {
+    for (i in seq_along(file_names)) {
+        file_name <- file_names[i]
         species_id <- strsplit(file_name, split = ".", fixed = TRUE)[[1]][1]
+        species_path <- paste(path, "genomes", file_name, sep = "/")
 
-        # Only continue for replicatively aging species.
-        # TODO: Which other species should be included?
-        if (original_species[id == species_id, group] == "replicative") {
-            species_path <- paste(path, "genomes", file_name, sep = "/")
-            species_distances <- fread(species_path)
+        log_info(sprintf(
+            "Reading species %i/%i (%s)", i, n_species, species_id
+        ))
 
-            # Compute the median distance across all genes of this species and
-            # add it to the species table along other static data.
-            species <- rbindlist(list(species, data.table(
-                id = species_id,
-                label = original_species[id == species_id, label],
-                median_distance = median(species_distances[, dist])
-            )))
+        species_distances <- fread(species_path)
 
-            species_distances <- data.table(
-                species = species_id,
-                gene = species_distances[, geneid],
-                distance = species_distances[, dist]
-            )
+        # Compute the median distance across all genes of this species and
+        # add it to the species table along other static data.
+        species <- rbindlist(list(species, data.table(
+            id = species_id,
+            label = original_species[id == species_id, label],
+            median_distance = median(species_distances[, dist])
+        )))
 
-            distances <- rbindlist(list(distances, species_distances))
-        }
+        species_distances <- data.table(
+            species = species_id,
+            gene = species_distances[, geneid],
+            distance = species_distances[, dist]
+        )
+
+        distances <- rbindlist(list(distances, species_distances))
     }
 
-    # Order species by there median distance.
+    # Order species by their median distance.
     setorder(species, median_distance)
 
     list(
