@@ -1,28 +1,5 @@
 library(data.table)
 
-#' Load and preprocess input data from `path`.
-#'
-#' A file named `cache.rds` will be created within that directory to reuse the
-#' results for future runs. To forcefully recompute, delete that file.
-#'
-#' @seealso [load_data()]
-load_data_cached <- function(path) {
-    cache_file <- paste(path, "cache.rds", sep = "/")
-
-    if (!file.exists(cache_file)) {
-        # If the cache file doesn't exist, we have to do the computation.
-        data <- load_data(path)
-
-        # The results are cached for the next run.
-        saveRDS(data, cache_file)
-
-        data
-    } else {
-        # If the cache file exists, we restore the data from it.
-        readRDS(cache_file)
-    }
-}
-
 #' Merge genome data from files in `path` into `data.table`s.
 #'
 #' The result will be a list with named elements:

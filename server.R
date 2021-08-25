@@ -4,8 +4,9 @@ library(shiny)
 
 source("data.R")
 source("scatter_plot.R")
+source("util.R")
 
-data <- load_data_cached("input")
+data <- run_cached("input", load_data, "input")
 
 server <- function(input, output) {
     output$genes <- renderDT({
