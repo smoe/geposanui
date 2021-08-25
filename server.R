@@ -2,11 +2,11 @@ library(data.table)
 library(DT)
 library(shiny)
 
-source("data.R")
+source("input.R")
 source("scatter_plot.R")
 source("util.R")
 
-data <- run_cached("input", load_data, "input")
+data <- run_cached("input", load_input, "input")
 
 server <- function(input, output) {
     output$genes <- renderDT({

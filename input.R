@@ -9,7 +9,7 @@ library(rlog)
 #' - `distances` will contain each species' genes' distances to the telomere.
 #'
 #' @seealso [load_data_cached()]
-load_data <- function(path) {
+load_input <- function(path) {
     genes <- fread(paste(path, "genes.tsv", sep = "/"))
     original_species <- fread(paste(path, "species.csv", sep = "/"))
 
