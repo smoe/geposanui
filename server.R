@@ -37,6 +37,6 @@ server <- function(input, output) {
 
     output$scatter <- renderPlot({
         gene_ids <- filtered()[input$genes_rows_selected, gene]
-        scatter_plot(gene_ids, data)
+        scatter_plot(gene_ids, data, results)
     })
 }
