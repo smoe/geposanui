@@ -35,7 +35,14 @@ process_input <- function(input) {
 
         clusters <- hclust(dist(distances[, distance]))
         clusters_cut <- cutree(clusters, h = 1000000)
-        cluster <- distances[which(clusters_cut == 1)]
+
+        # Find the largest cluster
+        cluster_indices <- unique(clusters_cut)
+        cluster_index <- cluster_indices[
+            which.max(tabulate(match(clusters_cut, cluster_indices)))
+        ]
+
+        cluster <- distances[which(clusters_cut == cluster_index)]
 
         results[
             gene == gene_id,
