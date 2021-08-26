@@ -7,8 +7,6 @@ library(rlog)
 #' - `genes` will be a table with metadata on human genes.
 #' - `species` will contain metadata on each species.
 #' - `distances` will contain each species' genes' distances to the telomere.
-#'
-#' @seealso [load_data_cached()]
 load_input <- function(path) {
     genes <- fread(paste(path, "genes.tsv", sep = "/"))
     original_species <- fread(paste(path, "species.csv", sep = "/"))

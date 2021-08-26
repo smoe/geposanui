@@ -24,6 +24,7 @@ server <- function(input, output) {
     output$genes <- renderDT({
         datatable(
             filtered()[, .(.I, name, chromosome, cluster_length, cluster_mean)],
+            rownames = FALSE,
             colnames = c(
                 "Rank",
                 "Gene",
