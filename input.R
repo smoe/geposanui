@@ -1,6 +1,30 @@
 library(data.table)
 library(rlog)
 
+#' Gene names of genes for verified TPE-OLD genes.
+genes_verified_tpe_old <- c(
+    "C1S",
+    "DSP",
+    "ISG15",
+    "SORBS2",
+    "TERT"
+)
+
+#' Gene names of genes with a suggested TPE-OLD.
+genes_suggested_tpe_old <- c(
+    "AKAP3",
+    "ANO2",
+    "CCND2",
+    "CD163L1",
+    "CD9",
+    "FOXM1",
+    "GALNT8",
+    "NDUFA9",
+    "TEAD4",
+    "TIGAR",
+    "TSPAN9"
+)
+
 #' Merge genome data from files in `path` into `data.table`s.
 #'
 #' The result will be a list with named elements:
@@ -8,7 +32,14 @@ library(rlog)
 #' - `species` will contain metadata on each species.
 #' - `distances` will contain each species' genes' distances to the telomere.
 load_input <- function(path) {
+    # Include data on TPE-OLD status for genes.
+    
     genes <- fread(paste(path, "genes.tsv", sep = "/"))
+    genes[name %chin% genes_verified_tpe_old, verified := TRUE]
+    genes[name %chin% genes_suggested_tpe_old, suggested := TRUE]
+
+    # Load and combine data on species and gene distances.
+    
     original_species <- fread(paste(path, "species.csv", sep = "/"))
 
     species <- data.table(
