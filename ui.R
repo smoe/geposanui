@@ -7,6 +7,14 @@ ui <- fluidPage(
         position = "right",
         sidebarPanel(
             h3("Candidate selection"),
+            selectInput(
+                "species",
+                "Species to include",
+                choices = list(
+                    "All qualified" = "all",
+                    "Replicatively aging" = "replicative"
+                )
+            ),
             sliderInput(
                 "range",
                 "Gene position (Mbp)",

@@ -5,17 +5,11 @@ library(ggplot2)
 #'
 #' @param input Input data from [`load_input()`].
 #' @param results Results from [`process_input()`].
-scatter_plot <- function(gene_ids, input, results) {
+#' @param species Species to be displayed.
+scatter_plot <- function(gene_ids, input, results, species) {
     if (length(gene_ids) < 1) {
         return(ggplot())
     }
-
-    # Exclude species with naturally or artificially short chromosomes as well
-    # as non-replicatively aging species.
-    # TODO: Sync with process_input().
-    species <- input$species[
-        median_distance >= 7500000 & group == "replicative"
-    ]
 
     species_ids <- species[, id]
 
@@ -60,5 +54,6 @@ scatter_plot <- function(gene_ids, input, results) {
                 shape = in_cluster
             ),
             size = 5
-        )
+        ) +
+        theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 }

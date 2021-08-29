@@ -7,15 +7,9 @@ library(rlog)
 #' account when regarding them as TPE-OLD candidates.
 #'
 #' @param input Data from [`load_input()`].
-process_input <- function(input) {
+#' @param species_ids IDs of species to include in the analysis.
+process_input <- function(input, species_ids) {
     results <- data.table(gene = input$genes$id)
-
-    # Exclude species with naturally or artificially short chromosomes as well
-    # as non-replicatively aging species.
-    species_ids <- input$species[
-        median_distance >= 7500000 & group == "replicative",
-        id
-    ]
 
     gene_ids <- input$genes[, id]
     gene_count <- length(gene_ids)
