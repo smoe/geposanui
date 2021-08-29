@@ -30,11 +30,24 @@ ui <- fluidPage(
                 max = 30,
                 value = 10
             ),
-            DTOutput("genes"),
+            div(
+                style = "overflow-x: auto",
+                DTOutput("genes")
+            ),
             width = 3
         ),
         mainPanel(
-            plotOutput("scatter"),
+            div(
+                style = "overflow-x: auto",
+                div(
+                    style = "min-width: 1400px",
+                    plotOutput(
+                        "scatter",
+                        width = "100%",
+                        height = "600px"
+                    )
+                )
+            )
         )
     )
 )
