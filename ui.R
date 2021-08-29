@@ -3,10 +3,10 @@ library(shiny)
 
 ui <- fluidPage(
     titlePanel("TPE-OLD candidates"),
-    sidebarLayout(
-        position = "right",
-        sidebarPanel(
-            h3("Candidate selection"),
+    column(
+        width = 3,
+        wellPanel(
+            h3("Filter criteria"),
             selectInput(
                 "species",
                 "Species to include",
@@ -29,16 +29,24 @@ ui <- fluidPage(
                 min = 0,
                 max = 30,
                 value = 10
-            ),
-            div(
-                style = "overflow-x: auto",
-                DTOutput("genes")
-            ),
-            width = 3
+            )
         ),
-        mainPanel(
-            h2("Synposis"),
+        wellPanel(
+            h3("Results"),
             textOutput("synposis"),
+            div(
+                style = "overflow-x: auto; overflow-y: auto; margin-top: 16px",
+                DTOutput("genes")
+            )
+        )
+    ),
+    column(
+        width = 8,
+        wellPanel(
+            h3("Gene positions"),
+            p("This plot shows the selected genes' distance to the telomeres \
+               across species. It visualizes how certain genes have \
+               evolutionary conserved positions."),
             div(
                 style = "overflow-x: auto",
                 div(
