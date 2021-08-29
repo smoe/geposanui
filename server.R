@@ -87,6 +87,20 @@ server <- function(input, output) {
         )
     })
 
+    output$synposis <- renderText({
+        results <- results()
+
+        sprintf(
+            "Found %i candidates including %i/%i verified and %i/%i suggested \
+            TPE-OLD genes.",
+            results[, .N],
+            results[verified == TRUE, .N],
+            inputs$genes[verified == TRUE, .N],
+            results[suggested == TRUE, .N],
+            inputs$genes[suggested == TRUE, .N]
+        )
+    })
+
     output$scatter <- renderPlot({
         results <- results()
 

@@ -37,6 +37,8 @@ ui <- fluidPage(
             width = 3
         ),
         mainPanel(
+            h2("Synposis"),
+            textOutput("synposis"),
             div(
                 style = "overflow-x: auto",
                 div(
