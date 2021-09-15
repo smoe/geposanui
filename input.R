@@ -1,5 +1,36 @@
+library(biomaRt)
 library(data.table)
 library(rlog)
+library(stringr)
+
+#' Species IDs of known replicatively aging species.
+species_ids_replicative <- c(
+    "bihybrid",
+    "btaurus",
+    "bthybrid",
+    "cfamiliaris",
+    "chircus",
+    "cjacchus",
+    "clfamiliaris",
+    "csabaeus",
+    "ecaballus",
+    "fcatus",
+    "ggorilla",
+    "hsapiens",
+    "lafricana",
+    "mfascicularis",
+    "mmulatta",
+    "mmurinus",
+    "mnemestrina",
+    "nleucogenys",
+    "oaries",
+    "pabelii",
+    "panubis",
+    "ppaniscus",
+    "ptroglodytes",
+    "sscrofa",
+    "tgelada"
+)
 
 #' Gene names of genes for verified TPE-OLD genes.
 genes_verified_tpe_old <- c(
@@ -25,75 +56,137 @@ genes_suggested_tpe_old <- c(
     "TSPAN9"
 )
 
-#' Merge genome data from files in `path` into `data.table`s.
+ensembl <- useEnsembl(
+    biomart = "ensembl",
+    version = 104
+)
+
+#' Retrieve information on species.
 #'
-#' The result will be a list with named elements:
-#' - `genes` will be a table with metadata on human genes.
-#' - `species` will contain metadata on each species.
-#' - `distances` will contain each species' genes' distances to the telomere.
-load_input <- function(path) {
-    # Include data on TPE-OLD status for genes.
-    
-    genes <- fread(paste(path, "genes.tsv", sep = "/"))
-    genes[name %chin% genes_verified_tpe_old, verified := TRUE]
-    genes[name %chin% genes_suggested_tpe_old, suggested := TRUE]
+#' The result will be a `data.table` with the following columns:
+#'
+#'  - `id` Species ID as presented by Ensembl.
+#'  - `name` Human readable species name.
+#'  - `replicative` Whether the species is likely to be aging replicatively.
+retrieve_species <- function() {
+    # Ensembl datasets correspond to distinct species.
+    ensembl_datasets <- data.table(listDatasets(ensembl))
 
-    # Load and combine data on species and gene distances.
-    
-    original_species <- fread(paste(path, "species.csv", sep = "/"))
+    # Filter out species ID and name from the result.
+    species <- ensembl_datasets[, .(
+        id = str_match(dataset, "(.*)_gene_ensembl")[, 2],
+        name = str_match(description, "(.*) genes \\(.*\\)")[, 2]
+    )]
 
-    species <- data.table(
-        id = character(),
-        group = character(),
-        label = character(),
-        median_distance = numeric()
-    )
+    species[, replicative := id %chin% species_ids_replicative]
+}
 
+#' Retrieve information on human genes.
+#'
+#' The result will be a `data.table` with the following columns:
+#'
+#'  - `id` Ensembl gene ID.
+#'  - `ǹame` HGNC name of the gene.
+#'  - `chromosome` Human chromosome on which the gene is located.
+retrieve_genes <- function() {
+    genes <- data.table(getBM(
+        attributes = c("ensembl_gene_id", "hgnc_symbol", "chromosome_name"),
+        mart = useDataset("hsapiens_gene_ensembl", mart = ensembl)
+    ))
+
+    genes[, .(
+        id = ensembl_gene_id,
+        name = hgnc_symbol,
+        chromosome = chromosome_name,
+        verified = hgnc_symbol %chin% genes_verified_tpe_old,
+        suggested = hgnc_symbol %chin% genes_suggested_tpe_old
+    )]
+}
+
+#' Retrieve gene distance data.
+#'
+#' The data will include all available values for the given species and genes.
+#' Specific values on naturally or artificially (e.g. due to incomplete
+#' sequencing) short chromosomes will be excluded.
+#'
+#' The result will be a `data.table` with the following columns:
+#'
+#'  - `species` Species ID.
+#'  - `gene` Ensembl gene ID.
+#'  - `distance` Distance to nearest telomere in base pairs.
+retrieve_distances <- function(species_ids, gene_ids) {
     distances <- data.table(
         species = character(),
-        gene = integer(),
+        gene = character(),
         distance = integer()
     )
 
-    # Each file will contain data on one species.
-    file_names <- list.files(paste(path, "genomes", sep = "/"))
-    n_species <- length(file_names)
+    species_count <- length(species_ids)
 
-    for (i in seq_along(file_names)) {
-        file_name <- file_names[i]
-        species_id <- strsplit(file_name, split = ".", fixed = TRUE)[[1]][1]
-        species_path <- paste(path, "genomes", file_name, sep = "/")
+    for (i in 1:species_count) {
+        species_id <- species_ids[i]
 
         log_info(sprintf(
-            "Reading species %i/%i (%s)", i, n_species, species_id
+            "[%3i%%] Loading species \"%s\"",
+            round(i / species_count * 100),
+            species_id
         ))
 
-        species_distances <- fread(species_path)
-
-        # Compute the median distance across all genes of this species and
-        # add it to the species table along other static data.
-        species <- rbindlist(list(species, data.table(
-            id = species_id,
-            group = original_species[id == species_id, group],
-            label = original_species[id == species_id, label],
-            median_distance = median(species_distances[, dist])
-        )))
-
-        species_distances <- data.table(
-            species = species_id,
-            gene = species_distances[, geneid],
-            distance = species_distances[, dist]
+        ensembl <- useDataset(
+            sprintf("%s_gene_ensembl", species_id),
+            mart = ensembl
         )
+
+        # Besides the attributes that are always present, we need to check for
+        # human orthologs. Some species don't have that information and will be
+        # skipped.
+        if (!"hsapiens_homolog_ensembl_gene" %chin%
+            listAttributes(ensembl, what = "name")) {
+            next
+        }
+
+        # Retrieve information on all genes of the current species, that have
+        # human orthologs. This is called "homolog" in the Ensembl schema.
+        ensembl_distances <- data.table(getBM(
+            filters = c("with_hsapiens_homolog"),
+            values = c(TRUE),
+            attributes = c(
+                "hsapiens_homolog_ensembl_gene",
+                "chromosome_name",
+                "start_position",
+                "end_position"
+            ),
+            mart = useDataset(
+                sprintf("%s_gene_ensembl", species_id),
+                mart = ensembl
+            )
+        ))
+
+        ensembl_distances[,
+            chromosome_length := max(end_position),
+            by = chromosome_name
+        ]
+
+        # Filter out relevant information and precompute the genes' distance to
+        # the nearest telomere. Exclude genes on naturally or artificially
+        # short chromosomes.
+        species_distances <- ensembl_distances[
+            chromosome_length > 15000000,
+            .(
+                species = species_id,
+                gene = hsapiens_homolog_ensembl_gene,
+                distance = pmin(
+                    start_position,
+                    chromosome_length - end_position
+                )
+            )
+        ]
 
         distances <- rbindlist(list(distances, species_distances))
     }
 
-    # Order species by their median distance.
-    setorder(species, median_distance)
-
-    list(
-        genes = genes,
-        species = species,
-        distances = distances
-    )
+    # Arbitrarily exclude duplicated genes.
+    # TODO: Consider a refined approach or work out how to include all
+    # duplicates.
+    unique(distances, by = c("species", "gene"))
 }

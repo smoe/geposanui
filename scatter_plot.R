@@ -3,23 +3,24 @@ library(ggplot2)
 
 #' Draw a scatter plot containing gene positions.
 #'
-#' @param input Input data from [`load_input()`].
 #' @param results Results from [`process_input()`].
 #' @param species Species to be displayed.
-scatter_plot <- function(gene_ids, input, results, species) {
-    if (length(gene_ids) < 1) {
+#' @param genes Genes to be displayed.
+#' @param distances Distance data to display.
+scatter_plot <- function(results, species, genes, distances) {
+    if (nrow(genes) < 1) {
         return(ggplot())
     }
 
     species_ids <- species[, id]
 
     data <- merge(
-        input$genes[id %in% gene_ids, .(id, name)],
-        input$distances[species %in% species_ids],
+        genes[, .(id, name)],
+        distances[species %in% species_ids],
         by.x = "id", by.y = "gene"
     )
 
-    for (gene_id in gene_ids) {
+    for (gene_id in genes[, id]) {
         cluster_species <- unlist(results[gene == gene_id, cluster_species])
         data[id == gene_id, in_cluster := species %in% cluster_species]
     }
@@ -28,7 +29,7 @@ scatter_plot <- function(gene_ids, input, results, species) {
         scale_x_discrete(
             name = "Species",
             breaks = species$id,
-            labels = species$label
+            labels = species$name
         ) +
         scale_y_continuous(
             name = "Distance to telomeres [Mbp]",

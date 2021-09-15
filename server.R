@@ -7,45 +7,48 @@ source("process.R")
 source("scatter_plot.R")
 source("util.R")
 
-# Initialize global static data
+# Load input data
 
-inputs <- run_cached("input", load_input, "input")
+species <- run_cached("species", retrieve_species)
+genes <- run_cached("genes", retrieve_genes)
 
-#' All species excluding species with naturally or artificially short
-#' chromosomes.
-species_qualified <- inputs$species[median_distance >= 7500000]
+distances <- run_cached(
+    "distances",
+    retrieve_distances,
+    species[, id],
+    genes[, id]
+)
 
-#' All known replicatively aging species with long enough chromosomes.
-species_replicative <- species_qualified[group == "replicative"]
-
-#' Results computed from [`species_qualified`].
+#' Results computed for all species.
 results_all <- run_cached(
     "results_all",
     process_input,
-    inputs,
-    species_qualified[, id]
+    distances,
+    species[, id],
+    genes[, id]
 )
 
-#' Results computed from [`species_replicative`].
+#' Results computed for known replicatively aging species.
 results_replicative <- run_cached(
     "results_replicative",
     process_input,
-    inputs,
-    species_replicative[, id]
+    distances,
+    species[replicative == TRUE, id],
+    genes[, id]
 )
 
 # Add gene information to results for display.
 
 results_all <- merge(
     results_all,
-    inputs$genes,
+    genes,
     by.x = "gene",
     by.y = "id"
 )
 
 results_replicative <- merge(
     results_replicative,
-    inputs$genes,
+    genes,
     by.x = "gene",
     by.y = "id"
 )
@@ -95,9 +98,9 @@ server <- function(input, output) {
             TPE-OLD genes.",
             results[, .N],
             results[verified == TRUE, .N],
-            inputs$genes[verified == TRUE, .N],
+            genes[verified == TRUE, .N],
             results[suggested == TRUE, .N],
-            inputs$genes[suggested == TRUE, .N]
+            genes[suggested == TRUE, .N]
         )
     })
 
@@ -105,13 +108,14 @@ server <- function(input, output) {
         results <- results()
 
         gene_ids <- results[input$genes_rows_selected, gene]
+        genes <- genes[id %chin% gene_ids]
 
         species <- if (input$species == "all") {
-            species_qualified
+            species
         } else {
-            species_replicative
+            species[replicative == TRUE]
         }
 
-        scatter_plot(gene_ids, inputs, results, species)
+        scatter_plot(results, species, genes, distances)
     })
 }
