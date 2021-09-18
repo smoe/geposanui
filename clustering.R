@@ -1,21 +1,30 @@
 library(data.table)
 library(rlog)
 
-#' Process genes screening for a likely TPE-OLD.
+#' Process genes clustering their distance to telomeres.
 #'
-#' The return value will be a table containing genes and data to take in
-#' account when regarding them as TPE-OLD candidates.
+#' The return value will be a data.table with the following columns:
+#'
+#'  - `gene` Gene ID of the processed gene.
+#'  - `cluster_length` Length of the largest cluster.
+#'  - `cluster_mean` Mean value of the largest cluster.
+#'  - `cluster_species` List of species contributing to the largest cluster.
 #'
 #' @param distances Gene distance data to use.
 #' @param species_ids IDs of species to include in the analysis.
 #' @param gene_ids Genes to include in the computation.
-process_input <- function(distances, species_ids, gene_ids) {
+process_clustering <- function(distances, species_ids, gene_ids) {
     results <- data.table(gene = gene_ids)
     gene_count <- length(gene_ids)
 
-    for (i in seq_along(gene_ids)) {
+    for (i in 1:gene_count) {
         gene_id <- gene_ids[i]
-        log_info(sprintf("Processing gene %i/%i (%s)", i, gene_count, gene_id))
+
+        log_info(sprintf(
+            "[%3i%%] Processing gene \"%s\"",
+            round(i / gene_count * 100),
+            gene_id
+        ))
 
         data <- distances[
             species %chin% species_ids & gene == gene_id,

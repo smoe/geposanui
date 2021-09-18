@@ -2,61 +2,8 @@ library(data.table)
 library(DT)
 library(shiny)
 
-source("input.R")
-source("process.R")
+source("init.R")
 source("scatter_plot.R")
-source("util.R")
-
-# Load input data
-
-species <- run_cached("species", retrieve_species)
-genes <- run_cached("genes", retrieve_genes)
-
-distances <- run_cached(
-    "distances",
-    retrieve_distances,
-    species[, id],
-    genes[, id]
-)
-
-#' Results computed for all species.
-results_all <- run_cached(
-    "results_all",
-    process_input,
-    distances,
-    species[, id],
-    genes[, id]
-)
-
-#' Results computed for known replicatively aging species.
-results_replicative <- run_cached(
-    "results_replicative",
-    process_input,
-    distances,
-    species[replicative == TRUE, id],
-    genes[, id]
-)
-
-# Add gene information to results for display.
-
-results_all <- merge(
-    results_all,
-    genes,
-    by.x = "gene",
-    by.y = "id"
-)
-
-results_replicative <- merge(
-    results_replicative,
-    genes,
-    by.x = "gene",
-    by.y = "id"
-)
-
-# Order results by cluster length descendingly.
-# TODO: Once other methods have been added, this has to be dynamic.
-setorder(results_all, -cluster_length)
-setorder(results_replicative, -cluster_length)
 
 server <- function(input, output) {
     #' This expression applies all user defined filters to the available
@@ -77,14 +24,13 @@ server <- function(input, output) {
 
     output$genes <- renderDT({
         datatable(
-            results()[, .(.I, name, chromosome, cluster_length, cluster_mean)],
+            results()[, .(.I, name, cluster_length, r_mean)],
             rownames = FALSE,
             colnames = c(
                 "Rank",
                 "Gene",
-                "Chromosome",
                 "Cluster length",
-                "Cluster mean"
+                "Correlation"
             ),
             style = "bootstrap"
         )
