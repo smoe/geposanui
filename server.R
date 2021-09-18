@@ -6,20 +6,37 @@ source("init.R")
 source("scatter_plot.R")
 
 server <- function(input, output) {
-    #' This expression applies all user defined filters to the available
-    #' results.
+    #' This reactive expression applies all user defined filters as well as the
+    #' desired ranking weights to the results.
     results <- reactive({
+        # Select the species preset.
+
         results <- if (input$species == "all") {
             results_all
         } else {
             results_replicative
         }
 
-        results[
+        # Apply user defined filters.
+
+        results <- results[
             cluster_length >= input$length &
                 cluster_mean >= input$range[1] * 1000000 &
                 cluster_mean <= input$range[2] * 1000000
         ]
+
+        # Compute scoring factors and the weighted score.
+
+        cluster_max <- results[, max(cluster_length)]
+        results[, cluster_score := cluster_length / cluster_max]
+        
+        results[, score := input$clustering / 100 * cluster_score +
+            input$correlation / 100 * r_mean]
+
+        # Order the results based on their score. The resulting index will be
+        # used as the "rank".
+
+        setorder(results, -score)
     })
 
     output$genes <- renderDT({

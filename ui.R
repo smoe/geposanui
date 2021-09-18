@@ -27,8 +27,30 @@ ui <- fluidPage(
                 "length",
                 "Minimum cluster size",
                 min = 0,
-                max = 30,
-                value = 10
+                max = 50,
+                value = c(0, 15),
+                step = 0.1
+            )
+        ),
+        wellPanel(
+            h3("Ranking"),
+            sliderInput(
+                "clustering",
+                "Size of largest cluster",
+                post = "%",
+                min = 0,
+                max = 100,
+                step = 1,
+                value = 100
+            ),
+            sliderInput(
+                "correlation",
+                "Correlation with known genes",
+                post = "%",
+                min = 0,
+                max = 100,
+                step = 1,
+                value = 100
             )
         ),
         wellPanel(
