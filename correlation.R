@@ -51,6 +51,10 @@ process_correlation <- function(distances, species_ids, gene_ids,
                 by = "species"
             )
 
+            # Order data by the reference gene's distance to get a monotonic
+            # relation.
+            setorder(data, distance.y)
+
             r_sum <- r_sum + abs(cor(data[, distance.x], data[, distance.y]))
         }
 
