@@ -5,11 +5,11 @@ source("util.R")
 
 # Load input data
 
-species <- run_cached("input/species", retrieve_species)
-genes <- run_cached("input/genes", retrieve_genes)
+species <- run_cached("input_species", retrieve_species)
+genes <- run_cached("input_genes", retrieve_genes)
 
 distances <- run_cached(
-    "input/distances",
+    "input_distances",
     retrieve_distances,
     species[, id],
     genes[, id]
@@ -23,7 +23,7 @@ all_genes <- genes[, id]
 tpe_old_genes <- genes[suggested | verified == TRUE, id]
 
 clustering_all <- run_cached(
-    "all_species/clustering",
+    "clustering_all",
     process_clustering,
     distances,
     all_species,
@@ -31,7 +31,7 @@ clustering_all <- run_cached(
 )
 
 clustering_replicative <- run_cached(
-    "replicative_species/clustering",
+    "clustering_replicative",
     process_clustering,
     distances,
     replicative_species,
@@ -39,7 +39,7 @@ clustering_replicative <- run_cached(
 )
 
 correlation_all <- run_cached(
-    "all_species/correlation",
+    "correlation_all",
     process_correlation,
     distances,
     all_species,
@@ -48,7 +48,7 @@ correlation_all <- run_cached(
 )
 
 correlation_replicative <- run_cached(
-    "replicative_species/correlation",
+    "correlation_replicative",
     process_correlation,
     distances,
     replicative_species,

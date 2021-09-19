@@ -115,11 +115,41 @@ retrieve_genes <- function() {
 #'  - `gene` Ensembl gene ID.
 #'  - `distance` Distance to nearest telomere in base pairs.
 retrieve_distances <- function(species_ids, gene_ids) {
-    distances <- data.table(
-        species = character(),
-        gene = character(),
-        distance = integer()
-    )
+    # Special case the human species and retrieve all available distance
+    # information.
+
+    ensembl <- useDataset("hsapiens_gene_ensembl", mart = ensembl)
+
+    human_distances <- data.table(getBM(
+        attributes = c(
+            "ensembl_gene_id",
+            "chromosome_name",
+            "start_position",
+            "end_position"
+        ),
+        mart = ensembl
+    ))
+
+    human_distances[,
+        chromosome_length := max(end_position),
+        by = chromosome_name
+    ]
+
+    # Filter out relevant information (see below).
+    distances <- human_distances[
+        chromosome_length > 15000000,
+        .(
+            species = "hsapiens",
+            gene = ensembl_gene_id,
+            distance = pmin(
+                start_position,
+                chromosome_length - end_position
+            )
+        )
+    ]
+
+    # Exclude the human from the species, in case it is present there.
+    species_ids <- species_ids[species_ids != "hsapiens"]
 
     species_count <- length(species_ids)
 
@@ -156,10 +186,7 @@ retrieve_distances <- function(species_ids, gene_ids) {
                 "start_position",
                 "end_position"
             ),
-            mart = useDataset(
-                sprintf("%s_gene_ensembl", species_id),
-                mart = ensembl
-            )
+            mart = ensembl
         ))
 
         ensembl_distances[,
