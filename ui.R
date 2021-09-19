@@ -27,9 +27,8 @@ ui <- fluidPage(
                 "length",
                 "Minimum cluster size",
                 min = 0,
-                max = 50,
-                value = c(0, 15),
-                step = 0.1
+                max = 30,
+                value = 10
             )
         ),
         wellPanel(

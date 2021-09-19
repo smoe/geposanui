@@ -29,7 +29,7 @@ server <- function(input, output) {
 
         cluster_max <- results[, max(cluster_length)]
         results[, cluster_score := cluster_length / cluster_max]
-        
+
         results[, score := input$clustering / 100 * cluster_score +
             input$correlation / 100 * r_mean]
 
