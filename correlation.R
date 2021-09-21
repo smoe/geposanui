@@ -1,4 +1,5 @@
 library(data.table)
+library(progress)
 library(rlog)
 
 #' Compute the mean correlation coefficient comparing gene distances with a set
@@ -15,24 +16,29 @@ library(rlog)
 #' @param reference_gene_ids Genes to compare to.
 process_correlation <- function(distances, species_ids, gene_ids,
                                 reference_gene_ids) {
-    log_info("Processing genes for correlation")
-
     results <- data.table(gene = gene_ids)
     gene_count <- length(gene_ids)
     reference_count <- length(reference_gene_ids)
+
+    log_info(sprintf(
+        "Correlating %i genes from %i species with %i reference genes",
+        gene_count,
+        length(species_ids),
+        reference_count
+    ))
+
+    progress <- progress_bar$new(
+        total = gene_count,
+        format = "Correlating genes [:bar] :percent (ETA :eta)"
+    )
 
     # Prefilter distances by species.
     distances <- distances[species %chin% species_ids]
 
     for (i in 1:gene_count) {
+        progress$tick()
+
         gene_id <- gene_ids[i]
-
-        log_info(sprintf(
-            "[%3i%%] Processing gene \"%s\"",
-            round(i / gene_count * 100),
-            gene_id
-        ))
-
         gene_distances <- distances[gene == gene_id]
 
         if (nrow(gene_distances) < 12) {

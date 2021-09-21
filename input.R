@@ -1,5 +1,6 @@
 library(biomaRt)
 library(data.table)
+library(progress)
 library(rlog)
 library(stringr)
 
@@ -115,6 +116,23 @@ retrieve_genes <- function() {
 #'  - `gene` Ensembl gene ID.
 #'  - `distance` Distance to nearest telomere in base pairs.
 retrieve_distances <- function(species_ids, gene_ids) {
+    # Exclude the human from the species, in case it is present there.
+    species_ids <- species_ids[species_ids != "hsapiens"]
+
+    species_count <- length(species_ids)
+    gene_count <- length(gene_ids)
+
+    log_info(sprintf(
+        "Retrieving distance data for %i genes from %i species",
+        gene_count,
+        species_count
+    ))
+
+    progress <- progress_bar$new(
+        total = gene_count,
+        format = "Retrieving distance data [:bar] :percent (ETA :eta)"
+    )
+
     # Special case the human species and retrieve all available distance
     # information.
 
@@ -148,19 +166,10 @@ retrieve_distances <- function(species_ids, gene_ids) {
         )
     ]
 
-    # Exclude the human from the species, in case it is present there.
-    species_ids <- species_ids[species_ids != "hsapiens"]
-
-    species_count <- length(species_ids)
-
     for (i in 1:species_count) {
         species_id <- species_ids[i]
 
-        log_info(sprintf(
-            "[%3i%%] Loading species \"%s\"",
-            round(i / species_count * 100),
-            species_id
-        ))
+        progress$tick()
 
         ensembl <- useDataset(
             sprintf("%s_gene_ensembl", species_id),

@@ -1,4 +1,5 @@
 library(data.table)
+library(progress)
 library(rlog)
 
 #' Process genes clustering their distance to telomeres.
@@ -17,14 +18,21 @@ process_clustering <- function(distances, species_ids, gene_ids) {
     results <- data.table(gene = gene_ids)
     gene_count <- length(gene_ids)
 
-    for (i in 1:gene_count) {
-        gene_id <- gene_ids[i]
+    log_info(sprintf(
+        "Clustering %i genes from %i species",
+        gene_count,
+        length(species_ids)
+    ))
 
-        log_info(sprintf(
-            "[%3i%%] Processing gene \"%s\"",
-            round(i / gene_count * 100),
-            gene_id
-        ))
+    progress <- progress_bar$new(
+        total = gene_count,
+        format = "Clustering genes [:bar] :percent (ETA :eta)"
+    )
+
+    for (i in 1:gene_count) {
+        progress$tick()
+
+        gene_id <- gene_ids[i]
 
         data <- distances[
             species %chin% species_ids & gene == gene_id,
