@@ -2,6 +2,37 @@ library(data.table)
 library(progress)
 library(rlog)
 
+#' Perform a cluster analysis.
+#'
+#' This function will cluster the data using `hclust` and `cutree` (with the
+#' specified height). Every cluster with at least two members qualifies for
+#' further analysis. Clusters are then ranked based on their size in relation
+#' to the total number of values. The return value is a final score between
+#' zero and one. Lower ranking clusters contribute less to this score.
+clusteriness <- function(data, height = 1000000) {
+    # Cluster the data and compute the cluster sizes.
+
+    tree <- hclust(dist(data))
+    clusters <- cutree(tree, h = height)
+    cluster_sizes <- sort(tabulate(clusters), decreasing = TRUE)
+
+    # Compute the "cluteriness" score.
+
+    score <- 0.0
+    n <- length(data)
+
+    for (i in seq_along(cluster_sizes)) {
+        cluster_size <- cluster_sizes[i]
+
+        if (cluster_size >= 2) {
+            cluster_score <- cluster_size / n
+            score <- score + cluster_score / i
+        }
+    }
+
+    score
+}
+
 #' Process genes clustering their distance to telomeres.
 #'
 #' The return value will be a data.table with the following columns:
@@ -43,24 +74,11 @@ process_clustering <- function(distances, species_ids, gene_ids) {
             next
         }
 
-        clusters <- hclust(dist(data[, distance]))
-        clusters_cut <- cutree(clusters, h = 1000000)
-
-        # Find the largest cluster
-        cluster_indices <- unique(clusters_cut)
-        cluster_index <- cluster_indices[
-            which.max(tabulate(match(clusters_cut, cluster_indices)))
-        ]
-
-        cluster <- data[which(clusters_cut == cluster_index)]
+        score <- clusteriness(data[, distance])
 
         results[
             gene == gene_id,
-            `:=`(
-                cluster_length = cluster[, .N],
-                cluster_mean = mean(cluster[, distance]),
-                cluster_species = list(cluster[, species])
-            )
+            clusteriness := score
         ]
     }
 

@@ -90,8 +90,3 @@ results_replicative <- merge(
 
 setnames(results_all, "id", "gene")
 setnames(results_replicative, "id", "gene")
-
-# Order results by cluster length descendingly as a start.
-
-setorder(results_all, -cluster_length)
-setorder(results_replicative, -cluster_length)

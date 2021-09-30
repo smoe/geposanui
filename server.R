@@ -17,36 +17,25 @@ server <- function(input, output) {
             results_replicative
         }
 
-        # Apply user defined filters.
-
-        results <- results[
-            cluster_length >= input$length &
-                cluster_mean >= input$range[1] * 1000000 &
-                cluster_mean <= input$range[2] * 1000000
-        ]
-
         # Compute scoring factors and the weighted score.
 
-        cluster_max <- results[, max(cluster_length)]
-        results[, cluster_score := cluster_length / cluster_max]
-
-        results[, score := input$clustering / 100 * cluster_score +
+        results[, score := input$clusteriness / 100 * clusteriness +
             input$correlation / 100 * r_mean]
 
         # Order the results based on their score. The resulting index will be
         # used as the "rank".
 
-        setorder(results, -score)
+        setorder(results, -score, na.last = TRUE)
     })
 
     output$genes <- renderDT({
         datatable(
-            results()[, .(.I, name, cluster_length, r_mean)],
+            results()[, .(.I, name, clusteriness, r_mean)],
             rownames = FALSE,
             colnames = c(
                 "Rank",
                 "Gene",
-                "Cluster length",
+                "Clusteriness",
                 "Correlation"
             ),
             style = "bootstrap"

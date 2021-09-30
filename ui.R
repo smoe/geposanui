@@ -11,36 +11,21 @@ ui <- fluidPage(
                 "species",
                 "Species to include",
                 choices = list(
-                    "All qualified" = "all",
-                    "Replicatively aging" = "replicative"
+                    "Replicatively aging" = "replicative",
+                    "All qualified" = "all"
                 )
-            ),
-            sliderInput(
-                "range",
-                "Gene position (Mbp)",
-                min = 0,
-                max = 50,
-                value = c(0, 15),
-                step = 0.1
-            ),
-            sliderInput(
-                "length",
-                "Minimum cluster size",
-                min = 0,
-                max = 30,
-                value = 10
             )
         ),
         wellPanel(
             h3("Ranking"),
             sliderInput(
-                "clustering",
-                "Size of largest cluster",
+                "clusteriness",
+                "Clustering of genes",
                 post = "%",
                 min = 0,
                 max = 100,
                 step = 1,
-                value = 100
+                value = 50
             ),
             sliderInput(
                 "correlation",

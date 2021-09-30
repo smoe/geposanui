@@ -20,11 +20,6 @@ scatter_plot <- function(results, species, genes, distances) {
         by.x = "id", by.y = "gene"
     )
 
-    for (gene_id in genes[, id]) {
-        cluster_species <- unlist(results[gene == gene_id, cluster_species])
-        data[id == gene_id, in_cluster := species %in% cluster_species]
-    }
-
     ggplot(data) +
         scale_x_discrete(
             name = "Species",
@@ -42,17 +37,11 @@ scatter_plot <- function(results, species, genes, distances) {
             }
         ) +
         scale_color_discrete(name = "Gene") +
-        scale_shape_discrete(
-            name = "Part of cluster",
-            breaks = c(TRUE, FALSE),
-            labels = c("Yes", "No")
-        ) +
         geom_point(
             mapping = aes(
                 x = species,
                 y = distance / 1000000,
-                color = name,
-                shape = in_cluster
+                color = name
             ),
             size = 5
         ) +
