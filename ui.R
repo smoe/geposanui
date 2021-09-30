@@ -25,7 +25,7 @@ ui <- fluidPage(
                 min = 0,
                 max = 100,
                 step = 1,
-                value = 50
+                value = 100
             ),
             sliderInput(
                 "correlation",
@@ -35,6 +35,15 @@ ui <- fluidPage(
                 max = 100,
                 step = 1,
                 value = 100
+            ),
+            sliderInput(
+                "cutoff",
+                "Cut-off score",
+                post = "%",
+                min = 0,
+                max = 100,
+                step = 1,
+                value = 50
             )
         ),
         wellPanel(

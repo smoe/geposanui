@@ -19,8 +19,18 @@ server <- function(input, output) {
 
         # Compute scoring factors and the weighted score.
 
-        results[, score := input$clusteriness / 100 * clusteriness +
-            input$correlation / 100 * r_mean]
+        clusteriness_weight <- input$clusteriness / 100
+        correlation_weight <- input$correlation / 100
+        total_weight <- clusteriness_weight + correlation_weight
+        clusteriness_factor <- clusteriness_weight / total_weight
+        correlation_factor <- correlation_weight / total_weight
+
+        results[, score := clusteriness_factor * clusteriness +
+            correlation_factor * r_mean]
+
+        # Apply the cut-off score.
+
+        results <- results[score >= input$cutoff / 100]
 
         # Order the results based on their score. The resulting index will be
         # used as the "rank".
@@ -29,17 +39,20 @@ server <- function(input, output) {
     })
 
     output$genes <- renderDT({
-        datatable(
-            results()[, .(.I, name, clusteriness, r_mean)],
+        dt <- datatable(
+            results()[, .(.I, name, clusteriness, r_mean, score)],
             rownames = FALSE,
             colnames = c(
                 "Rank",
                 "Gene",
                 "Clusteriness",
-                "Correlation"
+                "Correlation",
+                "Score"
             ),
             style = "bootstrap"
         )
+
+        formatPercentage(dt, c("clusteriness", "r_mean", "score"), digits = 1)
     })
 
     output$synposis <- renderText({
