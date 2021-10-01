@@ -5,6 +5,15 @@ library(shiny)
 source("init.R")
 source("scatter_plot.R")
 
+#' Java script function to replace gene IDs with Ensembl gene links.
+js_link <- JS("function(row, data) {
+    let id = data[1];
+    var name = data[2];
+    if (!name) name = 'Unknown';
+    let url = `https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=${id}`;
+    $('td:eq(1)', row).html(`<a href=\"${url}\" target=\"_blank\">${name}</a>`);
+}")
+
 server <- function(input, output) {
     #' This reactive expression applies all user defined filters as well as the
     #' desired ranking weights to the results.
@@ -40,16 +49,28 @@ server <- function(input, output) {
 
     output$genes <- renderDT({
         dt <- datatable(
-            results()[, .(.I, name, clusteriness, r_mean, score)],
+            results()[, .(
+                .I,
+                gene,
+                name,
+                clusteriness,
+                r_mean,
+                score
+            )],
             rownames = FALSE,
             colnames = c(
-                "Rank",
+                "",
                 "Gene",
-                "Clusteriness",
+                "",
+                "Clusters",
                 "Correlation",
                 "Score"
             ),
-            style = "bootstrap"
+            style = "bootstrap",
+            options = list(
+                rowCallback = js_link,
+                columnDefs = list(list(visible = FALSE, targets = 2))
+            )
         )
 
         formatPercentage(dt, c("clusteriness", "r_mean", "score"), digits = 1)
