@@ -7,9 +7,10 @@ library(rlog)
 #' This function will cluster the data using `hclust` and `cutree` (with the
 #' specified height). Every cluster with at least two members qualifies for
 #' further analysis. Clusters are then ranked based on their size in relation
-#' to the total number of values. The return value is a final score between
-#' zero and one. Lower ranking clusters contribute less to this score.
-clusteriness <- function(data, height = 1000000) {
+#' to the total number of possible values (`n`). The return value is a final
+#' score between zero and one. Lower ranking clusters contribute less to this
+#' score.
+clusteriness <- function(data, n, height = 1000000) {
     # Cluster the data and compute the cluster sizes.
 
     tree <- hclust(dist(data))
@@ -19,7 +20,6 @@ clusteriness <- function(data, height = 1000000) {
     # Compute the "cluteriness" score.
 
     score <- 0.0
-    n <- length(data)
 
     for (i in seq_along(cluster_sizes)) {
         cluster_size <- cluster_sizes[i]
@@ -70,11 +70,11 @@ process_clustering <- function(distances, species_ids, gene_ids) {
             .(species, distance)
         ]
 
-        if (data[, .N] < 12) {
+        if (data[, .N] < 10) {
             next
         }
 
-        score <- clusteriness(data[, distance])
+        score <- clusteriness(data[, distance], length(species_ids))
 
         results[
             gene == gene_id,

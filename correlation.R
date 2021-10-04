@@ -41,7 +41,7 @@ process_correlation <- function(distances, species_ids, gene_ids,
         gene_id <- gene_ids[i]
         gene_distances <- distances[gene == gene_id]
 
-        if (nrow(gene_distances) < 12) {
+        if (nrow(gene_distances) < 10) {
             next
         }
 
