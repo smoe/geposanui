@@ -1,6 +1,7 @@
 source("clustering.R")
 source("correlation.R")
 source("input.R")
+source("neural.R")
 source("util.R")
 
 # Load input data
@@ -56,6 +57,24 @@ correlation_replicative <- run_cached(
     tpe_old_genes
 )
 
+neural_all <- run_cached(
+    "neural_all",
+    process_neural,
+    distances,
+    all_species,
+    all_genes,
+    tpe_old_genes
+)
+
+neural_replicative <- run_cached(
+    "neural_replicative",
+    process_neural,
+    distances,
+    replicative_species,
+    all_genes,
+    tpe_old_genes
+)
+
 # Merge processed data as well as gene information.
 
 results_all <- merge(
@@ -72,6 +91,13 @@ results_all <- merge(
     by.y = "gene"
 )
 
+results_all <- merge(
+    results_all,
+    neural_all,
+    by.x = "id",
+    by.y = "gene"
+)
+
 results_replicative <- merge(
     genes,
     clustering_replicative,
@@ -82,6 +108,13 @@ results_replicative <- merge(
 results_replicative <- merge(
     results_replicative,
     correlation_replicative,
+    by.x = "id",
+    by.y = "gene"
+)
+
+results_replicative <- merge(
+    results_replicative,
+    neural_replicative,
     by.x = "id",
     by.y = "gene"
 )

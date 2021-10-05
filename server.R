@@ -30,12 +30,14 @@ server <- function(input, output) {
 
         clusteriness_weight <- input$clusteriness / 100
         correlation_weight <- input$correlation / 100
-        total_weight <- clusteriness_weight + correlation_weight
+        neural_weight <- input$neural / 100
+        total_weight <- clusteriness_weight + correlation_weight + neural_weight
         clusteriness_factor <- clusteriness_weight / total_weight
         correlation_factor <- correlation_weight / total_weight
+        neural_factor <- neural_weight / total_weight
 
         results[, score := clusteriness_factor * clusteriness +
-            correlation_factor * r_mean]
+            correlation_factor * r_mean + neural_factor * neural]
 
         # Apply the cut-off score.
 
@@ -55,6 +57,7 @@ server <- function(input, output) {
                 name,
                 clusteriness,
                 r_mean,
+                neural,
                 score
             )],
             rownames = FALSE,
@@ -64,6 +67,7 @@ server <- function(input, output) {
                 "",
                 "Clusters",
                 "Correlation",
+                "Neural",
                 "Score"
             ),
             style = "bootstrap",
@@ -73,7 +77,11 @@ server <- function(input, output) {
             )
         )
 
-        formatPercentage(dt, c("clusteriness", "r_mean", "score"), digits = 1)
+        formatPercentage(
+            dt,
+            c("clusteriness", "r_mean", "neural", "score"),
+            digits = 1
+        )
     })
 
     output$synposis <- renderText({
