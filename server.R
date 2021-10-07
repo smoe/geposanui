@@ -2,6 +2,7 @@ library(data.table)
 library(DT)
 library(gprofiler2)
 library(plotly)
+library(rclipboard)
 library(shiny)
 
 source("init.R")
@@ -97,6 +98,33 @@ server <- function(input, output) {
             genes[verified == TRUE, .N],
             results[suggested == TRUE, .N],
             genes[suggested == TRUE, .N]
+        )
+    })
+
+    output$copy <- renderUI({
+        results <- results()
+
+        gene_ids <- results[, gene]
+        names <- results[name != "", name]
+
+        genes_text <- paste(gene_ids, collapse = "\n")
+        names_text <- paste(names, collapse = "\n")
+
+        splitLayout(
+            rclipButton(
+                "copy_ids_button",
+                "Copy gene IDs",
+                genes_text,
+                icon = icon("clipboard"),
+                width = "100%"
+            ),
+            rclipButton(
+                "copy_names_button",
+                "Copy gene names",
+                names_text,
+                icon = icon("clipboard"),
+                width = "100%"
+            )
         )
     })
 

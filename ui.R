@@ -1,8 +1,10 @@
 library(DT)
 library(plotly)
+library(rclipboard)
 library(shiny)
 
 ui <- fluidPage(
+    rclipboardSetup(),
     titlePanel("TPE-OLD candidates"),
     column(
         width = 3,
@@ -59,6 +61,10 @@ ui <- fluidPage(
         wellPanel(
             h3("Results"),
             textOutput("synposis"),
+            div(
+                style = "margin-top: 16px",
+                uiOutput("copy")
+            ),
             div(
                 style = "overflow-x: auto; overflow-y: auto; margin-top: 16px",
                 DTOutput("genes")
