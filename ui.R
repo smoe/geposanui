@@ -1,4 +1,5 @@
 library(DT)
+library(plotly)
 library(shiny)
 
 ui <- fluidPage(
@@ -81,6 +82,14 @@ ui <- fluidPage(
                         height = "600px"
                     )
                 )
+            )
+        ),
+        wellPanel(
+            h3("Gene set enrichment analysis"),
+            plotlyOutput(
+                "gost",
+                width = "100%",
+                height = "600px"
             )
         )
     )

@@ -1,5 +1,7 @@
 library(data.table)
 library(DT)
+library(gprofiler2)
+library(plotly)
 library(shiny)
 
 source("init.R")
@@ -111,5 +113,10 @@ server <- function(input, output) {
         }
 
         scatter_plot(results, species, genes, distances)
+    })
+
+    output$gost <- renderPlotly({
+        result <- gost(results()[, gene], ordered_query = TRUE)
+        gostplot(result, capped = FALSE, interactive = TRUE)
     })
 }
