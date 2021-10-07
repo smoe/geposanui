@@ -25,7 +25,7 @@ ui <- fluidPage(
                 min = 0,
                 max = 100,
                 step = 1,
-                value = 100
+                value = 58
             ),
             sliderInput(
                 "correlation",
@@ -34,7 +34,7 @@ ui <- fluidPage(
                 min = 0,
                 max = 100,
                 step = 1,
-                value = 100
+                value = 36
             ),
             sliderInput(
                 "neural",
@@ -43,7 +43,7 @@ ui <- fluidPage(
                 min = 0,
                 max = 100,
                 step = 1,
-                value = 100
+                value = 6
             ),
             sliderInput(
                 "cutoff",
