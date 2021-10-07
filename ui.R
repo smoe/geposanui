@@ -86,10 +86,18 @@ ui <- fluidPage(
         ),
         wellPanel(
             h3("Gene set enrichment analysis"),
-            plotlyOutput(
-                "gost",
-                width = "100%",
-                height = "600px"
+            checkboxInput(
+                "enable_gost",
+                "Perform a gene set enrichment analysis on the filtered result \
+                 genes."
+            ),
+            conditionalPanel(
+                "input.enable_gost == true",
+                plotlyOutput(
+                    "gost",
+                    width = "100%",
+                    height = "600px"
+                )
             )
         )
     )

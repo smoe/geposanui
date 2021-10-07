@@ -116,7 +116,11 @@ server <- function(input, output) {
     })
 
     output$gost <- renderPlotly({
-        result <- gost(results()[, gene], ordered_query = TRUE)
-        gostplot(result, capped = FALSE, interactive = TRUE)
+        if (input$enable_gost) {
+            result <- gost(results()[, gene], ordered_query = TRUE)
+            gostplot(result, capped = FALSE, interactive = TRUE)
+        } else {
+            NULL
+        }
     })
 }
