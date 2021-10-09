@@ -1,6 +1,4 @@
 library(data.table)
-library(progress)
-library(rlog)
 
 #' Perform a cluster analysis.
 #'
@@ -11,13 +9,18 @@ library(rlog)
 #' score between zero and one. Lower ranking clusters contribute less to this
 #' score.
 clusteriness <- function(data, n, height = 1000000) {
+    # Return a score of 0.0 if there is just one or no value at all.
+    if (length(data) < 2) {
+        return(0.0)
+    }
+
     # Cluster the data and compute the cluster sizes.
 
     tree <- hclust(dist(data))
     clusters <- cutree(tree, h = height)
     cluster_sizes <- sort(tabulate(clusters), decreasing = TRUE)
 
-    # Compute the "cluteriness" score.
+    # Compute the "clusteriness" score.
 
     score <- 0.0
 
@@ -38,49 +41,25 @@ clusteriness <- function(data, n, height = 1000000) {
 #' The return value will be a data.table with the following columns:
 #'
 #'  - `gene` Gene ID of the processed gene.
-#'  - `cluster_length` Length of the largest cluster.
-#'  - `cluster_mean` Mean value of the largest cluster.
-#'  - `cluster_species` List of species contributing to the largest cluster.
+#'  - `clusteriness` Score quantidying the gene's clusters.
 #'
 #' @param distances Gene distance data to use.
 #' @param species_ids IDs of species to include in the analysis.
 #' @param gene_ids Genes to include in the computation.
 process_clustering <- function(distances, species_ids, gene_ids) {
     results <- data.table(gene = gene_ids)
-    gene_count <- length(gene_ids)
+    species_count <- length(species)
 
-    log_info(sprintf(
-        "Clustering %i genes from %i species",
-        gene_count,
-        length(species_ids)
-    ))
+    # Prefilter the input data by species.
+    distances <- distances[species %chin% species_ids]
 
-    progress <- progress_bar$new(
-        total = gene_count,
-        format = "Clustering genes [:bar] :percent (ETA :eta)"
-    )
+    # Add an index for quickly accessing data per gene.
+    setkey(distances, gene)
 
-    for (i in 1:gene_count) {
-        progress$tick()
-
-        gene_id <- gene_ids[i]
-
-        data <- distances[
-            species %chin% species_ids & gene == gene_id,
-            .(species, distance)
-        ]
-
-        if (data[, .N] < 10) {
-            next
-        }
-
-        score <- clusteriness(data[, distance], length(species_ids))
-
-        results[
-            gene == gene_id,
-            clusteriness := score
-        ]
+    #' Perform the cluster analysis for one gene.
+    compute <- function(gene_id) {
+        clusteriness(distances[gene_id, distance], species_count)
     }
 
-    results
+    results[, clusteriness := compute(gene), by = 1:nrow(results)]
 }
