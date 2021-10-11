@@ -5,12 +5,13 @@ library(data.table)
 #' This function will cluster the data using `hclust` and `cutree` (with the
 #' specified height). Every cluster with at least two members qualifies for
 #' further analysis. Clusters are then ranked based on their size in relation
-#' to the total number of possible values (`n`). The return value is a final
-#' score between zero and one. Lower ranking clusters contribute less to this
-#' score.
-clusteriness <- function(data, n, height = 1000000) {
+#' to the number of values. The return value is a final score between zero and
+#' one. Lower ranking clusters contribute less to this score.
+clusteriness <- function(data, height = 1000000) {
+    n <- length(data)
+
     # Return a score of 0.0 if there is just one or no value at all.
-    if (length(data) < 2) {
+    if (n < 2) {
         return(0.0)
     }
 
@@ -48,7 +49,6 @@ clusteriness <- function(data, n, height = 1000000) {
 #' @param gene_ids Genes to include in the computation.
 process_clustering <- function(distances, species_ids, gene_ids) {
     results <- data.table(gene = gene_ids)
-    species_count <- length(species)
 
     # Prefilter the input data by species.
     distances <- distances[species %chin% species_ids]
@@ -58,7 +58,7 @@ process_clustering <- function(distances, species_ids, gene_ids) {
 
     #' Perform the cluster analysis for one gene.
     compute <- function(gene_id) {
-        clusteriness(distances[gene_id, distance], species_count)
+        clusteriness(distances[gene_id, distance])
     }
 
     results[, clusteriness := compute(gene), by = 1:nrow(results)]
