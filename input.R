@@ -57,10 +57,17 @@ genes_suggested_tpe_old <- c(
     "TSPAN9"
 )
 
-ensembl <- useEnsembl(
-    biomart = "ensembl",
-    version = 104
-)
+#' Shared accessor for the Ensembl API.
+ensembl <- NULL
+
+#' Get the ensembl accessor and initialize it if necessary.
+get_ensembl <- function() {
+    if (is.null(ensembl)) {
+        ensembl <<- useEnsembl("ensembl", version = 104)
+    }
+
+    ensembl
+}
 
 #' Retrieve information on species.
 #'
@@ -71,7 +78,7 @@ ensembl <- useEnsembl(
 #'  - `replicative` Whether the species is likely to be aging replicatively.
 retrieve_species <- function() {
     # Ensembl datasets correspond to distinct species.
-    ensembl_datasets <- data.table(listDatasets(ensembl))
+    ensembl_datasets <- data.table(listDatasets(get_ensembl()))
 
     # Filter out species ID and name from the result.
     species <- ensembl_datasets[, .(
@@ -92,7 +99,7 @@ retrieve_species <- function() {
 retrieve_genes <- function() {
     genes <- data.table(getBM(
         attributes = c("ensembl_gene_id", "hgnc_symbol", "chromosome_name"),
-        mart = useDataset("hsapiens_gene_ensembl", mart = ensembl)
+        mart = useDataset("hsapiens_gene_ensembl", mart = get_ensembl())
     ))
 
     genes[, .(
@@ -116,6 +123,8 @@ retrieve_genes <- function() {
 #'  - `gene` Ensembl gene ID.
 #'  - `distance` Distance to nearest telomere in base pairs.
 retrieve_distances <- function(species_ids, gene_ids) {
+    ensembl <- get_ensembl()
+
     # Exclude the human from the species, in case it is present there.
     species_ids <- species_ids[species_ids != "hsapiens"]
 
