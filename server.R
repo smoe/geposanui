@@ -18,6 +18,22 @@ js_link <- JS("function(row, data) {
 }")
 
 server <- function(input, output) {
+    #' Show the customized slider for setting the required number of species.
+    output$n_species_slider <- renderUI({
+        sliderInput(
+            "n_species",
+            "Required number of species per gene",
+            min = 0,
+            max = if (input$species == "all") {
+                nrow(species)
+            } else {
+                length(species_ids_replicative)
+            },
+            step = 1,
+            value = 10
+        )
+    })
+
     #' This reactive expression applies all user defined filters as well as the
     #' desired ranking weights to the results.
     results <- reactive({
@@ -40,11 +56,12 @@ server <- function(input, output) {
         neural_factor <- neural_weight / total_weight
 
         results[, score := clusteriness_factor * clusteriness +
-            correlation_factor * r_mean + neural_factor * neural]
+            correlation_factor * correlation + neural_factor * neural]
 
-        # Apply the cut-off score.
+        # Apply the cut-off score & the required number of species.
 
-        results <- results[score >= input$cutoff / 100]
+        results <- results[n_species >= input$n_species &
+            score >= input$cutoff / 100]
 
         # Order the results based on their score. The resulting index will be
         # used as the "rank".
@@ -59,7 +76,7 @@ server <- function(input, output) {
                 gene,
                 name,
                 clusteriness,
-                r_mean,
+                correlation,
                 neural,
                 score
             )],
@@ -82,7 +99,7 @@ server <- function(input, output) {
 
         formatPercentage(
             dt,
-            c("clusteriness", "r_mean", "neural", "score"),
+            c("clusteriness", "correlation", "neural", "score"),
             digits = 1
         )
     })

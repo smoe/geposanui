@@ -17,7 +17,8 @@ ui <- fluidPage(
                     "Replicatively aging" = "replicative",
                     "All qualified" = "all"
                 )
-            )
+            ),
+            uiOutput("n_species_slider")
         ),
         wellPanel(
             h3("Ranking"),

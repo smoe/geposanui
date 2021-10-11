@@ -79,6 +79,13 @@ neural_replicative <- run_cached(
 
 results_all <- merge(
     genes,
+    distances[, .(n_species = .N), by = "gene"],
+    by.x = "id",
+    by.y = "gene"
+)
+
+results_all <- merge(
+    results_all,
     clustering_all,
     by.x = "id",
     by.y = "gene"
@@ -100,6 +107,17 @@ results_all <- merge(
 
 results_replicative <- merge(
     genes,
+    distances[
+        species %chin% species_ids_replicative,
+        .(n_species = .N),
+        by = gene
+    ],
+    by.x = "id",
+    by.y = "gene"
+)
+
+results_replicative <- merge(
+    results_replicative,
     clustering_replicative,
     by.x = "id",
     by.y = "gene"
