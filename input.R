@@ -69,6 +69,14 @@ get_ensembl <- function() {
     ensembl
 }
 
+#' Get all chromosome names for a Ensembl dataset.
+#'
+#' Valid chromosome names include decimal numbers as well as 'X' and 'Y'.
+get_chromosome_names <- function(dataset) {
+    chromosome_names <- listFilterOptions(dataset, "chromosome_name")
+    chromosome_names[str_which(chromosome_names, "^[0-9]+|[XY]$")]
+}
+
 #' Retrieve information on species.
 #'
 #' The result will be a `data.table` with the following columns:
@@ -91,14 +99,21 @@ retrieve_species <- function() {
 
 #' Retrieve information on human genes.
 #'
+#' This will only include genes on assembled chromosomes. Chromosomes are
+#' filtered based on their name being either a decimal number, 'X' or 'Y'.
+#'
 #' The result will be a `data.table` with the following columns:
 #'
 #'  - `id` Ensembl gene ID.
 #'  - `ǹame` HGNC name of the gene.
 #'  - `chromosome` Human chromosome on which the gene is located.
 retrieve_genes <- function() {
+    dataset <- useDataset("hsapiens_gene_ensembl", mart = get_ensembl())
+
     genes <- data.table(getBM(
         attributes = c("ensembl_gene_id", "hgnc_symbol", "chromosome_name"),
+        filters = "chromosome_name",
+        values = get_chromosome_names(dataset),
         mart = useDataset("hsapiens_gene_ensembl", mart = get_ensembl())
     ))
 
@@ -113,9 +128,8 @@ retrieve_genes <- function() {
 
 #' Retrieve gene distance data.
 #'
-#' The data will include all available values for the given species and genes.
-#' Specific values on naturally or artificially (e.g. due to incomplete
-#' sequencing) short chromosomes will be excluded.
+#' The data will include all available values for the given species and genes
+#' that are located on assembled chromosomes.
 #'
 #' The result will be a `data.table` with the following columns:
 #'
@@ -145,7 +159,7 @@ retrieve_distances <- function(species_ids, gene_ids) {
     # Special case the human species and retrieve all available distance
     # information.
 
-    ensembl <- useDataset("hsapiens_gene_ensembl", mart = ensembl)
+    dataset <- useDataset("hsapiens_gene_ensembl", mart = ensembl)
 
     human_distances <- data.table(getBM(
         attributes = c(
@@ -154,33 +168,33 @@ retrieve_distances <- function(species_ids, gene_ids) {
             "start_position",
             "end_position"
         ),
-        mart = ensembl
+        filters = "chromosome_name",
+        values = get_chromosome_names(dataset),
+        mart = dataset
     ))
+
+    # Compute the nearest distance to telomeres.
 
     human_distances[,
         chromosome_length := max(end_position),
         by = chromosome_name
     ]
 
-    # Filter out relevant information (see below).
-    distances <- human_distances[
-        chromosome_length > 15000000,
-        .(
-            species = "hsapiens",
-            gene = ensembl_gene_id,
-            distance = pmin(
-                start_position,
-                chromosome_length - end_position
-            )
+    distances <- human_distances[, .(
+        species = "hsapiens",
+        gene = ensembl_gene_id,
+        distance = pmin(
+            start_position,
+            chromosome_length - end_position
         )
-    ]
+    )]
 
     for (i in 1:species_count) {
         species_id <- species_ids[i]
 
         progress$tick()
 
-        ensembl <- useDataset(
+        dataset <- useDataset(
             sprintf("%s_gene_ensembl", species_id),
             mart = ensembl
         )
@@ -189,43 +203,46 @@ retrieve_distances <- function(species_ids, gene_ids) {
         # human orthologs. Some species don't have that information and will be
         # skipped.
         if (!"hsapiens_homolog_ensembl_gene" %chin%
-            listAttributes(ensembl, what = "name")) {
+            listAttributes(dataset, what = "name")) {
+            next
+        }
+
+        chromosome_names <- get_chromosome_names(dataset)
+
+        # Skip the species, if there are no assembled chromosomes.
+        if (length(chromosome_names) <= 0) {
             next
         }
 
         # Retrieve information on all genes of the current species, that have
         # human orthologs. This is called "homolog" in the Ensembl schema.
         ensembl_distances <- data.table(getBM(
-            filters = c("with_hsapiens_homolog"),
-            values = c(TRUE),
             attributes = c(
                 "hsapiens_homolog_ensembl_gene",
                 "chromosome_name",
                 "start_position",
                 "end_position"
             ),
-            mart = ensembl
+            filters = c("with_hsapiens_homolog", "chromosome_name"),
+            values = list(TRUE, chromosome_names),
+            mart = dataset
         ))
+
+        # Precompute the genes' distance to the nearest telomere.
 
         ensembl_distances[,
             chromosome_length := max(end_position),
             by = chromosome_name
         ]
 
-        # Filter out relevant information and precompute the genes' distance to
-        # the nearest telomere. Exclude genes on naturally or artificially
-        # short chromosomes.
-        species_distances <- ensembl_distances[
-            chromosome_length > 15000000,
-            .(
-                species = species_id,
-                gene = hsapiens_homolog_ensembl_gene,
-                distance = pmin(
-                    start_position,
-                    chromosome_length - end_position
-                )
+        species_distances <- ensembl_distances[, .(
+            species = species_id,
+            gene = hsapiens_homolog_ensembl_gene,
+            distance = pmin(
+                start_position,
+                chromosome_length - end_position
             )
-        ]
+        )]
 
         distances <- rbindlist(list(distances, species_distances))
     }
