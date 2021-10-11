@@ -58,10 +58,22 @@ server <- function(input, output) {
         results[, score := clusteriness_factor * clusteriness +
             correlation_factor * correlation + neural_factor * neural]
 
-        # Apply the cut-off score & the required number of species.
+        # Exclude genes with too few species.
+        results <- results[n_species >= input$n_species]
 
-        results <- results[n_species >= input$n_species &
-            score >= input$cutoff / 100]
+        # Penalize missing species.
+        if (input$penalize) {
+            species_count <- if (input$species == "all") {
+                nrow(species)
+            } else {
+                length(species_ids_replicative)
+            }
+
+            results <- results[, score := score * n_species / species_count]
+        }
+
+        # Apply the cut-off score.
+        results <- results[score >= input$cutoff / 100]
 
         # Order the results based on their score. The resulting index will be
         # used as the "rank".

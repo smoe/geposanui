@@ -57,6 +57,10 @@ ui <- fluidPage(
                 max = 100,
                 step = 1,
                 value = 50
+            ),
+            checkboxInput(
+                "penalize",
+                "Penalize missing values"
             )
         ),
         wellPanel(
