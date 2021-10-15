@@ -34,16 +34,23 @@ rank_plot <- function(results, reference_gene_ids, cutoff) {
         width = 10,
         type = "bar"
     )  |> layout(
-        shapes = list(
-            type = "rect",
-            fillcolor = "black",
-            opacity = 0.1,
-            x0 = first_not_included_rank,
-            x1 = last_rank,
-            y0 = 0.0,
-            y1 = 1.0
-        ),
         xaxis = list(title = "Ranks"),
         yaxis = list(title = "Score")
     )
+
+    if (first_not_included_rank <= last_rank) {
+        plot <- plot |> layout(
+            shapes = list(
+                type = "rect",
+                fillcolor = "black",
+                opacity = 0.1,
+                x0 = first_not_included_rank,
+                x1 = last_rank,
+                y0 = 0.0,
+                y1 = 1.0
+            )
+        )
+    }
+
+    plot
 }
