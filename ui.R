@@ -3,6 +3,8 @@ library(plotly)
 library(rclipboard)
 library(shiny)
 
+source("methods.R")
+
 ui <- fluidPage(
     rclipboardSetup(),
     titlePanel("TPE-OLD candidates"),
@@ -22,33 +24,17 @@ ui <- fluidPage(
         ),
         wellPanel(
             h3("Ranking"),
-            sliderInput(
-                "clusteriness",
-                "Clustering of genes",
-                post = "%",
-                min = 0,
-                max = 100,
-                step = 1,
-                value = 58
-            ),
-            sliderInput(
-                "correlation",
-                "Correlation with known genes",
-                post = "%",
-                min = 0,
-                max = 100,
-                step = 1,
-                value = 36
-            ),
-            sliderInput(
-                "neural",
-                "Assessment by neural network",
-                post = "%",
-                min = 0,
-                max = 100,
-                step = 1,
-                value = 6
-            ),
+            lapply(methods, function(method) {
+                sliderInput(
+                    method$id,
+                    method$description,
+                    post = "%",
+                    min = 0,
+                    max = 100,
+                    step = 1,
+                    value = 100
+                )
+            }),
             sliderInput(
                 "cutoff",
                 "Cut-off score",

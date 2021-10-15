@@ -6,7 +6,7 @@ library(neuralnet)
 #' The result will be a data.table with the following columns:
 #'
 #'  - `gene` Gene ID of the processed gene.
-#'  - `neural` Output score given by the neural network.
+#'  - `score` Output score given by the neural network.
 #'
 #' @param distances Distance data to use.
 #' @param species_ids Species, whose data should be included.
@@ -105,6 +105,6 @@ process_neural <- function(distances, species_ids, gene_ids,
 
     # Return the resulting scores given by applying the neural network.
 
-    data[, neural := compute(nn, data)$net.result]
-    data[, .(gene, neural)]
+    data[, score := compute(nn, data)$net.result]
+    data[, .(gene, score)]
 }

@@ -6,7 +6,7 @@ library(data.table)
 #' The result will be a data.table with the following columns:
 #'
 #'  - `gene` Gene ID of the processed gene.
-#'  - `correlation` Mean correlation coefficient.
+#'  - `score` Mean correlation coefficient.
 #'
 #' @param distances Distance data to use.
 #' @param species_ids Species, whose data should be included.
@@ -69,5 +69,5 @@ process_correlation <- function(distances, species_ids, gene_ids,
         score <- correlation_sum / reference_count
     }
 
-    results[, correlation := compute(gene), by = 1:nrow(results)]
+    results[, score := compute(gene), by = 1:nrow(results)]
 }

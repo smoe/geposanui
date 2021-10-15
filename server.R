@@ -47,16 +47,18 @@ server <- function(input, output) {
 
         # Compute scoring factors and the weighted score.
 
-        clusteriness_weight <- input$clusteriness / 100
-        correlation_weight <- input$correlation / 100
-        neural_weight <- input$neural / 100
-        total_weight <- clusteriness_weight + correlation_weight + neural_weight
-        clusteriness_factor <- clusteriness_weight / total_weight
-        correlation_factor <- correlation_weight / total_weight
-        neural_factor <- neural_weight / total_weight
+        total_weight <- 0.0
+        results[, score := 0.0]
 
-        results[, score := clusteriness_factor * clusteriness +
-            correlation_factor * correlation + neural_factor * neural]
+        for (method in methods) {
+            weight <- input[[method$id]]
+            total_weight <- total_weight + weight
+            column <- method$id
+            weighted <- weight * results[, ..column]
+            results[, score := score + weighted]
+        }
+
+        results[, score := score / total_weight]
 
         # Exclude genes with too few species.
         results <- results[n_species >= input$n_species]
@@ -75,33 +77,22 @@ server <- function(input, output) {
         # Apply the cut-off score.
         results <- results[score >= input$cutoff / 100]
 
-        # Order the results based on their score. The resulting index will be
-        # used as the "rank".
+        # Order the results based on their score.
 
         setorder(results, -score, na.last = TRUE)
+        results[, rank := .I]
     })
 
     output$genes <- renderDT({
+        method_ids <- sapply(methods, function(method) method$id)
+        method_names <- sapply(methods, function(method) method$name)
+        columns <- c("rank", "gene", "name", method_ids, "score")
+        column_names <- c("", "Gene", "", method_names, "Score")
+
         dt <- datatable(
-            results()[, .(
-                .I,
-                gene,
-                name,
-                clusteriness,
-                correlation,
-                neural,
-                score
-            )],
+            results()[, ..columns],
             rownames = FALSE,
-            colnames = c(
-                "",
-                "Gene",
-                "",
-                "Clusters",
-                "Correlation",
-                "Neural",
-                "Score"
-            ),
+            colnames = column_names,
             style = "bootstrap",
             options = list(
                 rowCallback = js_link,
@@ -109,11 +100,7 @@ server <- function(input, output) {
             )
         )
 
-        formatPercentage(
-            dt,
-            c("clusteriness", "correlation", "neural", "score"),
-            digits = 1
-        )
+        formatPercentage(dt, c(method_ids, "score"), digits = 1)
     })
 
     output$synposis <- renderText({

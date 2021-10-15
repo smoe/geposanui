@@ -1,7 +1,5 @@
-source("clustering.R")
-source("correlation.R")
 source("input.R")
-source("neural.R")
+source("methods.R")
 source("util.R")
 
 # Load input data
@@ -16,66 +14,12 @@ distances <- run_cached(
     genes[, id]
 )
 
-# Load processed data
-
 all_species <- species[, id]
 replicative_species <- species[replicative == TRUE, id]
 all_genes <- genes[, id]
 tpe_old_genes <- genes[suggested | verified == TRUE, id]
 
-clustering_all <- run_cached(
-    "clustering_all",
-    process_clustering,
-    distances,
-    all_species,
-    all_genes
-)
-
-clustering_replicative <- run_cached(
-    "clustering_replicative",
-    process_clustering,
-    distances,
-    replicative_species,
-    all_genes
-)
-
-correlation_all <- run_cached(
-    "correlation_all",
-    process_correlation,
-    distances,
-    all_species,
-    all_genes,
-    tpe_old_genes
-)
-
-correlation_replicative <- run_cached(
-    "correlation_replicative",
-    process_correlation,
-    distances,
-    replicative_species,
-    all_genes,
-    tpe_old_genes
-)
-
-neural_all <- run_cached(
-    "neural_all",
-    process_neural,
-    distances,
-    all_species,
-    all_genes,
-    tpe_old_genes
-)
-
-neural_replicative <- run_cached(
-    "neural_replicative",
-    process_neural,
-    distances,
-    replicative_species,
-    all_genes,
-    tpe_old_genes
-)
-
-# Merge processed data as well as gene information.
+# Apply all methods for all species
 
 results_all <- merge(
     genes,
@@ -84,26 +28,27 @@ results_all <- merge(
     by.y = "gene"
 )
 
-results_all <- merge(
-    results_all,
-    clustering_all,
-    by.x = "id",
-    by.y = "gene"
-)
+setnames(results_all, "id", "gene")
 
-results_all <- merge(
-    results_all,
-    correlation_all,
-    by.x = "id",
-    by.y = "gene"
-)
+for (method in methods) {
+    method_results <- run_cached(
+        sprintf("%s_all", method$id),
+        method$fn,
+        distances,
+        all_species,
+        all_genes,
+        tpe_old_genes
+    )
 
-results_all <- merge(
-    results_all,
-    neural_all,
-    by.x = "id",
-    by.y = "gene"
-)
+    setnames(method_results, "score", method$id)
+
+    results_all <- merge(
+        results_all,
+        method_results,
+    )
+}
+
+# Apply all methods for replicatively aging species
 
 results_replicative <- merge(
     genes,
@@ -116,28 +61,22 @@ results_replicative <- merge(
     by.y = "gene"
 )
 
-results_replicative <- merge(
-    results_replicative,
-    clustering_replicative,
-    by.x = "id",
-    by.y = "gene"
-)
-
-results_replicative <- merge(
-    results_replicative,
-    correlation_replicative,
-    by.x = "id",
-    by.y = "gene"
-)
-
-results_replicative <- merge(
-    results_replicative,
-    neural_replicative,
-    by.x = "id",
-    by.y = "gene"
-)
-
-# Rename `id` columns to `gene`.
-
-setnames(results_all, "id", "gene")
 setnames(results_replicative, "id", "gene")
+
+for (method in methods) {
+    method_results <- run_cached(
+        sprintf("%s_replicative", method$id),
+        method$fn,
+        distances,
+        replicative_species,
+        all_genes,
+        tpe_old_genes
+    )
+
+    setnames(method_results, "score", method$id)
+
+    results_replicative <- merge(
+        results_replicative,
+        method_results,
+    )
+}
