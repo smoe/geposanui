@@ -86,17 +86,21 @@ server <- function(input, output) {
     output$genes <- renderDT({
         method_ids <- sapply(methods, function(method) method$id)
         method_names <- sapply(methods, function(method) method$name)
-        columns <- c("rank", "gene", "name", method_ids, "score")
-        column_names <- c("", "Gene", "", method_names, "Score")
+        columns <- c("rank", "gene", "name", "chromosome", method_ids, "score")
+        column_names <- c("", "Gene", "", "Chromosome", method_names, "Score")
 
         dt <- datatable(
             results()[, ..columns],
             rownames = FALSE,
             colnames = column_names,
             style = "bootstrap",
+            extensions = "Scroller",
             options = list(
                 rowCallback = js_link,
-                columnDefs = list(list(visible = FALSE, targets = 2))
+                columnDefs = list(list(visible = FALSE, targets = 2)),
+                deferRender = TRUE,
+                scrollY = 200,
+                scroller = TRUE
             )
         )
 

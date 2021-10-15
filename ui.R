@@ -8,9 +8,9 @@ source("methods.R")
 ui <- fluidPage(
     rclipboardSetup(),
     titlePanel("TPE-OLD candidates"),
-    column(
-        width = 3,
-        wellPanel(
+    sidebarLayout(
+        sidebarPanel(
+            width = 3,
             h3("Filter criteria"),
             selectInput(
                 "species",
@@ -20,9 +20,16 @@ ui <- fluidPage(
                     "All qualified" = "all"
                 )
             ),
-            uiOutput("n_species_slider")
-        ),
-        wellPanel(
+            uiOutput("n_species_slider"),
+            sliderInput(
+                "cutoff",
+                "Cut-off score",
+                post = "%",
+                min = 0,
+                max = 100,
+                step = 1,
+                value = 50
+            ),
             h3("Ranking"),
             lapply(methods, function(method) {
                 sliderInput(
@@ -35,21 +42,12 @@ ui <- fluidPage(
                     value = 100
                 )
             }),
-            sliderInput(
-                "cutoff",
-                "Cut-off score",
-                post = "%",
-                min = 0,
-                max = 100,
-                step = 1,
-                value = 50
-            ),
             checkboxInput(
                 "penalize",
                 "Penalize missing values"
-            )
+            ),
         ),
-        wellPanel(
+        mainPanel(
             h3("Results"),
             textOutput("synposis"),
             div(
@@ -57,18 +55,13 @@ ui <- fluidPage(
                 uiOutput("copy")
             ),
             div(
-                style = "overflow-x: auto; overflow-y: auto; margin-top: 16px",
+                style = "margin-top: 16px",
                 DTOutput("genes")
-            )
-        )
-    ),
-    column(
-        width = 8,
-        wellPanel(
+            ),
             h3("Gene positions"),
             p("This plot shows the selected genes' distance to the telomeres \
-               across species. It visualizes how certain genes have \
-               evolutionary conserved positions."),
+                across species. It visualizes how certain genes have \
+                evolutionary conserved positions."),
             div(
                 style = "overflow-x: auto",
                 div(
@@ -79,9 +72,7 @@ ui <- fluidPage(
                         height = "600px"
                     )
                 )
-            )
-        ),
-        wellPanel(
+            ),
             h3("Gene set enrichment analysis"),
             checkboxInput(
                 "enable_gost",
