@@ -148,7 +148,7 @@ server <- function(input, output) {
         )
     })
 
-    output$scatter <- renderPlot({
+    output$scatter <- renderPlotly({
         results <- results()
 
         gene_ids <- results[input$genes_rows_selected, gene]

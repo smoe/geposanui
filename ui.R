@@ -62,16 +62,10 @@ ui <- fluidPage(
             p("This plot shows the selected genes' distance to the telomeres \
                 across species. It visualizes how certain genes have \
                 evolutionary conserved positions."),
-            div(
-                style = "overflow-x: auto",
-                div(
-                    style = "min-width: 1400px",
-                    plotOutput(
-                        "scatter",
-                        width = "100%",
-                        height = "600px"
-                    )
-                )
+            plotlyOutput(
+                "scatter",
+                width = "100%",
+                height = "600px"
             ),
             h3("Gene set enrichment analysis"),
             checkboxInput(
