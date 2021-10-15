@@ -35,8 +35,8 @@ server <- function(input, output) {
         )
     })
 
-    #' This reactive expression applies all user defined filters as well as the
-    #' desired ranking weights to the results.
+    #' Rank the results based on the specified weights. Filter out genes with
+    #' too few species but don't apply the cut-off score.
     results <- reactive({
         # Select the species preset.
 
@@ -75,18 +75,15 @@ server <- function(input, output) {
             results <- results[, score := score * n_species / species_count]
         }
 
-        # Apply the cut-off score.
-        results <- results[score >= input$cutoff / 100]
-
         # Order the results based on their score.
 
         setorder(results, -score, na.last = TRUE)
         results[, rank := .I]
     })
 
-    output$rank_plot <- renderPlotly({
-        results <- results()
-        rank_plot(results, genes[suggested | verified == TRUE, id])
+    #' Apply the cut-off score to the ranked results.
+    results_filtered <- reactive({
+        results()[score >= input$cutoff / 100]
     })
 
     output$genes <- renderDT({
@@ -96,7 +93,7 @@ server <- function(input, output) {
         column_names <- c("", "Gene", "", "Chromosome", method_names, "Score")
 
         dt <- datatable(
-            results()[, ..columns],
+            results_filtered()[, ..columns],
             rownames = FALSE,
             colnames = column_names,
             style = "bootstrap",
@@ -114,22 +111,8 @@ server <- function(input, output) {
         formatPercentage(dt, c(method_ids, "score"), digits = 1)
     })
 
-    output$synposis <- renderText({
-        results <- results()
-
-        sprintf(
-            "Found %i candidates including %i/%i verified and %i/%i suggested \
-            TPE-OLD genes.",
-            results[, .N],
-            results[verified == TRUE, .N],
-            genes[verified == TRUE, .N],
-            results[suggested == TRUE, .N],
-            genes[suggested == TRUE, .N]
-        )
-    })
-
     output$copy <- renderUI({
-        results <- results()
+        results <- results_filtered()
 
         gene_ids <- results[, gene]
         names <- results[name != "", name]
@@ -155,7 +138,7 @@ server <- function(input, output) {
     })
 
     output$scatter <- renderPlotly({
-        results <- results()
+        results <- results_filtered()
 
         gene_ids <- results[input$genes_rows_selected, gene]
         genes <- genes[id %chin% gene_ids]
@@ -169,9 +152,38 @@ server <- function(input, output) {
         scatter_plot(results, species, genes, distances)
     })
 
+    output$assessment_synopsis <- renderText({
+        reference_gene_ids <- genes[suggested | verified == TRUE, id]
+
+        reference_count <- results_filtered()[
+            gene %chin% reference_gene_ids,
+            .N
+        ]
+
+        reference_results <- results()[gene %chin% reference_gene_ids]
+
+        sprintf(
+            "Included reference genes: %i/%i<br> \
+            Mean rank of reference genes: %.1f<br> \
+            Maximum rank of reference genes: %i",
+            reference_count,
+            length(reference_gene_ids),
+            reference_results[, mean(rank)],
+            reference_results[, max(rank)]
+        )
+    })
+
+    output$rank_plot <- renderPlotly({
+        rank_plot(
+            results(),
+            genes[suggested | verified == TRUE, id],
+            input$cutoff / 100
+        )
+    })
+
     output$gost <- renderPlotly({
         if (input$enable_gost) {
-            result <- gost(results()[, gene], ordered_query = TRUE)
+            result <- gost(results_filtered()[, gene], ordered_query = TRUE)
             gostplot(result, capped = FALSE, interactive = TRUE)
         } else {
             NULL

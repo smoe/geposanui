@@ -12,7 +12,11 @@ library(plotly)
 #'
 #' @param results Results to display.
 #' @param reference_gene_ids IDs of reference genes.
-rank_plot <- function(results, reference_gene_ids) {
+#' @param cutoff Cut-off score.
+rank_plot <- function(results, reference_gene_ids, cutoff) {
+    first_not_included_rank <- results[score < cutoff, min(rank)]
+    last_rank <- results[, .N]
+
     plot <- plot_ly() |> add_trace(
         data = results,
         x = ~rank,
@@ -29,7 +33,16 @@ rank_plot <- function(results, reference_gene_ids) {
         name = ~name,
         width = 10,
         type = "bar"
-    ) |> layout(
+    )  |> layout(
+        shapes = list(
+            type = "rect",
+            fillcolor = "black",
+            opacity = 0.1,
+            x0 = first_not_included_rank,
+            x1 = last_rank,
+            y0 = 0.0,
+            y1 = 1.0
+        ),
         xaxis = list(title = "Ranks"),
         yaxis = list(title = "Score")
     )

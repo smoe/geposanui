@@ -53,11 +53,7 @@ ui <- fluidPage(
                 header = div(style = "margin-top: 16px"),
                 tabPanel(
                     "Results",
-                    textOutput("synposis"),
-                    div(
-                        style = "margin-top: 16px",
-                        uiOutput("copy")
-                    ),
+                    uiOutput("copy"),
                     div(
                         style = "margin-top: 16px",
                         DTOutput("genes", height = "1000px")
@@ -72,12 +68,16 @@ ui <- fluidPage(
                     )
                 ),
                 tabPanel(
-                    "Ranks",
-                    plotlyOutput(
-                        "rank_plot",
-                        width = "100%",
-                        height = "600px"
-                    )
+                    "Assessment",
+                    htmlOutput("assessment_synopsis"),
+                    div(
+                        style = "margin-top: 16px",
+                        plotlyOutput(
+                            "rank_plot",
+                            width = "100%",
+                            height = "600px"
+                        )
+                    ),
                 ),
                 tabPanel(
                     "Analysis",
