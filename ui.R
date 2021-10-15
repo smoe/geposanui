@@ -48,6 +48,12 @@ ui <- fluidPage(
             ),
         ),
         mainPanel(
+            h3("Gene ranks"),
+            plotlyOutput(
+                "rank_plot",
+                width = "100%",
+                height = "600px"
+            ),
             h3("Results"),
             textOutput("synposis"),
             div(

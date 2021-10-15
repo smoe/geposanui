@@ -6,6 +6,7 @@ library(rclipboard)
 library(shiny)
 
 source("init.R")
+source("rank_plot.R")
 source("scatter_plot.R")
 
 #' Java script function to replace gene IDs with Ensembl gene links.
@@ -81,6 +82,11 @@ server <- function(input, output) {
 
         setorder(results, -score, na.last = TRUE)
         results[, rank := .I]
+    })
+
+    output$rank_plot <- renderPlotly({
+        results <- results()
+        rank_plot(results, genes[suggested | verified == TRUE, id])
     })
 
     output$genes <- renderDT({
