@@ -100,6 +100,7 @@ server <- function(input, output) {
             rownames = FALSE,
             colnames = column_names,
             style = "bootstrap",
+            fillContainer = TRUE,
             extensions = "Scroller",
             options = list(
                 rowCallback = js_link,
@@ -137,19 +138,18 @@ server <- function(input, output) {
         names_text <- paste(names, collapse = "\n")
 
         splitLayout(
+            cellWidths = "auto",
             rclipButton(
                 "copy_ids_button",
                 "Copy gene IDs",
                 genes_text,
-                icon = icon("clipboard"),
-                width = "100%"
+                icon = icon("clipboard")
             ),
             rclipButton(
                 "copy_names_button",
                 "Copy gene names",
                 names_text,
-                icon = icon("clipboard"),
-                width = "100%"
+                icon = icon("clipboard")
             )
         )
     })

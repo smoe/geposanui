@@ -48,43 +48,52 @@ ui <- fluidPage(
             ),
         ),
         mainPanel(
-            h3("Gene ranks"),
-            plotlyOutput(
-                "rank_plot",
-                width = "100%",
-                height = "600px"
-            ),
-            h3("Results"),
-            textOutput("synposis"),
-            div(
-                style = "margin-top: 16px",
-                uiOutput("copy")
-            ),
-            div(
-                style = "margin-top: 16px",
-                DTOutput("genes")
-            ),
-            h3("Gene positions"),
-            p("This plot shows the selected genes' distance to the telomeres \
-                across species. It visualizes how certain genes have \
-                evolutionary conserved positions."),
-            plotlyOutput(
-                "scatter",
-                width = "100%",
-                height = "600px"
-            ),
-            h3("Gene set enrichment analysis"),
-            checkboxInput(
-                "enable_gost",
-                "Perform a gene set enrichment analysis on the filtered result \
-                 genes."
-            ),
-            conditionalPanel(
-                "input.enable_gost == true",
-                plotlyOutput(
-                    "gost",
-                    width = "100%",
-                    height = "600px"
+            tabsetPanel(
+                type = "pills",
+                header = div(style = "margin-top: 16px"),
+                tabPanel(
+                    "Results",
+                    textOutput("synposis"),
+                    div(
+                        style = "margin-top: 16px",
+                        uiOutput("copy")
+                    ),
+                    div(
+                        style = "margin-top: 16px",
+                        DTOutput("genes", height = "1000px")
+                    )
+                ),
+                tabPanel(
+                    "Positions",
+                    plotlyOutput(
+                        "scatter",
+                        width = "100%",
+                        height = "600px"
+                    )
+                ),
+                tabPanel(
+                    "Ranks",
+                    plotlyOutput(
+                        "rank_plot",
+                        width = "100%",
+                        height = "600px"
+                    )
+                ),
+                tabPanel(
+                    "Analysis",
+                    checkboxInput(
+                        "enable_gost",
+                        "Perform a gene set enrichment analysis on the \
+                        filtered result genes."
+                    ),
+                    conditionalPanel(
+                        "input.enable_gost == true",
+                        plotlyOutput(
+                            "gost",
+                            width = "100%",
+                            height = "600px"
+                        )
+                    )
                 )
             )
         )
