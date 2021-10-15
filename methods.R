@@ -1,6 +1,7 @@
 source("clusteriness.R")
 source("correlation.R")
 source("neural.R")
+source("proximity.R")
 
 #' Construct a new method.
 #'
@@ -46,6 +47,12 @@ methods <- list(
         "Correlation",
         "Correlation with known genes",
         process_correlation
+    ),
+    method(
+        "proximity",
+        "Proximity",
+        "Proximity to telomeres",
+        process_proximity
     ),
     method(
         "neural",
