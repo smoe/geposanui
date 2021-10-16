@@ -2,23 +2,13 @@ library(data.table)
 
 #' Compute the mean correlation coefficient comparing gene distances with a set
 #' of reference genes.
-#'
-#' The result will be a data.table with the following columns:
-#'
-#'  - `gene` Gene ID of the processed gene.
-#'  - `score` Mean correlation coefficient.
-#'
-#' @param distances Distance data to use.
-#' @param species_ids Species, whose data should be included.
-#' @param gene_ids Genes to process.
-#' @param reference_gene_ids Genes to compare to.
-process_correlation <- function(distances, species_ids, gene_ids,
-                                reference_gene_ids) {
+process_correlation <- function(distances, gene_ids, preset) {
     results <- data.table(gene = gene_ids)
+    reference_gene_ids <- preset$reference_gene_ids
     reference_count <- length(reference_gene_ids)
 
     # Prefilter distances by species.
-    distances <- distances[species %chin% species_ids]
+    distances <- distances[species %chin% preset$species_ids]
 
     # Add an index for quickly accessing data per gene.
     setkey(distances, gene)

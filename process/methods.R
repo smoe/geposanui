@@ -1,7 +1,7 @@
-source("clusteriness.R")
-source("correlation.R")
-source("neural.R")
-source("proximity.R")
+source("process/clusteriness.R")
+source("process/correlation.R")
+source("process/neural.R")
+source("process/proximity.R")
 
 #' Construct a new method.
 #'
@@ -10,9 +10,8 @@ source("proximity.R")
 #' parameters in this order:
 #'
 #'  - `distances` Distance data to use.
-#'  - `species_ids` Species, whose data should be included.
 #'  - `gene_ids` Genes to process.
-#'  - `reference_gene_ids` Genes to compare to.
+#'  - `preset` Preset to apply.
 #'
 #' The function should return a `data.table` with the following columns:
 #'

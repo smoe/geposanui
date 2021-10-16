@@ -38,20 +38,11 @@ clusteriness <- function(data, height = 1000000) {
 }
 
 #' Process genes clustering their distance to telomeres.
-#'
-#' The return value will be a data.table with the following columns:
-#'
-#'  - `gene` Gene ID of the processed gene.
-#'  - `score` Score quantidying the gene's clusters.
-#'
-#' @param distances Gene distance data to use.
-#' @param species_ids IDs of species to include in the analysis.
-#' @param gene_ids Genes to include in the computation.
-process_clusteriness <- function(distances, species_ids, gene_ids, ...) {
+process_clusteriness <- function(distances, gene_ids, preset) {
     results <- data.table(gene = gene_ids)
 
     # Prefilter the input data by species.
-    distances <- distances[species %chin% species_ids]
+    distances <- distances[species %chin% preset$species_ids]
 
     # Add an index for quickly accessing data per gene.
     setkey(distances, gene)

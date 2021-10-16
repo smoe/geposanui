@@ -5,7 +5,6 @@ library(plotly)
 library(rclipboard)
 library(shiny)
 
-source("init.R")
 source("optimize.R")
 source("rank_plot.R")
 source("scatter_plot.R")
@@ -71,10 +70,17 @@ server <- function(input, output, session) {
         # Select the species preset.
 
         results <- if (input$species == "all") {
-            results_all
+            process(preset_all_species)
         } else {
-            results_replicative
+            process(preset_replicative_species)
         }
+
+        results <- merge(
+            results,
+            genes,
+            by.x = "gene",
+            by.y = "id"
+        )
 
         # Compute scoring factors and the weighted score.
 

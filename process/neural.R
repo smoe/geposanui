@@ -2,19 +2,10 @@ library(data.table)
 library(neuralnet)
 
 #' Find genes by training a neural network on reference position data.
-#'
-#' The result will be a data.table with the following columns:
-#'
-#'  - `gene` Gene ID of the processed gene.
-#'  - `score` Output score given by the neural network.
-#'
-#' @param distances Distance data to use.
-#' @param species_ids Species, whose data should be included.
-#' @param gene_ids Genes to process. This should include the reference genes.
-#' @param reference_gene_ids Genes to compare to.
 #' @param seed A seed to get reproducible results.
-process_neural <- function(distances, species_ids, gene_ids,
-                           reference_gene_ids, seed = 726839) {
+process_neural <- function(distances, gene_ids, preset, seed = 726839) {
+    species_ids <- preset$species_ids
+    reference_gene_ids <- preset$reference_gene_ids
     set.seed(seed)
     gene_count <- length(gene_ids)
 

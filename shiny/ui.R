@@ -3,8 +3,6 @@ library(plotly)
 library(rclipboard)
 library(shiny)
 
-source("methods.R")
-
 ui <- fluidPage(
     shinyjs::useShinyjs(),
     rclipboardSetup(),
