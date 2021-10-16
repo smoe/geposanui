@@ -6,6 +6,7 @@ library(rclipboard)
 library(shiny)
 
 source("init.R")
+source("optimize.R")
 source("rank_plot.R")
 source("scatter_plot.R")
 
@@ -18,7 +19,7 @@ js_link <- JS("function(row, data) {
     $('td:eq(1)', row).html(`<a href=\"${url}\" target=\"_blank\">${name}</a>`);
 }")
 
-server <- function(input, output) {
+server <- function(input, output, session) {
     #' Show the customized slider for setting the required number of species.
     output$n_species_slider <- renderUI({
         sliderInput(
@@ -33,6 +34,35 @@ server <- function(input, output) {
             step = 1,
             value = 10
         )
+    })
+
+    observeEvent(input$optimize_button, {
+        results <- isolate(results())
+        method_ids <- NULL
+
+        for (method in methods) {
+            if (isolate(input[[method$id]])) {
+                method_ids <- c(method_ids, method$id)
+            }
+        }
+
+        reference_gene_ids <- genes[suggested | verified == TRUE, id]
+        weights <- optimize_weights(results, method_ids, reference_gene_ids)
+
+        mapply(function(method_id, weight) {
+            updateSliderInput(
+                session,
+                sprintf("%s_weight", method_id),
+                value = weight * 100
+            )
+        }, method_ids, weights)
+    })
+
+    # Observe each method's enable button.
+    lapply(methods, function(method) {
+        observeEvent(input[[method$id]], {
+            shinyjs::toggleState(sprintf("%s_weight", method$id))
+        }, ignoreInit = TRUE)
     })
 
     #' Rank the results based on the specified weights. Filter out genes with
@@ -52,11 +82,13 @@ server <- function(input, output) {
         results[, score := 0.0]
 
         for (method in methods) {
-            weight <- input[[method$id]]
-            total_weight <- total_weight + weight
-            column <- method$id
-            weighted <- weight * results[, ..column]
-            results[, score := score + weighted]
+            if (input[[method$id]]) {
+                weight <- input[[sprintf("%s_weight", method$id)]]
+                total_weight <- total_weight + weight
+                column <- method$id
+                weighted <- weight * results[, ..column]
+                results[, score := score + weighted]
+            }
         }
 
         results[, score := score / total_weight]

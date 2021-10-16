@@ -6,6 +6,7 @@ library(shiny)
 source("methods.R")
 
 ui <- fluidPage(
+    shinyjs::useShinyjs(),
     rclipboardSetup(),
     titlePanel("TPE-OLD candidates"),
     sidebarLayout(
@@ -30,16 +31,32 @@ ui <- fluidPage(
                 step = 1,
                 value = 50
             ),
-            h3("Ranking"),
+            h3("Methods"),
+            actionButton(
+                "optimize_button",
+                "Find optimal weights",
+                icon = icon("check-double")
+            ),
+            div(style = "margin-top: 16px"),
             lapply(methods, function(method) {
-                sliderInput(
-                    method$id,
-                    method$description,
-                    post = "%",
-                    min = 0,
-                    max = 100,
-                    step = 1,
-                    value = 100
+                verticalLayout(
+                    checkboxInput(
+                        method$id,
+                        span(
+                            method$description,
+                            style = "font-weight: bold"
+                        ),
+                        value = TRUE
+                    ),
+                    sliderInput(
+                        sprintf("%s_weight", method$id),
+                        NULL,
+                        post = "%",
+                        min = 0,
+                        max = 100,
+                        step = 1,
+                        value = 100
+                    )
                 )
             }),
             checkboxInput(
