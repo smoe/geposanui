@@ -6,6 +6,7 @@ library(plotly)
 library(rclipboard)
 library(shiny)
 
+source("methods.R")
 source("rank_plot.R")
 source("scatter_plot.R")
 source("utils.R")
@@ -36,41 +37,8 @@ server <- function(input, output, session) {
         )
     })
 
-    observeEvent(input$optimize_button, {
-        results <- isolate(results())
-        method_ids <- NULL
-
-        for (method in methods) {
-            if (isolate(input[[method$id]])) {
-                method_ids <- c(method_ids, method$id)
-            }
-        }
-
-        weights <- geposan::optimize_weights(
-            results,
-            method_ids,
-            genes_tpe_old
-        )
-
-        for (method_id in method_ids) {
-            updateSliderInput(
-                session,
-                sprintf("%s_weight", method_id),
-                value = weights[[method_id]] * 100
-            )
-        }
-    })
-
-    # Observe each method's enable button.
-    lapply(methods, function(method) {
-        observeEvent(input[[method$id]], {
-            shinyjs::toggleState(sprintf("%s_weight", method$id))
-        }, ignoreInit = TRUE)
-    })
-
-    #' Rank the results based on the specified weights. Filter out genes with
-    #' too few species but don't apply the cut-off score.
-    results <- reactive({
+    #' Compute the results according to the preset.
+    analysis <- reactive({
         # Select the preset.
         preset <- if (input$species == "all") {
             preset_all_species
@@ -102,21 +70,11 @@ server <- function(input, output, session) {
         )
 
         # Exclude genes with too few species.
-        results <- results[n_species >= input$n_species]
-
-        # Rank the results based on the weights.
-
-        weights <- NULL
-
-        for (method in methods) {
-            if (input[[method$id]]) {
-                weight <- input[[sprintf("%s_weight", method$id)]]
-                weights[[method$id]] <- weight
-            }
-        }
-
-        geposan::ranking(results, weights)
+        results[n_species >= input$n_species]
     })
+
+    # Rank the results.
+    results <- methods_server("methods", analysis)
 
     #' Apply the cut-off score to the ranked results.
     results_filtered <- reactive({

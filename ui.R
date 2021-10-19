@@ -3,6 +3,8 @@ library(plotly)
 library(rclipboard)
 library(shiny)
 
+source("methods.R")
+
 ui <- fluidPage(
     shinyjs::useShinyjs(),
     rclipboardSetup(),
@@ -29,34 +31,7 @@ ui <- fluidPage(
                 step = 1,
                 value = 50
             ),
-            h3("Methods"),
-            actionButton(
-                "optimize_button",
-                "Find optimal weights",
-                icon = icon("check-double")
-            ),
-            div(style = "margin-top: 16px"),
-            lapply(methods, function(method) {
-                verticalLayout(
-                    checkboxInput(
-                        method$id,
-                        span(
-                            method$description,
-                            style = "font-weight: bold"
-                        ),
-                        value = TRUE
-                    ),
-                    sliderInput(
-                        sprintf("%s_weight", method$id),
-                        NULL,
-                        post = "%",
-                        min = 0,
-                        max = 100,
-                        step = 1,
-                        value = 100
-                    )
-                )
-            })
+            methods_ui("methods")
         ),
         mainPanel(
             tabsetPanel(
