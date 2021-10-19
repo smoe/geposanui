@@ -79,7 +79,19 @@ server <- function(input, output, session) {
         }
 
         # Perform the analysis cached based on the preset's hash.
-        results <- run_cached(rlang::hash(preset), geposan::analyze, preset)
+        results <- withProgress(
+            message = "Analyzing genes",
+            value = 0.0, {
+                run_cached(
+                    rlang::hash(preset),
+                    geposan::analyze,
+                    preset,
+                    function(progress) {
+                        setProgress(progress)
+                    }
+                )
+            }
+        )
 
         # Add all gene information to the results.
         results <- merge(
