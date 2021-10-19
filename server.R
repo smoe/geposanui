@@ -1,13 +1,14 @@
 library(data.table)
 library(DT)
+library(geposan)
 library(gprofiler2)
 library(plotly)
 library(rclipboard)
 library(shiny)
 
-source("optimize.R")
 source("rank_plot.R")
 source("scatter_plot.R")
+source("utils.R")
 
 #' Java script function to replace gene IDs with Ensembl gene links.
 js_link <- JS("function(row, data) {
@@ -45,16 +46,19 @@ server <- function(input, output, session) {
             }
         }
 
-        reference_gene_ids <- genes[suggested | verified == TRUE, id]
-        weights <- optimize_weights(results, method_ids, reference_gene_ids)
+        weights <- geposan::optimize_weights(
+            results,
+            method_ids,
+            genes_tpe_old
+        )
 
-        mapply(function(method_id, weight) {
+        for (method_id in method_ids) {
             updateSliderInput(
                 session,
                 sprintf("%s_weight", method_id),
-                value = weight * 100
+                value = weights[[method_id]] * 100
             )
-        }, method_ids, weights)
+        }
     })
 
     # Observe each method's enable button.
@@ -67,14 +71,17 @@ server <- function(input, output, session) {
     #' Rank the results based on the specified weights. Filter out genes with
     #' too few species but don't apply the cut-off score.
     results <- reactive({
-        # Select the species preset.
-
-        results <- if (input$species == "all") {
-            process(preset_all_species)
+        # Select the preset.
+        preset <- if (input$species == "all") {
+            preset_all_species
         } else {
-            process(preset_replicative_species)
+            preset_replicative_species
         }
 
+        # Perform the analysis cached based on the preset's hash.
+        results <- run_cached(rlang::hash(preset), geposan::analyze, preset)
+
+        # Add all gene information to the results.
         results <- merge(
             results,
             genes,
@@ -82,41 +89,21 @@ server <- function(input, output, session) {
             by.y = "id"
         )
 
-        # Compute scoring factors and the weighted score.
+        # Exclude genes with too few species.
+        results <- results[n_species >= input$n_species]
 
-        total_weight <- 0.0
-        results[, score := 0.0]
+        # Rank the results based on the weights.
+
+        weights <- NULL
 
         for (method in methods) {
             if (input[[method$id]]) {
                 weight <- input[[sprintf("%s_weight", method$id)]]
-                total_weight <- total_weight + weight
-                column <- method$id
-                weighted <- weight * results[, ..column]
-                results[, score := score + weighted]
+                weights[[method$id]] <- weight
             }
         }
 
-        results[, score := score / total_weight]
-
-        # Exclude genes with too few species.
-        results <- results[n_species >= input$n_species]
-
-        # Penalize missing species.
-        if (input$penalize) {
-            species_count <- if (input$species == "all") {
-                nrow(species)
-            } else {
-                length(species_ids_replicative)
-            }
-
-            results <- results[, score := score * n_species / species_count]
-        }
-
-        # Order the results based on their score.
-
-        setorder(results, -score, na.last = TRUE)
-        results[, rank := .I]
+        geposan::ranking(results, weights)
     })
 
     #' Apply the cut-off score to the ranked results.

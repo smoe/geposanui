@@ -56,11 +56,7 @@ ui <- fluidPage(
                         value = 100
                     )
                 )
-            }),
-            checkboxInput(
-                "penalize",
-                "Penalize missing values"
-            ),
+            })
         ),
         mainPanel(
             tabsetPanel(
