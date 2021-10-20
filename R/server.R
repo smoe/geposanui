@@ -1,18 +1,5 @@
-library(data.table)
-library(DT)
-library(geposan)
-library(gprofiler2)
-library(plotly)
-library(rclipboard)
-library(shiny)
-
-source("methods.R")
-source("rank_plot.R")
-source("scatter_plot.R")
-source("utils.R")
-
-#' Java script function to replace gene IDs with Ensembl gene links.
-js_link <- JS("function(row, data) {
+# Java script function to replace gene IDs with Ensembl gene links.
+js_link <- DT::JS("function(row, data) {
     let id = data[1];
     var name = data[2];
     if (!name) name = 'Unknown';
@@ -21,7 +8,7 @@ js_link <- JS("function(row, data) {
 }")
 
 server <- function(input, output, session) {
-    #' Show the customized slider for setting the required number of species.
+    # Show the customized slider for setting the required number of species.
     output$n_species_slider <- renderUI({
         sliderInput(
             "n_species",
@@ -37,7 +24,7 @@ server <- function(input, output, session) {
         )
     })
 
-    #' Compute the results according to the preset.
+    # Compute the results according to the preset.
     analysis <- reactive({
         # Select the preset.
         preset <- if (input$species == "all") {
@@ -70,7 +57,7 @@ server <- function(input, output, session) {
         )
 
         # Count included species from the preset per gene.
-        genes_n_species <- distances[
+        genes_n_species <- geposan::distances[
             species %chin% preset$species_ids,
             .(n_species = .N),
             by = "gene"
@@ -85,18 +72,18 @@ server <- function(input, output, session) {
     # Rank the results.
     results <- methods_server("methods", analysis)
 
-    #' Apply the cut-off score to the ranked results.
+    # Apply the cut-off score to the ranked results.
     results_filtered <- reactive({
         results()[score >= input$cutoff / 100]
     })
 
-    output$genes <- renderDT({
+    output$genes <- DT::renderDT({
         method_ids <- sapply(methods, function(method) method$id)
         method_names <- sapply(methods, function(method) method$name)
         columns <- c("rank", "gene", "name", "chromosome", method_ids, "score")
         column_names <- c("", "Gene", "", "Chromosome", method_names, "Score")
 
-        dt <- datatable(
+        dt <- DT::datatable(
             results_filtered()[, ..columns],
             rownames = FALSE,
             colnames = column_names,
@@ -112,7 +99,7 @@ server <- function(input, output, session) {
             )
         )
 
-        formatPercentage(dt, c(method_ids, "score"), digits = 1)
+        DT::formatPercentage(dt, c(method_ids, "score"), digits = 1)
     })
 
     output$copy <- renderUI({
@@ -126,13 +113,13 @@ server <- function(input, output, session) {
 
         splitLayout(
             cellWidths = "auto",
-            rclipButton(
+            rclipboard::rclipButton(
                 "copy_ids_button",
                 "Copy gene IDs",
                 genes_text,
                 icon = icon("clipboard")
             ),
-            rclipButton(
+            rclipboard::rclipButton(
                 "copy_names_button",
                 "Copy gene names",
                 names_text,
@@ -141,7 +128,7 @@ server <- function(input, output, session) {
         )
     })
 
-    output$scatter <- renderPlotly({
+    output$scatter <- plotly::renderPlotly({
         results <- results_filtered()
 
         gene_ids <- results[input$genes_rows_selected, gene]
@@ -153,7 +140,7 @@ server <- function(input, output, session) {
             species[replicative == TRUE]
         }
 
-        scatter_plot(results, species, genes, distances)
+        scatter_plot(results, species, genes)
     })
 
     output$assessment_synopsis <- renderText({
@@ -190,7 +177,7 @@ server <- function(input, output, session) {
         )
     })
 
-    output$rank_plot <- renderPlotly({
+    output$rank_plot <- plotly::renderPlotly({
         rank_plot(
             results(),
             genes[suggested | verified == TRUE, id],
@@ -198,10 +185,18 @@ server <- function(input, output, session) {
         )
     })
 
-    output$gost <- renderPlotly({
+    output$gost <- plotly::renderPlotly({
         if (input$enable_gost) {
-            result <- gost(results_filtered()[, gene], ordered_query = TRUE)
-            gostplot(result, capped = FALSE, interactive = TRUE)
+            result <- gprofiler2::gost(
+                results_filtered()[, gene],
+                ordered_query = TRUE
+            )
+
+            gprofiler2::gostplot(
+                result,
+                capped = FALSE,
+                interactive = TRUE
+            )
         } else {
             NULL
         }

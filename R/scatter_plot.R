@@ -1,24 +1,20 @@
-library(data.table)
-library(plotly)
-
-#' Draw a scatter plot containing gene positions.
-#'
-#' @param results Results from [`process_input()`].
-#' @param species Species to be displayed.
-#' @param genes Genes to be displayed.
-#' @param distances Distance data to display.
-scatter_plot <- function(results, species, genes, distances) {
+# Draw a scatter plot containing gene positions.
+#
+# @param results Results from [`process_input()`].
+# @param species Species to be displayed.
+# @param genes Genes to be displayed.
+scatter_plot <- function(results, species, genes) {
     species_ids <- species[, id]
 
     data <- merge(
         genes[, .(id, name)],
-        distances[species %in% species_ids],
+        geposan::distances[species %in% species_ids],
         by.x = "id", by.y = "gene"
     )
 
     data[name == "", name := "Unknown"]
 
-    plot_ly(
+    plotly::plot_ly(
         data = data,
         x = ~species,
         y = ~distance,
@@ -26,7 +22,7 @@ scatter_plot <- function(results, species, genes, distances) {
         name = ~name,
         type = "scatter",
         mode = "markers"
-    ) |> layout(
+    ) |> plotly::layout(
         xaxis = list(
             title = "Species",
             tickvals = species_ids,

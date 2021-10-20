@@ -1,6 +1,4 @@
-library(data.table)
-
-#' Species IDs of known replicatively aging species.
+# Species IDs of known replicatively aging species.
 species_ids_replicative <- c(
     "bihybrid",
     "btaurus",
@@ -29,14 +27,14 @@ species_ids_replicative <- c(
     "tgelada"
 )
 
-#' Species from [geposan] and their aging status.
+# Species from [geposan] and their aging status.
 species <- geposan::species[, .(
     id,
     name,
     replicative = id %chin% species_ids_replicative
 )]
 
-#' Gene names of genes for verified TPE-OLD genes.
+# Gene names of genes for verified TPE-OLD genes.
 genes_verified_tpe_old <- c(
     "C1S",
     "DSP",
@@ -45,7 +43,7 @@ genes_verified_tpe_old <- c(
     "TERT"
 )
 
-#' Gene names of genes with a suggested TPE-OLD.
+# Gene names of genes with a suggested TPE-OLD.
 genes_suggested_tpe_old <- c(
     "AKAP3",
     "ANO2",
@@ -60,7 +58,7 @@ genes_suggested_tpe_old <- c(
     "TSPAN9"
 )
 
-#' Genes from [geposan] and their TPE-OLD status.
+# Genes from [geposan] and their TPE-OLD status.
 genes <- geposan::genes[, .(
     id,
     name,
@@ -69,7 +67,7 @@ genes <- geposan::genes[, .(
     verified = name %chin% genes_verified_tpe_old
 )]
 
-#' All available methods from [geposan] and additional information on them.
+# All available methods from [geposan] and additional information on them.
 methods <- list(
     list(
         id = "clusteriness",
@@ -93,10 +91,10 @@ methods <- list(
     )
 )
 
-#' Gene IDs of known or suggested TPE-OLD genes.
+# Gene IDs of known or suggested TPE-OLD genes.
 genes_tpe_old <- genes[suggested | verified == TRUE, id]
 
-#' Preset for [geposan] including all species and TPE-OLD genes for reference.
+# Preset for [geposan] including all species and TPE-OLD genes for reference.
 preset_all_species <- geposan::preset(
     methods = c("clusteriness", "correlation", "proximity", "neural"),
     species = species$id,
@@ -104,8 +102,8 @@ preset_all_species <- geposan::preset(
     reference_genes = genes_tpe_old
 )
 
-#' Preset for [geposan] including only replicatively aging species as well as
-#' TPE-OLD genes for reference.
+# Preset for [geposan] including only replicatively aging species as well as
+# TPE-OLD genes for reference.
 preset_replicative_species <- geposan::preset(
     methods = c("clusteriness", "correlation", "proximity", "neural"),
     species = species_ids_replicative,

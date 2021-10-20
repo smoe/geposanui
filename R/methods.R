@@ -1,6 +1,4 @@
-library(shiny)
-
-#' Construct UI for the methods editor.
+# Construct UI for the methods editor.
 methods_ui <- function(id) {
     initial_weight <- 100 / length(methods)
 
@@ -36,11 +34,11 @@ methods_ui <- function(id) {
     )
 }
 
-#' Construct server for the methods editor.
-#'
-#' @param analysis The reactive containing the results to be weighted.
-#'
-#' @return A reactive containing the weighted results.
+# Construct server for the methods editor.
+#
+# @param analysis The reactive containing the results to be weighted.
+#
+# @return A reactive containing the weighted results.
 methods_server <- function(id, analysis) {
     moduleServer(id, function(input, output, session) {
         observeEvent(input$optimize_button, {

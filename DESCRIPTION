@@ -1,0 +1,26 @@
+Package: tpeold
+Title: Interface for Finding TPE-OLD Candidates
+Version: 0.0.0.9000
+Authors@R:
+    person(
+        "Elias",
+        "Projahn",
+        email = "elias@johrpan.de",
+        role = c("aut", "cre")
+    )
+Description: This package provides a Shiny interface for analyzing genes and
+    finding TPE-OLD candidates based on known TPE-OLD genes.
+License: AGPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Imports:
+    data.table,
+    DT,
+    geposan,
+    gprofiler2,
+    plotly,
+    rlang,
+    rclipboard,
+    shiny,
+    shinyjs

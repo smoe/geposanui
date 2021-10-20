@@ -1,13 +1,6 @@
-library(DT)
-library(plotly)
-library(rclipboard)
-library(shiny)
-
-source("methods.R")
-
 ui <- fluidPage(
     shinyjs::useShinyjs(),
-    rclipboardSetup(),
+    rclipboard::rclipboardSetup(),
     titlePanel("TPE-OLD candidates"),
     sidebarLayout(
         sidebarPanel(
@@ -42,12 +35,12 @@ ui <- fluidPage(
                     uiOutput("copy"),
                     div(
                         style = "margin-top: 16px",
-                        DTOutput("genes", height = "1000px")
+                        DT::DTOutput("genes", height = "1000px")
                     )
                 ),
                 tabPanel(
                     "Positions",
-                    plotlyOutput(
+                    plotly::plotlyOutput(
                         "scatter",
                         width = "100%",
                         height = "600px"
@@ -58,7 +51,7 @@ ui <- fluidPage(
                     htmlOutput("assessment_synopsis"),
                     div(
                         style = "margin-top: 16px",
-                        plotlyOutput(
+                        plotly::plotlyOutput(
                             "rank_plot",
                             width = "100%",
                             height = "600px"
@@ -74,7 +67,7 @@ ui <- fluidPage(
                     ),
                     conditionalPanel(
                         "input.enable_gost == true",
-                        plotlyOutput(
+                        plotly::plotlyOutput(
                             "gost",
                             width = "100%",
                             height = "600px"
