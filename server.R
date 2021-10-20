@@ -159,21 +159,34 @@ server <- function(input, output, session) {
     output$assessment_synopsis <- renderText({
         reference_gene_ids <- genes[suggested | verified == TRUE, id]
 
-        reference_count <- results_filtered()[
+        included_reference_count <- results_filtered()[
             gene %chin% reference_gene_ids,
             .N
         ]
 
         reference_results <- results()[gene %chin% reference_gene_ids]
+        total_reference_count <- nrow(reference_results)
+
+        if (total_reference_count > 0) {
+            mean_rank <- as.character(round(
+                reference_results[, mean(rank)],
+                digits = 1
+            ))
+
+            max_rank <- as.character(reference_results[, max(rank)])
+        } else {
+            mean_rank <- "Unknown"
+            max_rank <- "Unknown"
+        }
 
         sprintf(
             "Included reference genes: %i/%i<br> \
-            Mean rank of reference genes: %.1f<br> \
-            Maximum rank of reference genes: %i",
-            reference_count,
-            length(reference_gene_ids),
-            reference_results[, mean(rank)],
-            reference_results[, max(rank)]
+            Mean rank of reference genes: %s<br> \
+            Maximum rank of reference genes: %s",
+            included_reference_count,
+            total_reference_count,
+            mean_rank,
+            max_rank
         )
     })
 
