@@ -69,8 +69,17 @@ server <- function(input, output, session) {
             by.y = "id"
         )
 
+        # Count included species from the preset per gene.
+        genes_n_species <- distances[
+            species %chin% preset$species_ids,
+            .(n_species = .N),
+            by = "gene"
+        ]
+
+        setkey(genes_n_species, gene)
+
         # Exclude genes with too few species.
-        results[n_species >= input$n_species]
+        results[genes_n_species[gene, n_species] >= input$n_species]
     })
 
     # Rank the results.

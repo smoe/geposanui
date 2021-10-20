@@ -65,7 +65,6 @@ genes <- geposan::genes[, .(
     id,
     name,
     chromosome,
-    n_species,
     suggested = name %chin% genes_suggested_tpe_old,
     verified = name %chin% genes_verified_tpe_old
 )]
