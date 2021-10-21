@@ -5,15 +5,8 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             width = 3,
+            preset_editor_ui("preset_editor"),
             h3("Filter criteria"),
-            selectInput(
-                "species",
-                "Species to include",
-                choices = list(
-                    "Replicatively aging" = "replicative",
-                    "All qualified" = "all"
-                )
-            ),
             uiOutput("n_species_slider"),
             sliderInput(
                 "cutoff",

@@ -23,4 +23,5 @@ Imports:
     rlang,
     rclipboard,
     shiny,
-    shinyjs
+    shinyjs,
+    shinyWidgets

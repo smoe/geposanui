@@ -8,17 +8,15 @@ js_link <- DT::JS("function(row, data) {
 }")
 
 server <- function(input, output, session) {
+    preset <- preset_editor_server("preset_editor")
+
     # Show the customized slider for setting the required number of species.
     output$n_species_slider <- renderUI({
         sliderInput(
             "n_species",
             "Required number of species per gene",
             min = 0,
-            max = if (input$species == "all") {
-                nrow(species)
-            } else {
-                length(species_ids_replicative)
-            },
+            max = length(preset()$species_ids),
             step = 1,
             value = 10
         )
@@ -26,12 +24,7 @@ server <- function(input, output, session) {
 
     # Compute the results according to the preset.
     analysis <- reactive({
-        # Select the preset.
-        preset <- if (input$species == "all") {
-            preset_all_species
-        } else {
-            preset_replicative_species
-        }
+        preset <- preset()
 
         # Perform the analysis cached based on the preset's hash.
         results <- withProgress(
@@ -133,18 +126,13 @@ server <- function(input, output, session) {
 
         gene_ids <- results[input$genes_rows_selected, gene]
         genes <- genes[id %chin% gene_ids]
-
-        species <- if (input$species == "all") {
-            species
-        } else {
-            species[replicative == TRUE]
-        }
+        species <- species[id %chin% preset()$species_ids]
 
         scatter_plot(results, species, genes)
     })
 
     output$assessment_synopsis <- renderText({
-        reference_gene_ids <- genes[suggested | verified == TRUE, id]
+        reference_gene_ids <- preset()$reference_gene_ids
 
         included_reference_count <- results_filtered()[
             gene %chin% reference_gene_ids,
@@ -184,7 +172,7 @@ server <- function(input, output, session) {
     output$rank_plot <- plotly::renderPlotly({
         rank_plot(
             results(),
-            genes[suggested | verified == TRUE, id],
+            preset()$reference_gene_ids,
             input$cutoff / 100
         )
     })
