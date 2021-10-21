@@ -160,19 +160,23 @@ server <- function(input, output, session) {
                 digits = 1
             ))
 
+            min_rank <- as.character(reference_results[, min(rank)])
             max_rank <- as.character(reference_results[, max(rank)])
         } else {
             mean_rank <- "Unknown"
+            min_rank <- "Unknown"
             max_rank <- "Unknown"
         }
 
         sprintf(
             "Included reference genes: %i/%i<br> \
             Mean rank of reference genes: %s<br> \
-            Maximum rank of reference genes: %s",
+            First rank of reference genes: %s<br> \
+            Last rank of reference genes: %s",
             included_reference_count,
             total_reference_count,
             mean_rank,
+            min_rank,
             max_rank
         )
     })

@@ -4,11 +4,6 @@ methods_ui <- function(id) {
 
     verticalLayout(
         h3("Methods"),
-        actionButton(
-            NS(id, "optimize_button"),
-            "Find optimal weights",
-            icon = icon("check-double")
-        ),
         div(style = "margin-top: 16px"),
         lapply(methods, function(method) {
             verticalLayout(
@@ -30,7 +25,21 @@ methods_ui <- function(id) {
                     value = initial_weight
                 )
             )
-        })
+        }),
+        radioButtons(
+            NS(id, "target"),
+            "Optimization target",
+            choices = list(
+                "Mean rank of reference genes" = "mean",
+                "First rank of reference genes" = "min",
+                "Last rank of reference genes" = "max"
+            )
+        ),
+        actionButton(
+            NS(id, "optimize_button"),
+            "Optimize weights",
+            class = "btn-primary"
+        )
     )
 }
 
@@ -54,7 +63,8 @@ methods_server <- function(id, analysis) {
             weights <- geposan::optimize_weights(
                 analysis(),
                 method_ids,
-                genes_tpe_old
+                genes_tpe_old,
+                target = input$target
             )
 
             for (method_id in method_ids) {
