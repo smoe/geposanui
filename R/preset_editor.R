@@ -3,13 +3,9 @@ preset_editor_ui <- function(id) {
     species_choices <- species$id
     names(species_choices) <- species$name
 
-    species_selected <- species_ids_replicative
-
     known_genes <- genes[name != ""]
     gene_choices <- known_genes$id
     names(gene_choices) <- known_genes$name
-
-    genes_selected <- genes[suggested | verified == TRUE, id]
 
     verticalLayout(
         h3("Preset"),
@@ -28,7 +24,7 @@ preset_editor_ui <- function(id) {
                 inputId = NS(id, "species"),
                 label = "Included species",
                 choices = species_choices,
-                selected = species_selected,
+                selected = species_replicative,
                 options = list(
                     "actions-box" = TRUE,
                     "live-search" = TRUE
@@ -39,7 +35,7 @@ preset_editor_ui <- function(id) {
                 inputId = NS(id, "reference_genes"),
                 label = "Reference genes",
                 choices = gene_choices,
-                selected = genes_selected,
+                selected = genes_tpe_old,
                 options = list(
                     "actions-box" = TRUE,
                     "live-search" = TRUE
