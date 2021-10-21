@@ -30,14 +30,9 @@ server <- function(input, output, session) {
         results <- withProgress(
             message = "Analyzing genes",
             value = 0.0, {
-                run_cached(
-                    rlang::hash(preset),
-                    geposan::analyze,
-                    preset,
-                    function(progress) {
-                        setProgress(progress)
-                    }
-                )
+                geposan::analyze(preset, function(progress) {
+                    setProgress(progress)
+                })
             }
         )
 
