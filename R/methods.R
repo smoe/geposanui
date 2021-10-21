@@ -79,9 +79,7 @@ methods_server <- function(id, analysis) {
         # Observe each method's enable button and synchronise the slider state.
         lapply(methods, function(method) {
             observeEvent(input[[method$id]], {
-                shinyjs::toggleState(
-                    session$ns(sprintf("%s_weight", method$id))
-                )
+                shinyjs::toggleState(sprintf("%s_weight", method$id))
             }, ignoreInit = TRUE)
         })
 
