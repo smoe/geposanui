@@ -10,14 +10,12 @@ js_link <- DT::JS("function(row, data) {
 server <- function(input, output, session) {
     preset <- preset_editor_server("preset_editor")
 
-    output$n_species_slider <- renderUI({
-        sliderInput(
+    observe({
+        species_count <- length(preset()$species_ids)
+        updateSliderInput(
+            session,
             "n_species",
-            "Required number of species per gene",
-            min = 0,
-            max = length(preset()$species_ids),
-            step = 1,
-            value = 10
+            max = species_count
         )
     })
 
