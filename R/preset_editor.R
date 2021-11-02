@@ -18,35 +18,40 @@ preset_editor_ui <- function(id) {
                 "Customize" = "custom"
             )
         ),
-        conditionalPanel(
-            sprintf("input['%s'] == 'custom'", NS(id, "preset")),
-            shinyWidgets::pickerInput(
-                inputId = NS(id, "species"),
-                label = "Included species",
-                choices = species_choices,
-                selected = species_replicative,
-                options = list(
-                    "actions-box" = TRUE,
-                    "live-search" = TRUE
+        tabsetPanel(
+            id = NS(id, "customization"),
+            type = "hidden",
+            tabPanelBody(value = "none"),
+            tabPanelBody(
+                value = "custom",
+                shinyWidgets::pickerInput(
+                    inputId = NS(id, "species"),
+                    label = "Included species",
+                    choices = species_choices,
+                    selected = species_replicative,
+                    options = list(
+                        "actions-box" = TRUE,
+                        "live-search" = TRUE
+                    ),
+                    multiple = TRUE
                 ),
-                multiple = TRUE
-            ),
-            shinyWidgets::pickerInput(
-                inputId = NS(id, "reference_genes"),
-                label = "Reference genes",
-                choices = gene_choices,
-                selected = genes_tpe_old,
-                options = list(
-                    "actions-box" = TRUE,
-                    "live-search" = TRUE
+                shinyWidgets::pickerInput(
+                    inputId = NS(id, "reference_genes"),
+                    label = "Reference genes",
+                    choices = gene_choices,
+                    selected = genes_tpe_old,
+                    options = list(
+                        "actions-box" = TRUE,
+                        "live-search" = TRUE
+                    ),
+                    multiple = TRUE
                 ),
-                multiple = TRUE
-            ),
-            actionButton(
-                NS(id, "apply_button"),
-                "Perform analysis",
-                class = "btn-primary",
-                style = "margin-top: 16px; margin-bottom: 16px"
+                actionButton(
+                    NS(id, "apply_button"),
+                    "Perform analysis",
+                    class = "btn-primary",
+                    style = "margin-top: 16px; margin-bottom: 16px"
+                )
             )
         )
     )
@@ -62,11 +67,17 @@ preset_editor_server <- function(id) {
         result <- reactiveVal(preset_replicative_species)
 
         observeEvent(input$preset, {
-            if (input$preset == "replicative") {
+            panel <- if (input$preset == "replicative") {
                 result(preset_replicative_species)
+                "none"
             } else if (input$preset == "all") {
                 result(preset_all_species)
+                "none"
+            } else {
+                "custom"
             }
+
+            updateTabsetPanel(session, "customization", selected = panel)
         })
 
         observeEvent(input$apply_button, {
