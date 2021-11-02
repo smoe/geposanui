@@ -6,17 +6,7 @@ ui <- fluidPage(
         sidebarPanel(
             width = 3,
             preset_editor_ui("preset_editor"),
-            h3("Filter criteria"),
-            uiOutput("n_species_slider"),
-            sliderInput(
-                "cutoff",
-                "Cut-off score",
-                post = "%",
-                min = 0,
-                max = 100,
-                step = 1,
-                value = 50
-            ),
+            filters_ui("filters"),
             methods_ui("methods")
         ),
         mainPanel(

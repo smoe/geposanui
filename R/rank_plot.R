@@ -9,11 +9,8 @@
 #
 # @param results Results to display.
 # @param reference_gene_ids IDs of reference genes.
-# @param cutoff Cut-off score.
-rank_plot <- function(results, reference_gene_ids, cutoff) {
-    first_not_included_rank <- results[score < cutoff, min(rank)]
-    last_rank <- results[, .N]
-
+# @param max_rank Last rank of the included genes.
+rank_plot <- function(results, reference_gene_ids, max_rank) {
     plot <- plotly::plot_ly() |> plotly::add_trace(
         data = results,
         x = ~rank,
@@ -34,6 +31,9 @@ rank_plot <- function(results, reference_gene_ids, cutoff) {
         xaxis = list(title = "Ranks"),
         yaxis = list(title = "Score")
     )
+
+    first_not_included_rank <- max_rank + 1
+    last_rank <- results[, .N]
 
     if (first_not_included_rank <= last_rank) {
         plot <- plot |> plotly::layout(
