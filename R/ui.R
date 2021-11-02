@@ -6,6 +6,7 @@ ui <- fluidPage(
         sidebarPanel(
             width = 3,
             preset_editor_ui("preset_editor"),
+            uiOutput("n_species_slider"),
             filters_ui("filters"),
             methods_ui("methods")
         ),

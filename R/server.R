@@ -9,7 +9,17 @@ js_link <- DT::JS("function(row, data) {
 
 server <- function(input, output, session) {
     preset <- preset_editor_server("preset_editor")
-    filters <- filters_server("filters", preset)
+
+    output$n_species_slider <- renderUI({
+        sliderInput(
+            "n_species",
+            "Required number of species per gene",
+            min = 0,
+            max = length(preset()$species_ids),
+            step = 1,
+            value = 10
+        )
+    })
 
     # Compute the results according to the preset.
     analysis <- reactive({
@@ -43,22 +53,14 @@ server <- function(input, output, session) {
         setkey(genes_n_species, gene)
 
         # Exclude genes with too few species.
-        results[genes_n_species[gene, n_species] >= filters()$n_species]
+        results[genes_n_species[gene, n_species] >= input$n_species]
     })
 
     # Rank the results.
     results <- methods_server("methods", analysis)
 
     # Apply the filters.
-    results_filtered <- reactive({
-        filters <- filters()
-
-        if (filters$filter == "score") {
-            results()[score >= filters$cut_off_score / 100]
-        } else {
-            results()[rank <= filters$max_rank]
-        }
-    })
+    results_filtered <- filters_server("filters", results)
 
     output$genes <- DT::renderDT({
         method_ids <- sapply(methods, function(method) method$id)
