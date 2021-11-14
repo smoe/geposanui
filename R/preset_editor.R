@@ -82,15 +82,10 @@ preset_editor_server <- function(id) {
 
         observeEvent(input$apply_button, {
             result(geposan::preset(
-                methods <- c(
-                    "clusteriness",
-                    "correlation",
-                    "proximity",
-                    "neural"
-                ),
-                species = input$species,
-                genes = genes$id,
-                reference_genes = input$reference_genes
+                methods = method_ids,
+                species_ids = input$species,
+                gene_ids = genes$id,
+                reference_gene_ids = input$reference_genes
             ))
         })
 

@@ -24,45 +24,39 @@ server <- function(input, output, session) {
         preset <- preset()
 
         # Perform the analysis cached based on the preset's hash.
-        results <- withProgress(
+        analysis <- withProgress(
             message = "Analyzing genes",
-            value = 0.0, {
+            value = 0.0,
+            { # nolint
                 geposan::analyze(preset, function(progress) {
                     setProgress(progress)
                 })
             }
         )
 
-        # Add all gene information to the results.
-        results <- merge(
-            results,
-            genes,
-            by.x = "gene",
-            by.y = "id"
-        )
-
-        # Count included species from the preset per gene.
-        genes_n_species <- geposan::distances[
-            species %chin% preset$species_ids,
-            .(n_species = .N),
-            by = "gene"
-        ]
-
-        setkey(genes_n_species, gene)
-
-        # Exclude genes with too few species.
-        results[genes_n_species[gene, n_species] >= input$n_species]
+        analysis
     })
 
+    min_n_species <- reactive(input$n_species)
+
     # Rank the results.
-    results <- methods_server("methods", analysis)
+    ranking <- methods_server("methods", analysis, min_n_species)
+
+    # Add gene information to the results.
+    results <- reactive({
+        merge(
+            ranking(),
+            geposan::genes,
+            by.x = "gene",
+            by.y = "id",
+            sort = FALSE
+        )
+    })
 
     # Apply the filters.
     results_filtered <- filters_server("filters", results)
 
     output$genes <- DT::renderDT({
-        method_ids <- sapply(methods, function(method) method$id)
-        method_names <- sapply(methods, function(method) method$name)
         columns <- c("rank", "gene", "name", "chromosome", method_ids, "score")
         column_names <- c("", "Gene", "", "Chromosome", method_names, "Score")
 

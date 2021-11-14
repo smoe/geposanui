@@ -46,9 +46,11 @@ methods_ui <- function(id) {
 # Construct server for the methods editor.
 #
 # @param analysis The reactive containing the results to be weighted.
+# @param min_n_species A reactive containing the minimum number of species to
+#   require for genes to be included in the ranking.
 #
 # @return A reactive containing the weighted results.
-methods_server <- function(id, analysis) {
+methods_server <- function(id, analysis, min_n_species) {
     moduleServer(id, function(input, output, session) {
         observeEvent(input$optimize_button, {
             method_ids <- NULL
@@ -60,11 +62,12 @@ methods_server <- function(id, analysis) {
                 }
             }
 
-            weights <- geposan::optimize_weights(
+            weights <- geposan::optimal_weights(
                 analysis(),
                 method_ids,
                 genes_tpe_old,
-                target = input$target
+                target = input$target,
+                min_n_species = min_n_species()
             )
 
             for (method_id in method_ids) {
@@ -95,7 +98,11 @@ methods_server <- function(id, analysis) {
                 }
             }
 
-            geposan::ranking(analysis(), weights)
+            geposan::ranking(
+                analysis(),
+                weights,
+                min_n_species = min_n_species()
+            )
         })
     })
 }

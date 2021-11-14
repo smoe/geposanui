@@ -71,13 +71,23 @@ genes <- geposan::genes[, .(
 methods <- list(
     list(
         id = "clusteriness",
-        name = "Clustering",
-        description = "Clustering of genes"
+        name = "Clustering (distances)",
+        description = "Clustering of genes (distances)"
+    ),
+    list(
+        id = "clusteriness_positions",
+        name = "Clustering (positions)",
+        description = "Clustering of genes (positions)"
     ),
     list(
         id = "correlation",
-        name = "Correlation",
-        description = "Correlation with known genes"
+        name = "Correlation (distances)",
+        description = "Correlation with known genes (distances)"
+    ),
+    list(
+        id = "correlation_positions",
+        name = "Correlation (positions)",
+        description = "Correlation with known genes (positions)"
     ),
     list(
         id = "proximity",
@@ -91,6 +101,12 @@ methods <- list(
     )
 )
 
+# IDs of methods for geposan.
+method_ids <- sapply(methods, function(method) method$id)
+
+# Names of methods for geposan.
+method_names <- sapply(methods, function(method) method$name)
+
 # Gene IDs of known or suggested TPE-OLD genes.
 genes_tpe_old <- genes[suggested | verified == TRUE, id]
 
@@ -99,17 +115,17 @@ species_replicative <- species[replicative == TRUE, id]
 
 # Preset for [geposan] including all species and TPE-OLD genes for reference.
 preset_all_species <- geposan::preset(
-    methods = c("clusteriness", "correlation", "proximity", "neural"),
-    species = species$id,
-    genes = genes$id,
-    reference_genes = genes_tpe_old
+    methods = method_ids,
+    species_ids = species$id,
+    gene_ids = genes$id,
+    reference_gene_ids = genes_tpe_old
 )
 
 # Preset for [geposan] including only replicatively aging species as well as
 # TPE-OLD genes for reference.
 preset_replicative_species <- geposan::preset(
-    methods = c("clusteriness", "correlation", "proximity", "neural"),
-    species = species_replicative,
-    genes = genes$id,
-    reference_genes = genes_tpe_old
+    methods = method_ids,
+    species_ids = species_replicative,
+    gene_ids = genes$id,
+    reference_gene_ids = genes_tpe_old
 )
