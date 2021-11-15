@@ -31,6 +31,10 @@ ui <- fluidPage(
                 ),
                 tabPanel(
                     "Positions",
+                    checkboxInput(
+                        "use_positions",
+                        "Show positions instead of distances"
+                    ),
                     plotly::plotlyOutput(
                         "scatter",
                         width = "100%",

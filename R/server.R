@@ -106,13 +106,27 @@ server <- function(input, output, session) {
     })
 
     output$scatter <- plotly::renderPlotly({
-        results <- results_filtered()
+        preset <- preset()
 
-        gene_ids <- results[input$genes_rows_selected, gene]
-        genes <- genes[id %chin% gene_ids]
-        species <- species[id %chin% preset()$species_ids]
+        gene_sets <- list(preset$reference_gene_ids)
+        labels <- c("Reference genes")
 
-        scatter_plot(results, species, genes)
+        comparison_gene_ids <- results_filtered()[
+            input$genes_rows_selected,
+            gene
+        ]
+
+        if (length(comparison_gene_ids) >= 1) {
+            gene_sets <- c(gene_sets, list(comparison_gene_ids))
+            labels <- c(labels, "Comparison genes")
+        }
+
+        geposan::plot_positions(
+            preset$species_ids,
+            gene_sets = gene_sets,
+            labels = labels,
+            use_positions = input$use_positions
+        )
     })
 
     output$assessment_synopsis <- renderText({
@@ -157,7 +171,10 @@ server <- function(input, output, session) {
         gene_sets <- list(preset()$reference_gene_ids)
         labels <- c("Reference genes")
 
-        comparison_gene_ids <- results()[input$genes_rows_selected, gene]
+        comparison_gene_ids <- results_filtered()[
+            input$genes_rows_selected,
+            gene
+        ]
 
         if (length(comparison_gene_ids) >= 1) {
             gene_sets <- c(gene_sets, list(comparison_gene_ids))
@@ -176,7 +193,10 @@ server <- function(input, output, session) {
         gene_sets <- list(preset()$reference_gene_ids)
         labels <- c("Reference genes")
 
-        comparison_gene_ids <- results()[input$genes_rows_selected, gene]
+        comparison_gene_ids <- results_filtered()[
+            input$genes_rows_selected,
+            gene
+        ]
 
         if (length(comparison_gene_ids) >= 1) {
             gene_sets <- c(gene_sets, list(comparison_gene_ids))
