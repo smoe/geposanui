@@ -154,19 +154,39 @@ server <- function(input, output, session) {
     })
 
     output$rank_plot <- plotly::renderPlotly({
+        gene_sets <- list(preset()$reference_gene_ids)
+        labels <- c("Reference genes")
+
+        comparison_gene_ids <- results()[input$genes_rows_selected, gene]
+
+        if (length(comparison_gene_ids) >= 1) {
+            gene_sets <- c(gene_sets, list(comparison_gene_ids))
+            labels <- c(labels, "Comparison genes")
+        }
+
         geposan::plot_scores(
             ranking(),
-            gene_sets = list(preset()$reference_gene_ids),
-            labels = "Reference genes",
+            gene_sets = gene_sets,
+            labels = labels,
             max_rank = results_filtered()[, max(rank)]
         )
     })
 
     output$boxplot <- plotly::renderPlotly({
+        gene_sets <- list(preset()$reference_gene_ids)
+        labels <- c("Reference genes")
+
+        comparison_gene_ids <- results()[input$genes_rows_selected, gene]
+
+        if (length(comparison_gene_ids) >= 1) {
+            gene_sets <- c(gene_sets, list(comparison_gene_ids))
+            labels <- c(labels, "Comparison genes")
+        }
+
         geposan::plot_boxplot(
             ranking(),
-            gene_sets = list(preset()$reference_gene_ids),
-            labels = "Reference genes"
+            gene_sets = gene_sets,
+            labels = labels
         )
     })
 
