@@ -157,7 +157,7 @@ server <- function(input, output, session) {
         geposan::plot_scores(
             ranking(),
             gene_sets = list(preset()$reference_gene_ids),
-            labels = "TPE-OLD genes",
+            labels = "Reference genes",
             max_rank = results_filtered()[, max(rank)]
         )
     })
@@ -166,7 +166,7 @@ server <- function(input, output, session) {
         geposan::plot_boxplot(
             ranking(),
             gene_sets = list(preset()$reference_gene_ids),
-            labels = "TPE-OLD genes"
+            labels = "Reference genes"
         )
     })
 

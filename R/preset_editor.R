@@ -8,10 +8,10 @@ preset_editor_ui <- function(id) {
     names(gene_choices) <- known_genes$name
 
     verticalLayout(
-        h3("Preset"),
+        h3("Inputs"),
         selectInput(
-            NS(id, "preset"),
-            "Default presets",
+            NS(id, "species"),
+            "Species to include",
             choices = list(
                 "Replicatively aging species" = "replicative",
                 "All species" = "all",
@@ -19,33 +19,54 @@ preset_editor_ui <- function(id) {
             )
         ),
         tabsetPanel(
-            id = NS(id, "customization"),
+            id = NS(id, "custom_species_panel"),
             type = "hidden",
-            tabPanelBody(value = "none"),
+            tabPanelBody(value = "hide"),
             tabPanelBody(
-                value = "custom",
+                value = "show",
                 shinyWidgets::pickerInput(
-                    inputId = NS(id, "species"),
-                    label = "Included species",
+                    inputId = NS(id, "custom_species"),
                     choices = species_choices,
-                    selected = species_replicative,
                     options = list(
                         "actions-box" = TRUE,
                         "live-search" = TRUE
                     ),
                     multiple = TRUE
-                ),
+                )
+            )
+        ),
+        selectInput(
+            NS(id, "reference_genes"),
+            "Reference genes",
+            choices = list(
+                "Verified or suggested TPE-OLD genes" = "tpeold",
+                "Only verified TPE-OLD genes" = "verified",
+                "Customize" = "custom"
+            )
+        ),
+        tabsetPanel(
+            id = NS(id, "custom_reference_genes_panel"),
+            type = "hidden",
+            tabPanelBody(value = "hide"),
+            tabPanelBody(
+                value = "show",
                 shinyWidgets::pickerInput(
-                    inputId = NS(id, "reference_genes"),
-                    label = "Reference genes",
+                    inputId = NS(id, "custom_reference_genes"),
                     choices = gene_choices,
-                    selected = genes_tpe_old,
                     options = list(
                         "actions-box" = TRUE,
                         "live-search" = TRUE
                     ),
                     multiple = TRUE
-                ),
+                )
+            )
+        ),
+        tabsetPanel(
+            id = NS(id, "apply_panel"),
+            type = "hidden",
+            tabPanelBody(value = "hide"),
+            tabPanelBody(
+                value = "show",
                 actionButton(
                     NS(id, "apply_button"),
                     "Perform analysis",
@@ -64,31 +85,97 @@ preset_editor_ui <- function(id) {
 # @return A reactive containing the preset.
 preset_editor_server <- function(id) {
     moduleServer(id, function(input, output, session) {
-        result <- reactiveVal(preset_replicative_species)
+        current_preset <- reactiveVal(geposan::preset(
+            methods = method_ids,
+            species_ids = species[replicative == TRUE, id],
+            gene_ids = genes$id,
+            reference_gene_ids = genes[suggested | verified == TRUE, id]
+        ))
 
-        observeEvent(input$preset, {
-            panel <- if (input$preset == "replicative") {
-                result(preset_replicative_species)
-                "none"
-            } else if (input$preset == "all") {
-                result(preset_all_species)
-                "none"
+        observeEvent(input$species, {
+            if (input$species == "custom") {
+                updateTabsetPanel(
+                    session,
+                    "custom_species_panel",
+                    selected = "show"
+                )
             } else {
-                "custom"
+                updateTabsetPanel(
+                    session,
+                    "custom_species_panel",
+                    selected = "hide"
+                )
+            }
+        })
+
+        observeEvent(input$reference_genes, {
+            if (input$reference_genes == "custom") {
+                updateTabsetPanel(
+                    session,
+                    "custom_reference_genes_panel",
+                    selected = "show"
+                )
+            } else {
+                updateTabsetPanel(
+                    session,
+                    "custom_reference_genes_panel",
+                    selected = "hide"
+                )
+            }
+        })
+
+        new_preset <- reactive({
+            species_ids <- if (input$species == "replicative") {
+                species[replicative == TRUE, id]
+            } else if (input$species == "all") {
+                species$id
+            } else {
+                input$custom_species
             }
 
-            updateTabsetPanel(session, "customization", selected = panel)
+            reference_gene_ids <- if (input$reference_genes == "tpeold") {
+                genes[verified | suggested == TRUE, id]
+            } else if (input$reference_genes == "verified") {
+                genes[verified == TRUE, id]
+            } else {
+                input$custom_reference_genes
+            }
+
+            geposan::preset(
+                methods = method_ids,
+                species_ids = species_ids,
+                gene_ids = genes$id,
+                reference_gene_ids = reference_gene_ids
+            )
         })
+
+        observeEvent(
+            { # nolint
+                current_preset()
+                new_preset()
+            },
+            { # nolint
+                if (rlang::hash(new_preset()) !=
+                    rlang::hash(current_preset())) {
+                    updateTabsetPanel(
+                        session,
+                        "apply_panel",
+                        selected = "show"
+                    )
+                } else {
+                    updateTabsetPanel(
+                        session,
+                        "apply_panel",
+                        selected = "hide"
+                    )
+                }
+            }
+        )
 
         observeEvent(input$apply_button, {
-            result(geposan::preset(
-                methods = method_ids,
-                species_ids = input$species,
-                gene_ids = genes$id,
-                reference_gene_ids = input$reference_genes
-            ))
+            current_preset(new_preset())
         })
 
-        result
+        current_preset
     })
 }

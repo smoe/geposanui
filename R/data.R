@@ -106,26 +106,3 @@ method_ids <- sapply(methods, function(method) method$id)
 
 # Names of methods for geposan.
 method_names <- sapply(methods, function(method) method$name)
-
-# Gene IDs of known or suggested TPE-OLD genes.
-genes_tpe_old <- genes[suggested | verified == TRUE, id]
-
-# Species IDs for replicatively aging species.
-species_replicative <- species[replicative == TRUE, id]
-
-# Preset for [geposan] including all species and TPE-OLD genes for reference.
-preset_all_species <- geposan::preset(
-    methods = method_ids,
-    species_ids = species$id,
-    gene_ids = genes$id,
-    reference_gene_ids = genes_tpe_old
-)
-
-# Preset for [geposan] including only replicatively aging species as well as
-# TPE-OLD genes for reference.
-preset_replicative_species <- geposan::preset(
-    methods = method_ids,
-    species_ids = species_replicative,
-    gene_ids = genes$id,
-    reference_gene_ids = genes_tpe_old
-)

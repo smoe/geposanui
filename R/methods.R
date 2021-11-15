@@ -53,6 +53,7 @@ methods_ui <- function(id) {
 methods_server <- function(id, analysis, min_n_species) {
     moduleServer(id, function(input, output, session) {
         observeEvent(input$optimize_button, {
+            analysis <- analysis()
             method_ids <- NULL
 
             # Only include activated methods.
@@ -63,9 +64,9 @@ methods_server <- function(id, analysis, min_n_species) {
             }
 
             weights <- geposan::optimal_weights(
-                analysis(),
+                analysis,
                 method_ids,
-                genes_tpe_old,
+                analysis$preset$reference_gene_ids,
                 target = input$target,
                 min_n_species = min_n_species()
             )
