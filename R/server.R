@@ -154,10 +154,19 @@ server <- function(input, output, session) {
     })
 
     output$rank_plot <- plotly::renderPlotly({
-        rank_plot(
-            results(),
-            preset()$reference_gene_ids,
-            results_filtered()[, max(rank)]
+        geposan::plot_scores(
+            ranking(),
+            gene_sets = list(preset()$reference_gene_ids),
+            labels = "TPE-OLD genes",
+            max_rank = results_filtered()[, max(rank)]
+        )
+    })
+
+    output$boxplot <- plotly::renderPlotly({
+        geposan::plot_boxplot(
+            ranking(),
+            gene_sets = list(preset()$reference_gene_ids),
+            labels = "TPE-OLD genes"
         )
     })
 
