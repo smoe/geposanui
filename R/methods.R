@@ -1,7 +1,5 @@
 # Construct UI for the methods editor.
 methods_ui <- function(id) {
-    initial_weight <- 100 / length(methods)
-
     verticalLayout(
         h3("Methods"),
         div(style = "margin-top: 16px"),
@@ -18,11 +16,10 @@ methods_ui <- function(id) {
                 sliderInput(
                     NS(id, sprintf("%s_weight", method$id)),
                     NULL,
-                    post = "%",
-                    min = 0,
-                    max = 100,
-                    step = 1,
-                    value = initial_weight
+                    min = -1.0,
+                    max = 1.0,
+                    step = 0.01,
+                    value = 1.0
                 )
             )
         }),
@@ -75,7 +72,7 @@ methods_server <- function(id, analysis, min_n_species) {
                 updateSliderInput(
                     session,
                     sprintf("%s_weight", method_id),
-                    value = weights[[method_id]] * 100
+                    value = weights[[method_id]]
                 )
             }
         })
