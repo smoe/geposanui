@@ -90,14 +90,19 @@ methods <- list(
         description = "Correlation with known genes (positions)"
     ),
     list(
+        id = "neural",
+        name = "Neural (distances)",
+        description = "Assessment by neural network (distances)"
+    ),
+    list(
+        id = "neural_positions",
+        name = "Neural (positions)",
+        description = "Assessment by neural network (positions)"
+    ),
+    list(
         id = "proximity",
         name = "Proximity",
         description = "Proximity to telomeres"
-    ),
-    list(
-        id = "neural",
-        name = "Neural",
-        description = "Assessment by neural network"
     )
 )
 
