@@ -18,7 +18,7 @@ ui <- fluidPage(
                     uiOutput("copy"),
                     div(
                         style = "margin-top: 16px",
-                        DT::DTOutput("genes", height = "1000px")
+                        DT::DTOutput("genes")
                     )
                 ),
                 tabPanel(

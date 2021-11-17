@@ -54,14 +54,10 @@ server <- function(input, output, session) {
             rownames = FALSE,
             colnames = column_names,
             style = "bootstrap",
-            fillContainer = TRUE,
-            extensions = "Scroller",
             options = list(
                 rowCallback = js_link,
                 columnDefs = list(list(visible = FALSE, targets = 2)),
-                deferRender = TRUE,
-                scrollY = 200,
-                scroller = TRUE
+                pageLength = 25
             )
         )
 
