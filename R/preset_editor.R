@@ -35,6 +35,14 @@ preset_editor_ui <- function(id) {
                 )
             )
         ),
+        sliderInput(
+            NS(id, "n_species"),
+            "Required number of species per gene",
+            min = 0,
+            max = 18,
+            step = 1,
+            value = 10
+        ),
         selectInput(
             NS(id, "reference_genes"),
             "Reference genes",
@@ -89,6 +97,7 @@ preset_editor_server <- function(id) {
             methods = method_ids,
             species_ids = species[replicative == TRUE, id],
             gene_ids = genes$id,
+            min_n_species = 10,
             reference_gene_ids = genes[suggested | verified == TRUE, id]
         ))
 
@@ -108,6 +117,24 @@ preset_editor_server <- function(id) {
             }
         })
 
+        species_ids <- reactive({
+            if (input$species == "replicative") {
+                species[replicative == TRUE, id]
+            } else if (input$species == "all") {
+                species$id
+            } else {
+                input$custom_species
+            }
+        })
+
+        observeEvent(species_ids(), {
+            updateSliderInput(
+                session,
+                "n_species",
+                max = length(species_ids())
+            )
+        })
+
         observeEvent(input$reference_genes, {
             if (input$reference_genes == "custom") {
                 updateTabsetPanel(
@@ -125,14 +152,6 @@ preset_editor_server <- function(id) {
         })
 
         new_preset <- reactive({
-            species_ids <- if (input$species == "replicative") {
-                species[replicative == TRUE, id]
-            } else if (input$species == "all") {
-                species$id
-            } else {
-                input$custom_species
-            }
-
             reference_gene_ids <- if (input$reference_genes == "tpeold") {
                 genes[verified | suggested == TRUE, id]
             } else if (input$reference_genes == "verified") {
@@ -143,8 +162,9 @@ preset_editor_server <- function(id) {
 
             geposan::preset(
                 methods = method_ids,
-                species_ids = species_ids,
+                species_ids = species_ids(),
                 gene_ids = genes$id,
+                min_n_species = input$n_species,
                 reference_gene_ids = reference_gene_ids
             )
         })

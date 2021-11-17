@@ -7,14 +7,6 @@ ui <- fluidPage(
             width = 3,
             preset_editor_ui("preset_editor"),
             filters_ui("filters"),
-            sliderInput(
-                "n_species",
-                "Required number of species per gene",
-                min = 0,
-                max = 18,
-                step = 1,
-                value = 10
-            ),
             methods_ui("methods")
         ),
         mainPanel(

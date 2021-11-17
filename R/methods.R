@@ -43,11 +43,9 @@ methods_ui <- function(id) {
 # Construct server for the methods editor.
 #
 # @param analysis The reactive containing the results to be weighted.
-# @param min_n_species A reactive containing the minimum number of species to
-#   require for genes to be included in the ranking.
 #
 # @return A reactive containing the weighted results.
-methods_server <- function(id, analysis, min_n_species) {
+methods_server <- function(id, analysis) {
     moduleServer(id, function(input, output, session) {
         observeEvent(input$optimize_button, {
             analysis <- analysis()
@@ -64,8 +62,7 @@ methods_server <- function(id, analysis, min_n_species) {
                 analysis,
                 method_ids,
                 analysis$preset$reference_gene_ids,
-                target = input$target,
-                min_n_species = min_n_species()
+                target = input$target
             )
 
             for (method_id in method_ids) {
@@ -79,9 +76,12 @@ methods_server <- function(id, analysis, min_n_species) {
 
         # Observe each method's enable button and synchronise the slider state.
         lapply(methods, function(method) {
-            observeEvent(input[[method$id]], {
-                shinyjs::toggleState(sprintf("%s_weight", method$id))
-            }, ignoreInit = TRUE)
+            observeEvent(input[[method$id]],
+                { # nolint
+                    shinyjs::toggleState(sprintf("%s_weight", method$id))
+                },
+                ignoreInit = TRUE
+            )
         })
 
         reactive({
@@ -96,11 +96,7 @@ methods_server <- function(id, analysis, min_n_species) {
                 }
             }
 
-            geposan::ranking(
-                analysis(),
-                weights,
-                min_n_species = min_n_species()
-            )
+            geposan::ranking(analysis(), weights)
         })
     })
 }

@@ -10,15 +10,6 @@ js_link <- DT::JS("function(row, data) {
 server <- function(input, output, session) {
     preset <- preset_editor_server("preset_editor")
 
-    observe({
-        species_count <- length(preset()$species_ids)
-        updateSliderInput(
-            session,
-            "n_species",
-            max = species_count
-        )
-    })
-
     # Compute the results according to the preset.
     analysis <- reactive({
         preset <- preset()
@@ -37,10 +28,8 @@ server <- function(input, output, session) {
         analysis
     })
 
-    min_n_species <- reactive(input$n_species)
-
     # Rank the results.
-    ranking <- methods_server("methods", analysis, min_n_species)
+    ranking <- methods_server("methods", analysis)
 
     # Add gene information to the results.
     results <- reactive({
