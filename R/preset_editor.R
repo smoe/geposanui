@@ -61,6 +61,15 @@ preset_editor_ui <- function(id) {
                 )
             )
         ),
+        selectInput(
+            NS(id, "optimization_target"),
+            "Optimization target",
+            choices = list(
+                "Mean rank of reference genes" = "mean",
+                "First rank of reference genes" = "min",
+                "Last rank of reference genes" = "max"
+            )
+        ),
         tabsetPanel(
             id = NS(id, "apply_panel"),
             type = "hidden",
@@ -89,7 +98,8 @@ preset_editor_server <- function(id) {
             methods = method_ids,
             species_ids = species[replicative == TRUE, id],
             gene_ids = genes$id,
-            reference_gene_ids = genes[suggested | verified == TRUE, id]
+            reference_gene_ids = genes[suggested | verified == TRUE, id],
+            optimization_target = "mean"
         ))
 
         observeEvent(input$species, {
@@ -145,7 +155,8 @@ preset_editor_server <- function(id) {
                 methods = method_ids,
                 species_ids = species_ids,
                 gene_ids = genes$id,
-                reference_gene_ids = reference_gene_ids
+                reference_gene_ids = reference_gene_ids,
+                optimization_target = input$optimization_target
             )
         })
 
