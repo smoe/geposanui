@@ -91,13 +91,8 @@ methods <- list(
     ),
     list(
         id = "neural",
-        name = "Neural (distances)",
-        description = "Assessment by neural network (distances)"
-    ),
-    list(
-        id = "neural_positions",
-        name = "Neural (positions)",
-        description = "Assessment by neural network (positions)"
+        name = "Neural",
+        description = "Assessment by neural network"
     ),
     list(
         id = "proximity",
