@@ -66,6 +66,7 @@ preset_editor_ui <- function(id) {
             "Optimization target",
             choices = list(
                 "Mean rank of reference genes" = "mean",
+                "Median rank of reference genes" = "median",
                 "First rank of reference genes" = "min",
                 "Last rank of reference genes" = "max"
             )
