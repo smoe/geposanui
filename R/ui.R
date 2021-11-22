@@ -52,6 +52,14 @@ ui <- fluidPage(
                             height = "600px"
                         )
                     ),
+                    div(
+                        style = "margin-top: 16px",
+                        plotly::plotlyOutput(
+                            "chromosome_plot",
+                            width = "100%",
+                            height = "600px"
+                        )
+                    ),
                 ),
                 tabPanel(
                     "Analysis",

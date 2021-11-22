@@ -195,6 +195,10 @@ server <- function(input, output, session) {
         )
     })
 
+    output$chromosome_plot <- plotly::renderPlotly({
+        geposan::plot_chromosomes(ranking())
+    })
+
     output$gost <- plotly::renderPlotly({
         if (input$enable_gost) {
             result <- gprofiler2::gost(
