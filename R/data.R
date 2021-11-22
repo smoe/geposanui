@@ -71,23 +71,13 @@ genes <- geposan::genes[, .(
 methods <- list(
     list(
         id = "clusteriness",
-        name = "Clustering (distances)",
-        description = "Clustering of genes (distances)"
-    ),
-    list(
-        id = "clusteriness_positions",
-        name = "Clustering (positions)",
-        description = "Clustering of genes (positions)"
+        name = "Clustering",
+        description = "Clustering of genes"
     ),
     list(
         id = "correlation",
-        name = "Correlation (distances)",
-        description = "Correlation with known genes (distances)"
-    ),
-    list(
-        id = "correlation_positions",
-        name = "Correlation (positions)",
-        description = "Correlation with known genes (positions)"
+        name = "Correlation",
+        description = "Correlation with known genes"
     ),
     list(
         id = "neural",
