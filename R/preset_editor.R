@@ -13,8 +13,8 @@ preset_editor_ui <- function(id) {
             NS(id, "species"),
             "Species to include",
             choices = list(
-                "Replicatively aging species" = "replicative",
                 "All species" = "all",
+                "Known replicatively aging species" = "replicative",
                 "Customize" = "custom"
             )
         ),
@@ -97,7 +97,7 @@ preset_editor_server <- function(id) {
     moduleServer(id, function(input, output, session) {
         current_preset <- reactiveVal(geposan::preset(
             methods = method_ids,
-            species_ids = species[replicative == TRUE, id],
+            species_ids = species$id,
             gene_ids = genes$id,
             reference_gene_ids = genes[suggested | verified == TRUE, id],
             optimization_target = "mean"
