@@ -85,6 +85,11 @@ methods <- list(
         description = "Assessment by neural network"
     ),
     list(
+        id = "adjacency",
+        name = "Adjacency",
+        description = "Adjacency to reference genes"
+    ),
+    list(
         id = "proximity",
         name = "Proximity",
         description = "Proximity to telomeres"
