@@ -164,6 +164,37 @@ server <- function(input, output, session) {
         )
     })
 
+    output$rankings_plot <- plotly::renderPlotly({
+        preset <- preset()
+        gene_sets <- list("Reference genes" = preset$reference_gene_ids)
+        comparison_gene_ids <- comparison_gene_ids()
+
+        if (length(comparison_gene_ids) >= 1) {
+            gene_sets <- c(
+                gene_sets,
+                list("Comparison genes" = comparison_gene_ids)
+            )
+        }
+
+        all <- ranking()
+        clusteriness <- geposan::ranking(all, list(clusteriness = 1))
+        correlation <- geposan::ranking(all, list(correlation = 1))
+        neural <- geposan::ranking(all, list(neural = 1))
+        adjacency <- geposan::ranking(all, list(adjacency = 1))
+        proximity <- geposan::ranking(all, list(proximity = 1))
+
+        rankings <- list(
+            "Clusteriness" = clusteriness,
+            "Correlation" = correlation,
+            "Neural" = neural,
+            "Adjacency" = adjacency,
+            "Proximity" = proximity,
+            "Combined" = all
+        )
+
+        geposan::plot_rankings(rankings, gene_sets)
+    })
+
     output$boxplot <- plotly::renderPlotly({
         preset <- preset()
         gene_sets <- list("Reference genes" = preset$reference_gene_ids)

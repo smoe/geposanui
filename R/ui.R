@@ -44,6 +44,14 @@ ui <- fluidPage(
                     div(
                         style = "margin-top: 16px",
                         plotly::plotlyOutput(
+                            "rankings_plot",
+                            width = "100%",
+                            height = "600px"
+                        )
+                    ),
+                    div(
+                        style = "margin-top: 16px",
+                        plotly::plotlyOutput(
                             "boxplot",
                             width = "100%",
                             height = "600px"
