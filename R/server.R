@@ -45,6 +45,8 @@ server <- function(input, output, session) {
     # Apply the filters.
     results_filtered <- filters_server("filters", results)
 
+    comparison_gene_ids <- comparison_editor_server("comparison_editor", preset)
+
     output$genes <- DT::renderDT({
         columns <- c("rank", "gene", "name", "chromosome", method_ids, "score")
         column_names <- c("", "Gene", "", "Chromosome", method_names, "Score")

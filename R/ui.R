@@ -6,6 +6,7 @@ ui <- fluidPage(
         sidebarPanel(
             width = 3,
             preset_editor_ui("preset_editor"),
+            comparison_editor_ui("comparison_editor"),
             filters_ui("filters"),
             methods_ui("methods")
         ),
