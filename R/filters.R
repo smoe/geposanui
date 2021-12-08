@@ -22,7 +22,7 @@ filters_ui <- function(id) {
                     min = 0,
                     max = 100,
                     step = 1,
-                    value = 60
+                    value = 75
                 )
             ),
             tabPanelBody(

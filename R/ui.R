@@ -85,18 +85,13 @@ ui <- div(
                         ),
                         tabPanel(
                             title = "g:Profiler",
-                            checkboxInput(
-                                "enable_gost",
-                                "Perform a gene set enrichment analysis on the \
-                                filtered result genes."
+                            div(
+                                style = "margin-top: 16px",
+                                plotly::plotlyOutput("gost_plot"),
                             ),
-                            conditionalPanel(
-                                "input.enable_gost == true",
-                                plotly::plotlyOutput(
-                                    "gost",
-                                    width = "100%",
-                                    height = "600px"
-                                )
+                            div(
+                                style = "margin-top: 16px",
+                                DT::DTOutput("gost_details")
                             )
                         )
                     )

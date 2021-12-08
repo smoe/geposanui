@@ -172,20 +172,53 @@ server <- function(input, output, session) {
         geposan::plot_boxplot(ranking(), gene_sets)
     })
 
-    output$gost <- plotly::renderPlotly({
-        if (input$enable_gost) {
-            result <- gprofiler2::gost(
-                results_filtered()[, gene],
-                ordered_query = TRUE
-            )
+    gost <- reactive({
+         withProgress(
+            message = "Querying g:Profiler",
+            value = 0.0,
+            { # nolint
+                setProgress(0.2)
+                gprofiler2::gost(results_filtered()[, gene])
+            }
+         )
+    })
 
-            gprofiler2::gostplot(
-                result,
-                capped = FALSE,
-                interactive = TRUE
+    output$gost_plot <- plotly::renderPlotly({
+        gprofiler2::gostplot(
+            gost(),
+            capped = FALSE,
+            interactive = TRUE
+        )
+    })
+
+    output$gost_details <- DT::renderDT({
+        data <- data.table(gost()$result)
+        setorder(data, p_value)
+
+        data[, total_ratio := term_size / effective_domain_size]
+        data[, query_ratio := intersection_size / query_size]
+
+        dt <- DT::datatable(
+            data[, .(source, term_name, total_ratio, query_ratio, p_value)],
+            rownames = FALSE,
+            colnames = c(
+                "Source",
+                "Term",
+                "Total ratio",
+                "Query ratio",
+                "p-Value"
+            ),
+            style = "bootstrap",
+            options = list(
+                pageLength = 25
             )
-        } else {
-            NULL
-        }
+        )
+
+        dt <- DT::formatRound(dt, "p_value", digits = 4)
+        dt <- DT::formatPercentage(
+            dt,
+            c("total_ratio", "query_ratio"),
+            digits = 1
+        )
     })
 }
