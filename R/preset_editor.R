@@ -1,12 +1,5 @@
 # Create a preset editor.
 preset_editor_ui <- function(id) {
-    species_choices <- species$id
-    names(species_choices) <- species$name
-
-    known_genes <- genes[name != ""]
-    gene_choices <- known_genes$id
-    names(gene_choices) <- known_genes$name
-
     verticalLayout(
         h3("Inputs"),
         selectInput(
@@ -18,22 +11,14 @@ preset_editor_ui <- function(id) {
                 "Customize" = "custom"
             )
         ),
-        tabsetPanel(
-            id = NS(id, "custom_species_panel"),
-            type = "hidden",
-            tabPanelBody(value = "hide"),
-            tabPanelBody(
-                value = "show",
-                shinyWidgets::pickerInput(
-                    inputId = NS(id, "custom_species"),
-                    choices = species_choices,
-                    options = list(
-                        "actions-box" = TRUE,
-                        "live-search" = TRUE
-                    ),
-                    multiple = TRUE
-                )
-            )
+        conditionalPanel(
+            condition = sprintf("input['%s'] == 'custom'", NS(id, "species")),
+            selectizeInput(
+                inputId = NS(id, "custom_species"),
+                label = "Select input species",
+                choices = NULL,
+                multiple = TRUE
+            ),
         ),
         selectInput(
             NS(id, "reference_genes"),
@@ -44,21 +29,16 @@ preset_editor_ui <- function(id) {
                 "Customize" = "custom"
             )
         ),
-        tabsetPanel(
-            id = NS(id, "custom_reference_genes_panel"),
-            type = "hidden",
-            tabPanelBody(value = "hide"),
-            tabPanelBody(
-                value = "show",
-                shinyWidgets::pickerInput(
-                    inputId = NS(id, "custom_reference_genes"),
-                    choices = gene_choices,
-                    options = list(
-                        "actions-box" = TRUE,
-                        "live-search" = TRUE
-                    ),
-                    multiple = TRUE
-                )
+        conditionalPanel(
+            condition = sprintf(
+                "input['%s'] == 'custom'",
+                NS(id, "reference_genes")
+            ),
+            selectizeInput(
+                inputId = NS(id, "custom_reference_genes"),
+                label = "Select reference genes",
+                choices = NULL,
+                multiple = TRUE
             )
         ),
         selectInput(
@@ -95,6 +75,27 @@ preset_editor_ui <- function(id) {
 # @return A reactive containing the preset.
 preset_editor_server <- function(id) {
     moduleServer(id, function(input, output, session) {
+        species_choices <- species$id
+        names(species_choices) <- species$name
+
+        known_genes <- genes[name != ""]
+        gene_choices <- known_genes$id
+        names(gene_choices) <- known_genes$name
+
+        updateSelectizeInput(
+            session,
+            "custom_species",
+            choices = species_choices,
+            server = TRUE
+        )
+
+        updateSelectizeInput(
+            session,
+            "custom_reference_genes",
+            choices = gene_choices,
+            server = TRUE
+        )
+
         current_preset <- reactiveVal(geposan::preset(
             methods = method_ids,
             species_ids = species$id,
@@ -102,38 +103,6 @@ preset_editor_server <- function(id) {
             reference_gene_ids = genes[suggested | verified == TRUE, id],
             optimization_target = "mean"
         ))
-
-        observeEvent(input$species, {
-            if (input$species == "custom") {
-                updateTabsetPanel(
-                    session,
-                    "custom_species_panel",
-                    selected = "show"
-                )
-            } else {
-                updateTabsetPanel(
-                    session,
-                    "custom_species_panel",
-                    selected = "hide"
-                )
-            }
-        })
-
-        observeEvent(input$reference_genes, {
-            if (input$reference_genes == "custom") {
-                updateTabsetPanel(
-                    session,
-                    "custom_reference_genes_panel",
-                    selected = "show"
-                )
-            } else {
-                updateTabsetPanel(
-                    session,
-                    "custom_reference_genes_panel",
-                    selected = "hide"
-                )
-            }
-        })
 
         new_preset <- reactive({
             species_ids <- if (input$species == "replicative") {

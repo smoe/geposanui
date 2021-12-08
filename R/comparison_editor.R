@@ -1,9 +1,5 @@
 # Create a comparison editor.
 comparison_editor_ui <- function(id) {
-    known_genes <- genes[name != ""]
-    gene_choices <- known_genes$id
-    names(gene_choices) <- known_genes$name
-
     verticalLayout(
         h3("Comparison"),
         selectInput(
@@ -18,21 +14,16 @@ comparison_editor_ui <- function(id) {
                 "Customize" = "custom"
             )
         ),
-        tabsetPanel(
-            id = NS(id, "custom_comparison_genes_panel"),
-            type = "hidden",
-            tabPanelBody(value = "hide"),
-            tabPanelBody(
-                value = "show",
-                shinyWidgets::pickerInput(
-                    inputId = NS(id, "custom_comparison_genes"),
-                    choices = gene_choices,
-                    options = list(
-                        "actions-box" = TRUE,
-                        "live-search" = TRUE
-                    ),
-                    multiple = TRUE
-                )
+        conditionalPanel(
+            condition = sprintf(
+                "input['%s'] == 'custom'",
+                NS(id, "comparison_genes")
+            ),
+            selectizeInput(
+                inputId = NS(id, "custom_comparison_genes"),
+                label = "Select comparison genes",
+                choices = NULL,
+                multiple = TRUE
             )
         )
     )
@@ -46,21 +37,16 @@ comparison_editor_ui <- function(id) {
 # @return A reactive containing the comparison gene IDs.
 comparison_editor_server <- function(id, preset) {
     moduleServer(id, function(input, output, session) {
-        observeEvent(input$comparison_genes, {
-            if (input$comparison_genes == "custom") {
-                updateTabsetPanel(
-                    session,
-                    "custom_comparison_genes_panel",
-                    selected = "show"
-                )
-            } else {
-                updateTabsetPanel(
-                    session,
-                    "custom_comparison_genes_panel",
-                    selected = "hide"
-                )
-            }
-        })
+        known_genes <- genes[name != ""]
+        gene_choices <- known_genes$id
+        names(gene_choices) <- known_genes$name
+
+        updateSelectizeInput(
+            session,
+            "custom_comparison_genes",
+            choices = gene_choices,
+            server = TRUE
+        )
 
         reactive({
             if (input$comparison_genes == "none") {

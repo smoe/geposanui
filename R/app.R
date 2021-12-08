@@ -8,7 +8,6 @@ run_app <- function(port = 3464) {
 
     shinyjs::useShinyjs()
     rclipboard::rclipboardSetup()
-    shinyWidgets::pickerInput("none", choices = NULL)
 
     # Actually run the app.
 
