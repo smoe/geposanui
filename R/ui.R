@@ -8,7 +8,7 @@ ui <- div(
             primary = "#1c71d8"
         ),
         title = "TPE-OLD candidates",
-        selected = "Ranking",
+        selected = "Results",
         tabPanel(
             "Input data",
             sidebarLayout(
@@ -28,7 +28,7 @@ ui <- div(
             ),
         ),
         tabPanel(
-            "Ranking",
+            "Results",
             sidebarLayout(
                 sidebarPanel(
                     width = 3,
@@ -37,68 +37,74 @@ ui <- div(
                 ),
                 mainPanel(
                     width = 9,
-                    div(
-                        style = "margin-top: 16px",
-                        plotly::plotlyOutput(
-                            "rank_plot",
-                            width = "100%",
-                            height = "600px"
+                    tabsetPanel(
+                        type = "pills",
+                        tabPanel(
+                            title = "Overview",
+                            div(
+                                style = "margin-top: 16px",
+                                plotly::plotlyOutput(
+                                    "rank_plot",
+                                    width = "100%",
+                                    height = "600px"
+                                )
+                            )
+                        ),
+                        tabPanel(
+                            title = "Methods & Distribution",
+                            div(
+                                style = "margin-top: 16px",
+                                plotly::plotlyOutput(
+                                    "rankings_plot",
+                                    width = "100%",
+                                    height = "600px"
+                                )
+                            )
+                        ),
+                        tabPanel(
+                            title = "Comparison",
+                            div(
+                                style = "margin-top: 16px",
+                                plotly::plotlyOutput(
+                                    "boxplot",
+                                    width = "100%",
+                                    height = "600px"
+                                )
+                            )
+                        ),
+                        tabPanel(
+                            title = "Detailed results",
+                            div(
+                                style = "margin-top: 16px",
+                                uiOutput("copy"),
+                            ),
+                            div(
+                                style = "margin-top: 16px",
+                                DT::DTOutput("genes")
+                            )
+                        ),
+                        tabPanel(
+                            title = "g:Profiler",
+                            checkboxInput(
+                                "enable_gost",
+                                "Perform a gene set enrichment analysis on the \
+                                filtered result genes."
+                            ),
+                            conditionalPanel(
+                                "input.enable_gost == true",
+                                plotly::plotlyOutput(
+                                    "gost",
+                                    width = "100%",
+                                    height = "600px"
+                                )
+                            )
                         )
-                    ),
-                    div(
-                        style = "margin-top: 16px",
-                        plotly::plotlyOutput(
-                            "rankings_plot",
-                            width = "100%",
-                            height = "600px"
-                        )
-                    ),
+                    )
                 )
-            ),
-        ),
-        tabPanel(
-            "Detailed results",
-            uiOutput("copy"),
-            div(
-                style = "margin-top: 16px",
-                DT::DTOutput("genes")
             )
         ),
         tabPanel(
-            "Assessment",
-            htmlOutput("assessment_synopsis"),
-            div(
-                style = "margin-top: 16px",
-                plotly::plotlyOutput(
-                    "boxplot",
-                    width = "100%",
-                    height = "600px"
-                )
-            ),
-            div(
-                style = "margin-top: 16px",
-                plotly::plotlyOutput(
-                    "chromosome_plot",
-                    width = "100%",
-                    height = "600px"
-                )
-            ),
-        ),
-        tabPanel(
-            "Analysis",
-            checkboxInput(
-                "enable_gost",
-                "Perform a gene set enrichment analysis on the \
-                filtered result genes."
-            ),
-            conditionalPanel(
-                "input.enable_gost == true",
-                plotly::plotlyOutput(
-                    "gost",
-                    width = "100%",
-                    height = "600px"
-                )
-            )
+            title = "Publication"
         )
     )
 )

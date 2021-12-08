@@ -107,44 +107,6 @@ server <- function(input, output, session) {
         geposan::plot_positions(preset$species_ids, gene_sets)
     })
 
-    output$assessment_synopsis <- renderText({
-        reference_gene_ids <- preset()$reference_gene_ids
-
-        included_reference_count <- results_filtered()[
-            gene %chin% reference_gene_ids,
-            .N
-        ]
-
-        reference_results <- results()[gene %chin% reference_gene_ids]
-        total_reference_count <- nrow(reference_results)
-
-        if (total_reference_count > 0) {
-            mean_rank <- as.character(round(
-                reference_results[, mean(rank)],
-                digits = 1
-            ))
-
-            min_rank <- as.character(reference_results[, min(rank)])
-            max_rank <- as.character(reference_results[, max(rank)])
-        } else {
-            mean_rank <- "Unknown"
-            min_rank <- "Unknown"
-            max_rank <- "Unknown"
-        }
-
-        sprintf(
-            "Included reference genes: %i/%i<br> \
-            Mean rank of reference genes: %s<br> \
-            First rank of reference genes: %s<br> \
-            Last rank of reference genes: %s",
-            included_reference_count,
-            total_reference_count,
-            mean_rank,
-            min_rank,
-            max_rank
-        )
-    })
-
     output$rank_plot <- plotly::renderPlotly({
         preset <- preset()
         gene_sets <- list("Reference genes" = preset$reference_gene_ids)
@@ -208,10 +170,6 @@ server <- function(input, output, session) {
         }
 
         geposan::plot_boxplot(ranking(), gene_sets)
-    })
-
-    output$chromosome_plot <- plotly::renderPlotly({
-        geposan::plot_chromosomes(ranking())
     })
 
     output$gost <- plotly::renderPlotly({
