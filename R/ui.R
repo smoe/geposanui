@@ -93,6 +93,13 @@ ui <- div(
                                 style = "margin-top: 16px",
                                 DT::DTOutput("gost_details")
                             )
+                        ),
+                        tabPanel(
+                            title = "DisGeNET",
+                            div(
+                                style = "margin-top: 16px",
+                                DT::DTOutput("disgenet")
+                            )
                         )
                     )
                 )

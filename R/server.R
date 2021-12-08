@@ -173,14 +173,14 @@ server <- function(input, output, session) {
     })
 
     gost <- reactive({
-         withProgress(
+        withProgress(
             message = "Querying g:Profiler",
             value = 0.0,
             { # nolint
                 setProgress(0.2)
                 gprofiler2::gost(results_filtered()[, gene])
             }
-         )
+        )
     })
 
     output$gost_plot <- plotly::renderPlotly({
@@ -198,15 +198,17 @@ server <- function(input, output, session) {
         data[, total_ratio := term_size / effective_domain_size]
         data[, query_ratio := intersection_size / query_size]
 
+        data <- data[, .(source, term_name, total_ratio, query_ratio, p_value)]
+
         dt <- DT::datatable(
-            data[, .(source, term_name, total_ratio, query_ratio, p_value)],
+            data,
             rownames = FALSE,
             colnames = c(
                 "Source",
                 "Term",
                 "Total ratio",
                 "Query ratio",
-                "p-Value"
+                "p-value"
             ),
             style = "bootstrap",
             options = list(
@@ -219,6 +221,45 @@ server <- function(input, output, session) {
             dt,
             c("total_ratio", "query_ratio"),
             digits = 1
+        )
+    })
+
+    output$disgenet <- DT::renderDT({
+        withProgress(
+            message = "Querying DisGeNET",
+            value = 0.0,
+            { # nolint
+                setProgress(0.2)
+
+                gene_names <- results_filtered()[, name]
+                gene_names <- unique(gene_names[gene_names != ""])
+
+                diseases <- disgenet2r::disease_enrichment(gene_names)
+
+                data <- data.table(diseases@qresult)
+
+                data <- data[, .(Description, Ratio, BgRatio, pvalue)]
+                setorder(data, pvalue)
+
+                dt <- DT::datatable(
+                    data,
+                    rownames = FALSE,
+                    colnames = c(
+                        "Disease",
+                        "Query ratio",
+                        "Total ratio",
+                        "p-value"
+                    ),
+                    style = "bootstrap",
+                    options = list(
+                        pageLength = 25
+                    )
+                )
+
+                dt <- DT::formatRound(dt, "pvalue", digits = 4)
+
+                dt
+            }
         )
     })
 }
