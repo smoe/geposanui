@@ -34,11 +34,18 @@ preset_editor_ui <- function(id) {
                 "input['%s'] == 'custom'",
                 NS(id, "reference_genes")
             ),
-            selectizeInput(
+            selectInput(
+                NS(id, "identifier_type"),
+                "Gene identifiers",
+                choices = list(
+                    "HGNC symbols" = "hgnc",
+                    "Ensembl gene IDs" = "ensembl"
+                )
+            ),
+            textAreaInput(
                 inputId = NS(id, "custom_reference_genes"),
-                label = "Select reference genes",
-                choices = NULL,
-                multiple = TRUE
+                label = "Enter reference genes",
+                height = "250px"
             )
         ),
         selectInput(
@@ -78,21 +85,10 @@ preset_editor_server <- function(id) {
         species_choices <- species$id
         names(species_choices) <- species$name
 
-        known_genes <- genes[name != ""]
-        gene_choices <- known_genes$id
-        names(gene_choices) <- known_genes$name
-
         updateSelectizeInput(
             session,
             "custom_species",
             choices = species_choices,
-            server = TRUE
-        )
-
-        updateSelectizeInput(
-            session,
-            "custom_reference_genes",
-            choices = gene_choices,
             server = TRUE
         )
 
@@ -118,7 +114,12 @@ preset_editor_server <- function(id) {
             } else if (input$reference_genes == "verified") {
                 genes[verified == TRUE, id]
             } else {
-                input$custom_reference_genes
+                inputs <- strsplit(input$custom_reference_genes, "\\s+")[[1]]
+                if (input$identifier_type == "hgnc") {
+                    geposan::genes[name %chin% inputs, id]
+                } else {
+                    geposan::genes[id %chin% inputs, id]
+                }
             }
 
             geposan::preset(
