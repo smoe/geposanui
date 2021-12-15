@@ -6,13 +6,27 @@ filters_ui <- function(id) {
             NS(id, "method"),
             "Filter method",
             choices = list(
+                "Percentile" = "percentile",
                 "Cut-off score" = "score",
-                "Maximum number of genes" = "rank"
+                "Maximum number of genes" = "rank",
+                "None" = "none"
             )
         ),
         tabsetPanel(
             id = NS(id, "sliders"),
             type = "hidden",
+            tabPanelBody(
+                value = "percentile",
+                sliderInput(
+                    NS(id, "percentile"),
+                    label = "Minimum percentile",
+                    post = "%",
+                    min = 0,
+                    max = 100,
+                    step = 1,
+                    value = 95
+                )
+            ),
             tabPanelBody(
                 value = "score",
                 sliderInput(
@@ -35,6 +49,9 @@ filters_ui <- function(id) {
                     step = 50,
                     value = 2500
                 )
+            ),
+            tabPanelBody(
+                value = "none"
             )
         )
     )
@@ -54,10 +71,15 @@ filters_server <- function(id, results) {
         reactive({
             results <- results()
 
-            if (input$method == "score") {
+            if (input$method == "percentile")  {
+                n_ranks <- nrow(results)
+                results[rank <= (1 - (input$percentile / 100)) * n_ranks]
+            } else if (input$method == "score") {
                 results[score >= input$score / 100]
             } else if (input$method == "rank") {
                 results[rank <= input$rank]
+            } else {
+                results
             }
         })
     })
