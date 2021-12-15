@@ -9,7 +9,7 @@ methods_ui <- function(id) {
                     NS(id, method$id),
                     span(
                         method$description,
-                        style = "font-weight: bold"
+                        class = "control-label"
                     ),
                     value = TRUE
                 ),

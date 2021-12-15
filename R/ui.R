@@ -3,9 +3,9 @@ ui <- div(
     rclipboard::rclipboardSetup(),
     navbarPage(
         theme = bslib::bs_theme(
-            version = 3,
+            version = 5,
             bootswatch = "united",
-            primary = "#1c71d8"
+            primary = "#1964bf"
         ),
         title = "TPE-OLD candidates",
         selected = "Results",
