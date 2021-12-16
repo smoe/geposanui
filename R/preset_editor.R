@@ -48,16 +48,6 @@ preset_editor_ui <- function(id) {
                 height = "250px"
             )
         ),
-        selectInput(
-            NS(id, "optimization_target"),
-            "Optimization target",
-            choices = list(
-                "Mean rank of reference genes" = "mean",
-                "Median rank of reference genes" = "median",
-                "First rank of reference genes" = "min",
-                "Last rank of reference genes" = "max"
-            )
-        ),
         tabsetPanel(
             id = NS(id, "apply_panel"),
             type = "hidden",
@@ -93,11 +83,10 @@ preset_editor_server <- function(id) {
         )
 
         current_preset <- reactiveVal(geposan::preset(
-            methods = method_ids,
+            methods = methods,
             species_ids = species$id,
             gene_ids = genes$id,
-            reference_gene_ids = genes[suggested | verified == TRUE, id],
-            optimization_target = "mean"
+            reference_gene_ids = genes[suggested | verified == TRUE, id]
         ))
 
         new_preset <- reactive({
@@ -123,11 +112,10 @@ preset_editor_server <- function(id) {
             }
 
             geposan::preset(
-                methods = method_ids,
+                methods = methods,
                 species_ids = species_ids,
                 gene_ids = genes$id,
-                reference_gene_ids = reference_gene_ids,
-                optimization_target = input$optimization_target
+                reference_gene_ids = reference_gene_ids
             )
         })
 

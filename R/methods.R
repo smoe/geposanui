@@ -2,7 +2,17 @@
 methods_ui <- function(id) {
     verticalLayout(
         h3("Methods"),
-        div(style = "margin-top: 16px"),
+        selectInput(
+            NS(id, "optimization_target"),
+            "Optimization target",
+            choices = list(
+                "Mean rank of reference genes" = "mean",
+                "Median rank of reference genes" = "median",
+                "First rank of reference genes" = "min",
+                "Last rank of reference genes" = "max",
+                "Customize weights" = "custom"
+            )
+        ),
         lapply(methods, function(method) {
             verticalLayout(
                 checkboxInput(
@@ -22,12 +32,7 @@ methods_ui <- function(id) {
                     value = 1.0
                 )
             )
-        }),
-        actionButton(
-            NS(id, "reset_button"),
-            "Reset weights",
-            class = "btn-primary"
-        )
+        })
     )
 }
 
@@ -40,48 +45,56 @@ methods_server <- function(id, analysis) {
     moduleServer(id, function(input, output, session) {
         # Observe each method's enable button and synchronise the slider state.
         lapply(methods, function(method) {
-            observeEvent(input[[method$id]],
-                { # nolint
-                    shinyjs::toggleState(sprintf("%s_weight", method$id))
-                },
-                ignoreInit = TRUE
-            )
+            observeEvent(c(input[[method$id]], input$optimization_target), {
+                shinyjs::toggleState(
+                    sprintf("%s_weight", method$id),
+                    condition = input$optimization_target == "custom" &
+                        input[[method$id]]
+                )
+            })
         })
 
-        observeEvent(
-            { # nolint
-                analysis()
-                input$reset_button
-            },
-            { # nolint
-                for (method in methods) {
-                    updateCheckboxInput(
-                        session,
-                        method$id,
-                        value = TRUE
-                    )
-
-                    updateSliderInput(
-                        session,
-                        sprintf("%s_weight", method$id),
-                        value = analysis()$weights[[method$id]]
-                    )
-                }
-            },
-            ignoreNULL = FALSE
-        )
-
         reactive({
+            analysis <- analysis()
             weights <- NULL
 
-            for (method in methods) {
-                if (input[[method$id]]) {
-                    weight <- input[[sprintf("%s_weight", method$id)]]
-                    weights[[method$id]] <- weight
+            if (input$optimization_target == "custom") {
+                for (method in methods) {
+                    if (input[[method$id]]) {
+                        weight <- input[[sprintf("%s_weight", method$id)]]
+                        weights[[method$id]] <- weight
+                    }
                 }
+            } else {
+                withProgress(message = "Optimizing weights", {
+                    setProgress(0.2)
+
+                    included_methods <- NULL
+
+                    for (method in methods) {
+                        if (input[[method$id]]) {
+                            included_methods <- c(included_methods, method$id)
+                        }
+                    }
+
+                    weights <- geposan::optimal_weights(
+                        analysis,
+                        included_methods,
+                        analysis$preset$reference_gene_ids,
+                        target = input$optimization_target
+                    )
+
+                    for (method_id in names(weights)) {
+                        updateSliderInput(
+                            session,
+                            sprintf("%s_weight", method_id),
+                            value = weights[[method_id]]
+                        )
+                    }
+                })
             }
 
-            geposan::ranking(analysis(), weights)
+            geposan::ranking(analysis, weights)
         })
     })
 }

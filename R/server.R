@@ -139,14 +139,14 @@ server <- function(input, output, session) {
         }
 
         all <- ranking()
-        clusteriness <- geposan::ranking(all, list(clusteriness = 1))
+        clustering <- geposan::ranking(all, list(clustering = 1))
         correlation <- geposan::ranking(all, list(correlation = 1))
         neural <- geposan::ranking(all, list(neural = 1))
         adjacency <- geposan::ranking(all, list(adjacency = 1))
         proximity <- geposan::ranking(all, list(proximity = 1))
 
         rankings <- list(
-            "Clusteriness" = clusteriness,
+            "Clustering" = clustering,
             "Correlation" = correlation,
             "Neural" = neural,
             "Adjacency" = adjacency,

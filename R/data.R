@@ -68,33 +68,7 @@ genes <- geposan::genes[, .(
 )]
 
 # All available methods from [geposan] and additional information on them.
-methods <- list(
-    list(
-        id = "clusteriness",
-        name = "Clustering",
-        description = "Clustering of genes"
-    ),
-    list(
-        id = "correlation",
-        name = "Correlation",
-        description = "Correlation with known genes"
-    ),
-    list(
-        id = "neural",
-        name = "Neural",
-        description = "Assessment by neural network"
-    ),
-    list(
-        id = "adjacency",
-        name = "Adjacency",
-        description = "Adjacency to reference genes"
-    ),
-    list(
-        id = "proximity",
-        name = "Proximity",
-        description = "Proximity to telomeres"
-    )
-)
+methods <- geposan::all_methods()
 
 # IDs of methods for geposan.
 method_ids <- sapply(methods, function(method) method$id)
