@@ -45,11 +45,18 @@ methods_server <- function(id, analysis) {
     moduleServer(id, function(input, output, session) {
         # Observe each method's enable button and synchronise the slider state.
         lapply(methods, function(method) {
-            observeEvent(c(input[[method$id]], input$optimization_target), {
+            observeEvent(input[[method$id]], {
                 shinyjs::toggleState(
                     sprintf("%s_weight", method$id),
-                    condition = input$optimization_target == "custom" &
-                        input[[method$id]]
+                    condition = input[[method$id]]
+                )
+            })
+
+            shinyjs::onclick(sprintf("%s_weight", method$id), {
+                updateSelectInput(
+                    session,
+                    "optimization_target",
+                    selected = "custom"
                 )
             })
         })
