@@ -48,8 +48,25 @@ server <- function(input, output, session) {
     comparison_gene_ids <- comparison_editor_server("comparison_editor", preset)
 
     output$genes <- DT::renderDT({
-        columns <- c("rank", "gene", "name", "chromosome", method_ids, "score")
-        column_names <- c("", "Gene", "", "Chromosome", method_names, "Score")
+        columns <- c(
+            "rank",
+            "gene",
+            "name",
+            "chromosome",
+            method_ids,
+            "score",
+            "percentile"
+        )
+
+        column_names <- c(
+            "",
+            "Gene",
+            "",
+            "Chromosome",
+            method_names,
+            "Score",
+            "Percentile"
+        )
 
         dt <- DT::datatable(
             results_filtered()[, ..columns],
@@ -63,7 +80,11 @@ server <- function(input, output, session) {
             )
         )
 
-        DT::formatPercentage(dt, c(method_ids, "score"), digits = 1)
+        DT::formatPercentage(
+            dt,
+            c(method_ids, "score", "percentile"),
+            digits = 2
+        )
     })
 
     output$copy <- renderUI({
