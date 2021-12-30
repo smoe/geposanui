@@ -4,7 +4,11 @@ results_ui <- function(id) {
     verticalLayout(
         div(
             style = "margin-top: 16px",
-            uiOutput(NS(id, "copy")),
+            splitLayout(
+                cellWidths = "auto",
+                uiOutput(NS(id, "copy")),
+                downloadButton(NS(id, "download"), "Download CSV")
+            )
         ),
         div(
             style = "margin-top: 16px",
@@ -21,46 +25,6 @@ results_ui <- function(id) {
 #' @noRd
 results_server <- function(id, filtered_results) {
     moduleServer(id, function(input, output, session) {
-        output$genes <- DT::renderDT({
-            columns <- c(
-                "rank",
-                "gene",
-                "name",
-                "chromosome",
-                method_ids,
-                "score",
-                "percentile"
-            )
-
-            column_names <- c(
-                "",
-                "Gene",
-                "",
-                "Chromosome",
-                method_names,
-                "Score",
-                "Percentile"
-            )
-
-            dt <- DT::datatable(
-                filtered_results()[, ..columns],
-                rownames = FALSE,
-                colnames = column_names,
-                style = "bootstrap",
-                options = list(
-                    rowCallback = js_link,
-                    columnDefs = list(list(visible = FALSE, targets = 2)),
-                    pageLength = 25
-                )
-            )
-
-            DT::formatPercentage(
-                dt,
-                c(method_ids, "score", "percentile"),
-                digits = 2
-            )
-        })
-
         output$copy <- renderUI({
             results <- filtered_results()
 
@@ -84,6 +48,58 @@ results_server <- function(id, filtered_results) {
                     names_text,
                     icon = icon("clipboard")
                 )
+            )
+        })
+
+        columns <- c(
+            "rank",
+            "gene",
+            "name",
+            "chromosome",
+            method_ids,
+            "score",
+            "percentile"
+        )
+
+        column_names <- c(
+            "",
+            "Gene",
+            "",
+            "Chromosome",
+            method_names,
+            "Score",
+            "Percentile"
+        )
+
+        output_data <- reactive({
+            filtered_results()[, ..columns]
+        })
+
+        output$download <- downloadHandler(
+            filename = "geposan_filtered_results.csv",
+            content = function(file) {
+                fwrite(output_data(), file = file)
+            },
+            contentType = "text/csv"
+        )
+
+        output$genes <- DT::renderDT({
+            dt <- DT::datatable(
+                output_data(),
+                rownames = FALSE,
+                colnames = column_names,
+                style = "bootstrap",
+                options = list(
+                    rowCallback = js_link,
+                    columnDefs = list(list(visible = FALSE, targets = 2)),
+                    pageLength = 25
+                )
+            )
+
+            DT::formatPercentage(
+                dt,
+                c(method_ids, "score", "percentile"),
+                digits = 2
             )
         })
     })
