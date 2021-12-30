@@ -74,14 +74,7 @@ ui <- div(
                         ),
                         tabPanel(
                             title = "Detailed results",
-                            div(
-                                style = "margin-top: 16px",
-                                uiOutput("copy"),
-                            ),
-                            div(
-                                style = "margin-top: 16px",
-                                DT::DTOutput("genes")
-                            )
+                            results_ui("results")
                         ),
                         tabPanel(
                             title = "g:Profiler",

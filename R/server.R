@@ -45,73 +45,10 @@ server <- function(input, output, session) {
     # Apply the filters.
     results_filtered <- filters_server("filters", results)
 
+    # Server for the detailed results panel.
+    results_server("results", results_filtered)
+
     comparison_gene_ids <- comparison_editor_server("comparison_editor", preset)
-
-    output$genes <- DT::renderDT({
-        columns <- c(
-            "rank",
-            "gene",
-            "name",
-            "chromosome",
-            method_ids,
-            "score",
-            "percentile"
-        )
-
-        column_names <- c(
-            "",
-            "Gene",
-            "",
-            "Chromosome",
-            method_names,
-            "Score",
-            "Percentile"
-        )
-
-        dt <- DT::datatable(
-            results_filtered()[, ..columns],
-            rownames = FALSE,
-            colnames = column_names,
-            style = "bootstrap",
-            options = list(
-                rowCallback = js_link,
-                columnDefs = list(list(visible = FALSE, targets = 2)),
-                pageLength = 25
-            )
-        )
-
-        DT::formatPercentage(
-            dt,
-            c(method_ids, "score", "percentile"),
-            digits = 2
-        )
-    })
-
-    output$copy <- renderUI({
-        results <- results_filtered()
-
-        gene_ids <- results[, gene]
-        names <- results[name != "", name]
-
-        genes_text <- paste(gene_ids, collapse = "\n")
-        names_text <- paste(names, collapse = "\n")
-
-        splitLayout(
-            cellWidths = "auto",
-            rclipboard::rclipButton(
-                "copy_ids_button",
-                "Copy gene IDs",
-                genes_text,
-                icon = icon("clipboard")
-            ),
-            rclipboard::rclipButton(
-                "copy_names_button",
-                "Copy gene names",
-                names_text,
-                icon = icon("clipboard")
-            )
-        )
-    })
 
     output$scatter <- plotly::renderPlotly({
         preset <- preset()

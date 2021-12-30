@@ -1,0 +1,90 @@
+#' Construct UI for the detailed results panel.
+#' @noRd
+results_ui <- function(id) {
+    verticalLayout(
+        div(
+            style = "margin-top: 16px",
+            uiOutput(NS(id, "copy")),
+        ),
+        div(
+            style = "margin-top: 16px",
+            DT::DTOutput(NS(id, "genes"))
+        )
+    )
+}
+
+#' Server for the detailed results panel.
+#'
+#' @param filtered_results A reactive containing the prefiltered results to be
+#'   displayed.
+#'
+#' @noRd
+results_server <- function(id, filtered_results) {
+    moduleServer(id, function(input, output, session) {
+        output$genes <- DT::renderDT({
+            columns <- c(
+                "rank",
+                "gene",
+                "name",
+                "chromosome",
+                method_ids,
+                "score",
+                "percentile"
+            )
+
+            column_names <- c(
+                "",
+                "Gene",
+                "",
+                "Chromosome",
+                method_names,
+                "Score",
+                "Percentile"
+            )
+
+            dt <- DT::datatable(
+                filtered_results()[, ..columns],
+                rownames = FALSE,
+                colnames = column_names,
+                style = "bootstrap",
+                options = list(
+                    rowCallback = js_link,
+                    columnDefs = list(list(visible = FALSE, targets = 2)),
+                    pageLength = 25
+                )
+            )
+
+            DT::formatPercentage(
+                dt,
+                c(method_ids, "score", "percentile"),
+                digits = 2
+            )
+        })
+
+        output$copy <- renderUI({
+            results <- filtered_results()
+
+            gene_ids <- results[, gene]
+            names <- results[name != "", name]
+
+            genes_text <- paste(gene_ids, collapse = "\n")
+            names_text <- paste(names, collapse = "\n")
+
+            splitLayout(
+                cellWidths = "auto",
+                rclipboard::rclipButton(
+                    "copy_ids_button",
+                    "Copy gene IDs",
+                    genes_text,
+                    icon = icon("clipboard")
+                ),
+                rclipboard::rclipButton(
+                    "copy_names_button",
+                    "Copy gene names",
+                    names_text,
+                    icon = icon("clipboard")
+                )
+            )
+        })
+    })
+}
