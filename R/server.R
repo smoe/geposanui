@@ -86,6 +86,19 @@ server <- function(input, output, session) {
 
     output$rankings_plot <- plotly::renderPlotly({
         preset <- preset()
+
+        rankings <- list()
+        methods <- preset$methods
+        all <- ranking()
+
+        for (method in methods) {
+            weights <- list()
+            weights[[method$id]] <- 1.0
+            rankings[[method$name]] <- geposan::ranking(all, weights)
+        }
+
+        rankings[["Combined"]] <- all
+
         gene_sets <- list("Reference genes" = preset$reference_gene_ids)
         comparison_gene_ids <- comparison_gene_ids()
 
@@ -95,22 +108,6 @@ server <- function(input, output, session) {
                 list("Comparison genes" = comparison_gene_ids)
             )
         }
-
-        all <- ranking()
-        clustering <- geposan::ranking(all, list(clustering = 1))
-        correlation <- geposan::ranking(all, list(correlation = 1))
-        neural <- geposan::ranking(all, list(neural = 1))
-        adjacency <- geposan::ranking(all, list(adjacency = 1))
-        proximity <- geposan::ranking(all, list(proximity = 1))
-
-        rankings <- list(
-            "Clustering" = clustering,
-            "Correlation" = correlation,
-            "Neural" = neural,
-            "Adjacency" = adjacency,
-            "Proximity" = proximity,
-            "Combined" = all
-        )
 
         geposan::plot_rankings(rankings, gene_sets)
     })
