@@ -72,8 +72,8 @@ preset_editor_ui <- function(id) {
 # @return A reactive containing the preset.
 preset_editor_server <- function(id) {
     moduleServer(id, function(input, output, session) {
-        species_choices <- species$id
-        names(species_choices) <- species$name
+        species_choices <- geposan::species$id
+        names(species_choices) <- geposan::species$name
 
         updateSelectizeInput(
             session,
@@ -83,17 +83,14 @@ preset_editor_server <- function(id) {
         )
 
         current_preset <- reactiveVal(geposan::preset(
-            genes[suggested | verified == TRUE, id],
-            methods = methods,
-            species_ids = species$id,
-            gene_ids = genes$id
+            genes[suggested | verified == TRUE, id]
         ))
 
         new_preset <- reactive({
             species_ids <- if (input$species == "replicative") {
-                species[replicative == TRUE, id]
+                species_ids_replicative
             } else if (input$species == "all") {
-                species$id
+                geposan::species$id
             } else {
                 input$custom_species
             }

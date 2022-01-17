@@ -27,13 +27,6 @@ species_ids_replicative <- c(
     "tgelada"
 )
 
-# Species from [geposan] and their aging status.
-species <- geposan::species[, .(
-    id,
-    name,
-    replicative = id %chin% species_ids_replicative
-)]
-
 # Gene names of genes for verified TPE-OLD genes.
 genes_verified_tpe_old <- c(
     "C1S",
