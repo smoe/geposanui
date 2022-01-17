@@ -83,10 +83,10 @@ preset_editor_server <- function(id) {
         )
 
         current_preset <- reactiveVal(geposan::preset(
+            genes[suggested | verified == TRUE, id],
             methods = methods,
             species_ids = species$id,
-            gene_ids = genes$id,
-            reference_gene_ids = genes[suggested | verified == TRUE, id]
+            gene_ids = genes$id
         ))
 
         new_preset <- reactive({
@@ -112,10 +112,10 @@ preset_editor_server <- function(id) {
             }
 
             geposan::preset(
+                reference_gene_ids,
                 methods = methods,
                 species_ids = species_ids,
-                gene_ids = genes$id,
-                reference_gene_ids = reference_gene_ids
+                gene_ids = genes$id
             )
         })
 
