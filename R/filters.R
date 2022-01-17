@@ -45,9 +45,9 @@ filters_ui <- function(id) {
                     NS(id, "rank"),
                     label = "Maximum rank",
                     min = 0,
-                    max = 5000,
-                    step = 50,
-                    value = 2500
+                    max = 2000,
+                    step = 10,
+                    value = 1000
                 )
             ),
             tabPanelBody(
