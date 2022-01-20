@@ -86,6 +86,33 @@ preset_editor_server <- function(id) {
             genes[suggested | verified == TRUE, id]
         ))
 
+        # Reactive containing the latest valid set of reference genes.
+        reference_gene_ids <- reactiveVal(
+            genes[verified | suggested == TRUE, id]
+        )
+
+        observeEvent(c(input$reference_genes, input$custom_reference_genes), {
+            if (input$reference_genes == "custom") {
+                inputs <- strsplit(input$custom_reference_genes, "\\s+")[[1]]
+
+                gene_ids <- if (input$identifier_type == "hgnc") {
+                    geposan::genes[name %chin% inputs, id]
+                } else {
+                    geposan::genes[id %chin% inputs, id]
+                }
+
+                if (length(gene_ids) >= 5) {
+                    reference_gene_ids(gene_ids)
+                }
+            } else {
+                reference_gene_ids(if (input$reference_genes == "tpeold") {
+                    genes[verified | suggested == TRUE, id]
+                } else if (input$reference_genes == "verified") {
+                    genes[verified == TRUE, id]
+                })
+            }
+        })
+
         new_preset <- reactive({
             species_ids <- if (input$species == "replicative") {
                 species_ids_replicative
@@ -95,21 +122,8 @@ preset_editor_server <- function(id) {
                 input$custom_species
             }
 
-            reference_gene_ids <- if (input$reference_genes == "tpeold") {
-                genes[verified | suggested == TRUE, id]
-            } else if (input$reference_genes == "verified") {
-                genes[verified == TRUE, id]
-            } else {
-                inputs <- strsplit(input$custom_reference_genes, "\\s+")[[1]]
-                if (input$identifier_type == "hgnc") {
-                    geposan::genes[name %chin% inputs, id]
-                } else {
-                    geposan::genes[id %chin% inputs, id]
-                }
-            }
-
             geposan::preset(
-                reference_gene_ids,
+                reference_gene_ids(),
                 methods = methods,
                 species_ids = species_ids,
                 gene_ids = genes$id
