@@ -8,7 +8,9 @@ js_link <- DT::JS("function(row, data) {
 }")
 
 server <- function(input, output, session) {
-    preset <- preset_editor_server("preset_editor")
+    input_reactives <- input_page_server("input_page")
+    preset <- input_reactives$preset
+    comparison_gene_ids <- input_reactives$comparison_gene_ids
 
     # Compute the results according to the preset.
     analysis <- reactive({
@@ -47,23 +49,6 @@ server <- function(input, output, session) {
 
     # Server for the detailed results panel.
     results_server("results", results_filtered)
-
-    comparison_gene_ids <- comparison_editor_server("comparison_editor", preset)
-
-    output$scatter <- plotly::renderPlotly({
-        preset <- preset()
-        gene_sets <- list("Reference genes" = preset$reference_gene_ids)
-        comparison_gene_ids <- comparison_gene_ids()
-
-        if (length(comparison_gene_ids) >= 1) {
-            gene_sets <- c(
-                gene_sets,
-                list("Comparison genes" = comparison_gene_ids)
-            )
-        }
-
-        geposan::plot_positions(preset$species_ids, gene_sets)
-    })
 
     output$rank_plot <- plotly::renderPlotly({
         preset <- preset()

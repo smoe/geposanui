@@ -1,4 +1,9 @@
-# Create a preset editor.
+#' Create the UI for a preset editor.
+#'
+#' @param id ID for namespacing.
+#' @return The UI elements.
+#'
+#' @noRd
 preset_editor_ui <- function(id) {
     verticalLayout(
         h3("Inputs"),
@@ -47,29 +52,17 @@ preset_editor_ui <- function(id) {
                 label = "Enter reference genes",
                 height = "250px"
             )
-        ),
-        tabsetPanel(
-            id = NS(id, "apply_panel"),
-            type = "hidden",
-            tabPanelBody(value = "hide"),
-            tabPanelBody(
-                value = "show",
-                actionButton(
-                    NS(id, "apply_button"),
-                    "Perform analysis",
-                    class = "btn-primary",
-                    style = "margin-top: 16px; margin-bottom: 16px"
-                )
-            )
         )
     )
 }
 
-# Create a server for the preset editor.
-#
-# @param id ID for namespacing the inputs and outputs.
-#
-# @return A reactive containing the preset.
+#' Application logic for the preset editor.
+#'
+#' @param id ID for namespacing the inputs and outputs.
+#' @return A reactive containing the preset or `NULL`, if the input data doesn't
+#'   result in a valid one.
+#'
+#' @noRd
 preset_editor_server <- function(id) {
     moduleServer(id, function(input, output, session) {
         species_choices <- geposan::species$id
@@ -82,17 +75,12 @@ preset_editor_server <- function(id) {
             server = TRUE
         )
 
-        current_preset <- reactiveVal(geposan::preset(
-            genes[suggested | verified == TRUE, id]
-        ))
-
-        # Reactive containing the latest valid set of reference genes.
-        reference_gene_ids <- reactiveVal(
-            genes[verified | suggested == TRUE, id]
-        )
-
-        observeEvent(c(input$reference_genes, input$custom_reference_genes), {
-            if (input$reference_genes == "custom") {
+        reactive({
+            reference_gene_ids <- if (input$reference_genes == "tpeold") {
+                genes[verified | suggested == TRUE, id]
+            } else if (input$reference_genes == "verified") {
+                genes[verified == TRUE, id]
+            } else {
                 inputs <- strsplit(input$custom_reference_genes, "\\s+")[[1]]
 
                 gene_ids <- if (input$identifier_type == "hgnc") {
@@ -100,20 +88,8 @@ preset_editor_server <- function(id) {
                 } else {
                     geposan::genes[id %chin% inputs, id]
                 }
-
-                if (length(gene_ids) >= 5) {
-                    reference_gene_ids(gene_ids)
-                }
-            } else {
-                reference_gene_ids(if (input$reference_genes == "tpeold") {
-                    genes[verified | suggested == TRUE, id]
-                } else if (input$reference_genes == "verified") {
-                    genes[verified == TRUE, id]
-                })
             }
-        })
 
-        new_preset <- reactive({
             species_ids <- if (input$species == "replicative") {
                 species_ids_replicative
             } else if (input$species == "all") {
@@ -122,41 +98,13 @@ preset_editor_server <- function(id) {
                 input$custom_species
             }
 
-            geposan::preset(
-                reference_gene_ids(),
-                methods = methods,
-                species_ids = species_ids,
-                gene_ids = genes$id
+            tryCatch(
+                geposan::preset(
+                    reference_gene_ids,
+                    species_ids = species_ids
+                ),
+                error = function(err) NULL
             )
         })
-
-        observeEvent(
-            { # nolint
-                current_preset()
-                new_preset()
-            },
-            { # nolint
-                if (rlang::hash(new_preset()) !=
-                    rlang::hash(current_preset())) {
-                    updateTabsetPanel(
-                        session,
-                        "apply_panel",
-                        selected = "show"
-                    )
-                } else {
-                    updateTabsetPanel(
-                        session,
-                        "apply_panel",
-                        selected = "hide"
-                    )
-                }
-            }
-        )
-
-        observeEvent(input$apply_button, {
-            current_preset(new_preset())
-        })
-
-        current_preset
     })
 }

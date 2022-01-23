@@ -11,21 +11,7 @@ ui <- div(
         selected = "Results",
         tabPanel(
             "Input data",
-            sidebarLayout(
-                sidebarPanel(
-                    width = 3,
-                    preset_editor_ui("preset_editor"),
-                    comparison_editor_ui("comparison_editor")
-                ),
-                mainPanel(
-                    width = 9,
-                    plotly::plotlyOutput(
-                        "scatter",
-                        width = "100%",
-                        height = "600px"
-                    )
-                )
-            ),
+            input_page_ui("input_page")
         ),
         tabPanel(
             "Results",
