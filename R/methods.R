@@ -3,13 +3,21 @@ methods_ui <- function(id) {
     verticalLayout(
         h3("Methods"),
         selectInput(
+            NS(id, "optimization_genes"),
+            "Genes to optimize for",
+            choices = list(
+                "Reference genes" = "reference",
+                "Comparison genes" = "comparison"
+            )
+        ),
+        selectInput(
             NS(id, "optimization_target"),
             "Optimization target",
             choices = list(
-                "Mean rank of reference genes" = "mean",
-                "Median rank of reference genes" = "median",
-                "First rank of reference genes" = "min",
-                "Last rank of reference genes" = "max",
+                "Mean rank" = "mean",
+                "Median rank" = "median",
+                "First rank" = "min",
+                "Last rank" = "max",
                 "Customize weights" = "custom"
             )
         ),
@@ -41,7 +49,7 @@ methods_ui <- function(id) {
 # @param analysis The reactive containing the results to be weighted.
 #
 # @return A reactive containing the weighted results.
-methods_server <- function(id, analysis) {
+methods_server <- function(id, analysis, comparison_gene_ids) {
     moduleServer(id, function(input, output, session) {
         # Observe each method's enable button and synchronise the slider state.
         lapply(methods, function(method) {
@@ -65,7 +73,13 @@ methods_server <- function(id, analysis) {
             analysis <- analysis()
             weights <- NULL
 
-            if (input$optimization_target == "custom") {
+            gene_ids <- if (input$optimization_genes == "comparison") {
+                comparison_gene_ids()
+            } else {
+                analysis$preset$reference_gene_ids
+            }
+
+            if (length(gene_ids) < 1 | input$optimization_target == "custom") {
                 for (method in methods) {
                     if (input[[method$id]]) {
                         weight <- input[[sprintf("%s_weight", method$id)]]
@@ -87,7 +101,7 @@ methods_server <- function(id, analysis) {
                     weights <- geposan::optimal_weights(
                         analysis,
                         included_methods,
-                        analysis$preset$reference_gene_ids,
+                        gene_ids,
                         target = input$optimization_target
                     )
 

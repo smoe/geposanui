@@ -31,7 +31,7 @@ server <- function(input, output, session) {
     })
 
     # Rank the results.
-    ranking <- methods_server("methods", analysis)
+    ranking <- methods_server("methods", analysis, comparison_gene_ids)
 
     # Add gene information to the results.
     results <- reactive({
