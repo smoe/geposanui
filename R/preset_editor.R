@@ -50,6 +50,10 @@ preset_editor_ui <- function(id) {
             textAreaInput(
                 inputId = NS(id, "custom_reference_genes"),
                 label = "Enter reference genes",
+                value = paste(
+                    genes[verified | suggested == TRUE, name],
+                    collapse = "\n"
+                ),
                 height = "250px"
             )
         )
