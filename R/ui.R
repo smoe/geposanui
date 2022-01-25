@@ -2,6 +2,7 @@ ui <- div(
     shinyjs::useShinyjs(),
     rclipboard::rclipboardSetup(),
     navbarPage(
+        id = "main_page",
         theme = bslib::bs_theme(
             version = 5,
             bootswatch = "united",

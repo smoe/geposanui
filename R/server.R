@@ -12,6 +12,14 @@ server <- function(input, output, session) {
     preset <- input_reactives$preset
     comparison_gene_ids <- input_reactives$comparison_gene_ids
 
+    observe({
+        updateNavbarPage(
+            session,
+            "main_page",
+            selected = "Results"
+        )
+    }) |> bindEvent(preset(), ignoreInit = TRUE)
+
     # Compute the results according to the preset.
     analysis <- reactive({
         preset <- preset()
