@@ -39,22 +39,9 @@ preset_editor_ui <- function(id) {
                 "input['%s'] == 'custom'",
                 NS(id, "reference_genes")
             ),
-            selectInput(
-                NS(id, "identifier_type"),
-                "Gene identifiers",
-                choices = list(
-                    "HGNC symbols" = "hgnc",
-                    "Ensembl gene IDs" = "ensembl"
-                )
-            ),
-            textAreaInput(
-                inputId = NS(id, "custom_reference_genes"),
-                label = "Enter reference genes",
-                value = paste(
-                    genes[verified | suggested == TRUE, name],
-                    collapse = "\n"
-                ),
-                height = "250px"
+            gene_selector_ui(
+                NS(id, "custom_genes"),
+                genes[suggested | verified == TRUE, id]
             )
         )
     )
@@ -79,19 +66,15 @@ preset_editor_server <- function(id) {
             server = TRUE
         )
 
+        custom_gene_ids <- gene_selector_server("custom_genes")
+
         reactive({
             reference_gene_ids <- if (input$reference_genes == "tpeold") {
                 genes[verified | suggested == TRUE, id]
             } else if (input$reference_genes == "verified") {
                 genes[verified == TRUE, id]
             } else {
-                inputs <- strsplit(input$custom_reference_genes, "\\s+")[[1]]
-
-                gene_ids <- if (input$identifier_type == "hgnc") {
-                    geposan::genes[name %chin% inputs, id]
-                } else {
-                    geposan::genes[id %chin% inputs, id]
-                }
+                custom_gene_ids()
             }
 
             species_ids <- if (input$species == "replicative") {

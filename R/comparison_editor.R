@@ -19,19 +19,7 @@ comparison_editor_ui <- function(id) {
                 "input['%s'] == 'custom'",
                 NS(id, "comparison_genes")
             ),
-            selectInput(
-                NS(id, "identifier_type"),
-                "Gene identifiers",
-                choices = list(
-                    "HGNC symbols" = "hgnc",
-                    "Ensembl gene IDs" = "ensembl"
-                )
-            ),
-            textAreaInput(
-                inputId = NS(id, "custom_comparison_genes"),
-                label = "Enter comparison genes",
-                height = "250px"
-            )
+            gene_selector_ui(NS(id, "custom_genes"))
         )
     )
 }
@@ -44,6 +32,8 @@ comparison_editor_ui <- function(id) {
 # @return A reactive containing the comparison gene IDs.
 comparison_editor_server <- function(id, preset) {
     moduleServer(id, function(input, output, session) {
+        custom_gene_ids <- gene_selector_server("custom_genes")
+
         reactive({
             if (input$comparison_genes == "none") {
                 NULL
@@ -60,12 +50,7 @@ comparison_editor_server <- function(id, preset) {
             } else if (input$comparison_genes == "suggested") {
                 genes[suggested == TRUE, id]
             } else {
-                inputs <- strsplit(input$custom_comparison_genes, "\\s+")[[1]]
-                if (input$identifier_type == "hgnc") {
-                    geposan::genes[name %chin% inputs, id]
-                } else {
-                    geposan::genes[id %chin% inputs, id]
-                }
+                custom_gene_ids()
             }
         })
     })

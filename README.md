@@ -9,6 +9,7 @@ You can install the development version of tpeold using:
 
 ```r
 # install.packages("remotes")
+remotes::install_github("dreamRs/shinyvs")
 remotes::install_git("https://code.johrpan.de/johrpan/tpeold.git")
 ```
 
