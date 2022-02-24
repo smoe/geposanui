@@ -69,17 +69,51 @@ methods_server <- function(id, analysis, comparison_gene_ids) {
             })
         })
 
-        reactive({
-            analysis <- analysis()
-            weights <- NULL
-
+        # This reactive will always contain the currently selected optimization
+        # gene IDs in a normalized form.
+        optimization_gene_ids <- reactive({
             gene_ids <- if (input$optimization_genes == "comparison") {
                 comparison_gene_ids()
             } else {
-                analysis$preset$reference_gene_ids
+                analysis()$preset$reference_gene_ids
             }
 
-            if (length(gene_ids) < 1 | input$optimization_target == "custom") {
+            sort(unique(gene_ids))
+        })
+
+        # This reactive will always contain the optimal weights according to
+        # the selected parameters.
+        optimal_weights <- reactive({
+            withProgress(message = "Optimizing weights", {
+                setProgress(0.2)
+
+                included_methods <- NULL
+
+                for (method in methods) {
+                    if (input[[method$id]]) {
+                        included_methods <- c(included_methods, method$id)
+                    }
+                }
+
+                geposan::optimal_weights(
+                    analysis(),
+                    included_methods,
+                    optimization_gene_ids(),
+                    target = input$optimization_target
+                )
+            })
+        }) |> bindCache(
+            analysis(),
+            optimization_gene_ids(),
+            sapply(methods, function(method) input[[method$id]]),
+            input$optimization_target
+        )
+
+        reactive({
+            weights <- NULL
+
+            if (length(optimization_gene_ids()) < 1 |
+                input$optimization_target == "custom") {
                 for (method in methods) {
                     if (input[[method$id]]) {
                         weight <- input[[sprintf("%s_weight", method$id)]]
@@ -87,35 +121,18 @@ methods_server <- function(id, analysis, comparison_gene_ids) {
                     }
                 }
             } else {
-                withProgress(message = "Optimizing weights", {
-                    setProgress(0.2)
+                weights <- optimal_weights()
 
-                    included_methods <- NULL
-
-                    for (method in methods) {
-                        if (input[[method$id]]) {
-                            included_methods <- c(included_methods, method$id)
-                        }
-                    }
-
-                    weights <- geposan::optimal_weights(
-                        analysis,
-                        included_methods,
-                        gene_ids,
-                        target = input$optimization_target
+                for (method_id in names(weights)) {
+                    updateSliderInput(
+                        session,
+                        sprintf("%s_weight", method_id),
+                        value = weights[[method_id]]
                     )
-
-                    for (method_id in names(weights)) {
-                        updateSliderInput(
-                            session,
-                            sprintf("%s_weight", method_id),
-                            value = weights[[method_id]]
-                        )
-                    }
-                })
+                }
             }
 
-            geposan::ranking(analysis, weights)
+            geposan::ranking(analysis(), weights)
         })
     })
 }
