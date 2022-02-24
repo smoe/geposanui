@@ -22,21 +22,20 @@ server <- function(input, output, session) {
 
     # Compute the results according to the preset.
     analysis <- reactive({
-        preset <- preset()
-
-        # Perform the analysis cached based on the preset's hash.
-        analysis <- withProgress(
+        withProgress(
             message = "Analyzing genes",
             value = 0.0,
             { # nolint
-                geposan::analyze(preset, function(progress) {
-                    setProgress(progress)
-                })
+                geposan::analyze(
+                    preset(),
+                    progress = function(progress) {
+                        setProgress(progress)
+                    },
+                    include_results = FALSE
+                )
             }
         )
-
-        analysis
-    })
+    }) |> bindCache(preset())
 
     # Rank the results.
     ranking <- methods_server("methods", analysis, comparison_gene_ids)
