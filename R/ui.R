@@ -1,92 +1,132 @@
-ui <- div(
-    shinyjs::useShinyjs(),
-    rclipboard::rclipboardSetup(),
-    navbarPage(
-        id = "main_page",
-        theme = bslib::bs_theme(
-            version = 5,
-            bootswatch = "united",
-            primary = "#1964bf"
-        ),
-        title = "TPE-OLD candidates",
-        selected = "Results",
-        tabPanel(
-            "Input data",
-            input_page_ui("input_page")
-        ),
-        tabPanel(
-            "Results",
-            sidebarLayout(
-                sidebarPanel(
-                    width = 3,
-                    methods_ui("methods"),
-                    filters_ui("filters")
-                ),
-                mainPanel(
-                    width = 9,
-                    tabsetPanel(
-                        type = "pills",
-                        tabPanel(
-                            title = "Overview",
-                            div(
-                                style = "margin-top: 16px",
-                                plotly::plotlyOutput(
-                                    "rank_plot",
-                                    width = "100%",
-                                    height = "600px"
+#' Generate the main UI for the application.
+#' @noRd
+ui <- function() {
+    div(
+        shinyjs::useShinyjs(),
+        rclipboard::rclipboardSetup(),
+        navbarPage(
+            id = "main_page",
+            theme = bslib::bs_theme(
+                version = 5,
+                bootswatch = "united",
+                primary = "#1964bf"
+            ),
+            title = "TPE-OLD candidates",
+            selected = "Results",
+            tabPanel(
+                "Input data",
+                input_page_ui("input_page")
+            ),
+            tabPanel(
+                "Results",
+                sidebarLayout(
+                    sidebarPanel(
+                        width = 3,
+                        methods_ui("methods"),
+                        filters_ui("filters")
+                    ),
+                    mainPanel(
+                        width = 9,
+                        tabsetPanel(
+                            type = "pills",
+                            tabPanel(
+                                title = "Overview",
+                                div(
+                                    style = "margin-top: 16px",
+                                    plotly::plotlyOutput(
+                                        "rank_plot",
+                                        width = "100%",
+                                        height = "600px"
+                                    )
                                 )
-                            )
-                        ),
-                        tabPanel(
-                            title = "Methods & Distribution",
-                            div(
-                                style = "margin-top: 16px",
-                                plotly::plotlyOutput(
-                                    "rankings_plot",
-                                    width = "100%",
-                                    height = "600px"
-                                )
-                            )
-                        ),
-                        tabPanel(
-                            title = "Comparison",
-                            div(
-                                style = "margin-top: 16px",
-                                plotly::plotlyOutput(
-                                    "boxplot",
-                                    width = "100%",
-                                    height = "600px"
-                                )
-                            )
-                        ),
-                        tabPanel(
-                            title = "Detailed results",
-                            results_ui("results")
-                        ),
-                        tabPanel(
-                            title = "g:Profiler",
-                            div(
-                                style = "margin-top: 16px",
-                                plotly::plotlyOutput("gost_plot"),
                             ),
-                            div(
-                                style = "margin-top: 16px",
-                                DT::DTOutput("gost_details")
-                            )
-                        ),
-                        tabPanel(
-                            title = "DisGeNET",
-                            div(
-                                style = "margin-top: 16px",
-                                DT::DTOutput("disgenet")
+                            tabPanel(
+                                title = "Methods & Distribution",
+                                div(
+                                    style = "margin-top: 16px",
+                                    plotly::plotlyOutput(
+                                        "rankings_plot",
+                                        width = "100%",
+                                        height = "600px"
+                                    )
+                                )
+                            ),
+                            tabPanel(
+                                title = "Comparison",
+                                div(
+                                    style = "margin-top: 16px",
+                                    plotly::plotlyOutput(
+                                        "boxplot",
+                                        width = "100%",
+                                        height = "600px"
+                                    )
+                                )
+                            ),
+                            tabPanel(
+                                title = "Scores by position",
+                                div(
+                                    style = "margin-top: 16px",
+                                    selectInput(
+                                        "positions_plot_chromosome_name",
+                                        label = NULL,
+                                        choices = chromosome_choices()
+                                    ),
+                                    plotly::plotlyOutput(
+                                        "positions_plot",
+                                        width = "100%",
+                                        height = "600px"
+                                    )
+                                )
+                            ),
+                            tabPanel(
+                                title = "Detailed results",
+                                results_ui("results")
+                            ),
+                            tabPanel(
+                                title = "g:Profiler",
+                                div(
+                                    style = "margin-top: 16px",
+                                    plotly::plotlyOutput("gost_plot"),
+                                ),
+                                div(
+                                    style = "margin-top: 16px",
+                                    DT::DTOutput("gost_details")
+                                )
+                            ),
+                            tabPanel(
+                                title = "DisGeNET",
+                                div(
+                                    style = "margin-top: 16px",
+                                    DT::DTOutput("disgenet")
+                                )
                             )
                         )
                     )
                 )
+            ),
+            tabPanel(
+                title = "Publication"
             )
-        ),
-        tabPanel(
-            title = "Publication"
         )
     )
-)
+}
+
+#' Generate a named list for choosing chromosomes.
+#' @noRd
+chromosome_choices <- function() {
+    choices <- purrr::lmap(
+        unique(geposan::genes$chromosome),
+        function(name) {
+            choice <- list(name)
+
+            names(choice) <- paste0(
+                "Chromosome ",
+                name
+            )
+
+            choice
+        }
+    )
+
+    choices[order(suppressWarnings(sapply(choices, as.integer)))]
+}

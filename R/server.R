@@ -119,6 +119,13 @@ server <- function(input, output, session) {
         geposan::plot_boxplot(ranking(), gene_sets)
     })
 
+    output$positions_plot <- plotly::renderPlotly(
+        geposan::plot_scores_by_position(
+            ranking(),
+            input$positions_plot_chromosome_name
+        )
+    )
+
     gost <- reactive({
         withProgress(
             message = "Querying g:Profiler",

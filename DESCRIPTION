@@ -21,6 +21,7 @@ Imports:
     geposan,
     gprofiler2,
     plotly,
+    purrr,
     rlang,
     rclipboard,
     shiny,
