@@ -119,12 +119,24 @@ server <- function(input, output, session) {
         geposan::plot_boxplot(ranking(), gene_sets)
     })
 
-    output$positions_plot <- plotly::renderPlotly(
+    output$positions_plot <- plotly::renderPlotly({
+        preset <- preset()
+        gene_sets <- list("Reference genes" = preset$reference_gene_ids)
+        comparison_gene_ids <- comparison_gene_ids()
+
+        if (length(comparison_gene_ids) >= 1) {
+            gene_sets <- c(
+                gene_sets,
+                list("Comparison genes" = comparison_gene_ids)
+            )
+        }
+
         geposan::plot_scores_by_position(
             ranking(),
-            input$positions_plot_chromosome_name
+            input$positions_plot_chromosome_name,
+            gene_sets = gene_sets
         )
-    )
+    })
 
     gost <- reactive({
         withProgress(
