@@ -1,88 +1,110 @@
 #' Create the UI for a preset editor.
 #'
 #' @param id ID for namespacing.
+#' @param options Global options for the application.
+#'
 #' @return The UI elements.
 #'
 #' @noRd
-preset_editor_ui <- function(id) {
+preset_editor_ui <- function(id, options) {
+    species_choices <- c("All species", names(options$species_sets))
+    gene_choices <- names(options$gene_sets)
+
+    if (!options$locked) {
+        species_choices <- c(species_choices, "Customize")
+        gene_choices <- c(gene_choices, "Customize")
+    }
+
     verticalLayout(
         h3("Inputs"),
         selectInput(
             NS(id, "species"),
             "Species to include",
-            choices = list(
-                "All species" = "all",
-                "Known replicatively aging species" = "replicative",
-                "Customize" = "custom"
+            choices = species_choices
+        ),
+        if (!options$locked) {
+            conditionalPanel(
+                condition = sprintf(
+                    "input['%s'] == 'Customize'",
+                    NS(id, "species")
+                ),
+                selectizeInput(
+                    inputId = NS(id, "custom_species"),
+                    label = "Select input species",
+                    choices = NULL,
+                    multiple = TRUE
+                ),
             )
-        ),
-        conditionalPanel(
-            condition = sprintf("input['%s'] == 'custom'", NS(id, "species")),
-            selectizeInput(
-                inputId = NS(id, "custom_species"),
-                label = "Select input species",
-                choices = NULL,
-                multiple = TRUE
-            ),
-        ),
+        },
         selectInput(
             NS(id, "reference_genes"),
             "Reference genes",
-            choices = list(
-                "Verified or suggested TPE-OLD genes" = "tpeold",
-                "Only verified TPE-OLD genes" = "verified",
-                "Customize" = "custom"
-            )
+            choices = gene_choices
         ),
-        conditionalPanel(
-            condition = sprintf(
-                "input['%s'] == 'custom'",
-                NS(id, "reference_genes")
-            ),
-            gene_selector_ui(
-                NS(id, "custom_genes"),
-                genes[suggested | verified == TRUE, id]
+        if (!options$locked) {
+            conditionalPanel(
+                condition = sprintf(
+                    "input['%s'] == 'Customize'",
+                    NS(id, "reference_genes")
+                ),
+                gene_selector_ui(NS(id, "custom_genes"))
             )
-        )
+        },
+        if (options$locked) {
+            HTML(
+                "This instance prohibits performing custom analyses ",
+                "to reduce resource usage. Normally, it is possible ",
+                "to use this web application for analyzing any set of ",
+                "reference genes to find patterns in their ",
+                "chromosomal positions. If you would like to apply ",
+                "this method for your own research, see ",
+                "<a href=\"https://code.johrpan.de/johrpan/tpeold\"",
+                "target=\"_blank\">this page</a> for more information."
+            )
+        }
     )
 }
 
 #' Application logic for the preset editor.
 #'
 #' @param id ID for namespacing the inputs and outputs.
+#' @param options Global application options.
+#'
 #' @return A reactive containing the preset or `NULL`, if the input data doesn't
 #'   result in a valid one.
 #'
 #' @noRd
-preset_editor_server <- function(id) {
+preset_editor_server <- function(id, options) {
     moduleServer(id, function(input, output, session) {
-        species_choices <- geposan::species$id
-        names(species_choices) <- geposan::species$name
+        custom_gene_ids <- if (!options$locked) {
+            species_choices <- geposan::species$id
+            names(species_choices) <- geposan::species$name
 
-        updateSelectizeInput(
-            session,
-            "custom_species",
-            choices = species_choices,
-            server = TRUE
-        )
+            updateSelectizeInput(
+                session,
+                "custom_species",
+                choices = species_choices,
+                server = TRUE
+            )
 
-        custom_gene_ids <- gene_selector_server("custom_genes")
+            gene_selector_server("custom_genes")
+        } else {
+            NULL
+        }
 
         reactive({
-            reference_gene_ids <- if (input$reference_genes == "tpeold") {
-                genes[verified | suggested == TRUE, id]
-            } else if (input$reference_genes == "verified") {
-                genes[verified == TRUE, id]
-            } else {
+            reference_gene_ids <- if (input$reference_genes == "Customize") {
                 custom_gene_ids()
+            } else {
+                options$gene_sets[[input$reference_genes]]
             }
 
-            species_ids <- if (input$species == "replicative") {
-                species_ids_replicative
-            } else if (input$species == "all") {
+            species_ids <- if (input$species == "All species") {
                 geposan::species$id
-            } else {
+            } else if (input$species == "Customize") {
                 input$custom_species
+            } else {
+                options$species_sets[[input$species]]
             }
 
             tryCatch(

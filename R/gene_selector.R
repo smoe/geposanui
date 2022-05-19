@@ -7,7 +7,7 @@
 #'
 #' @noRd
 gene_selector_ui <- function(id, default_gene_ids = NULL) {
-    named_genes <- genes[name != ""]
+    named_genes <- geposan::genes[name != ""]
     named_genes <- unique(named_genes, by = "name")
     gene_choices <- named_genes$id
     names(gene_choices) <- named_genes$name
@@ -42,7 +42,10 @@ gene_selector_ui <- function(id, default_gene_ids = NULL) {
                     NS(id, "hgnc_names_raw"),
                     "Enter HGNC symbols",
                     value = paste(
-                        genes[id %chin% default_gene_ids & name != "", name],
+                        geposan::genes[
+                            id %chin% default_gene_ids & name != "",
+                            name
+                        ],
                         collapse = "\n"
                     ),
                     height = "250px"

@@ -1,6 +1,9 @@
 #' Generate the main UI for the application.
+#'
+#' @param options Global options for the application.
+#'
 #' @noRd
-ui <- function() {
+ui <- function(options) {
     div(
         shinyjs::useShinyjs(),
         rclipboard::rclipboardSetup(),
@@ -15,7 +18,7 @@ ui <- function() {
             selected = "Results",
             tabPanel(
                 "Input data",
-                input_page_ui("input_page")
+                input_page_ui("input_page", options)
             ),
             tabPanel(
                 "Results",

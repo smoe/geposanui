@@ -1,10 +1,13 @@
 #' Create the UI for the input page.
+#'
+#' @param options Global options for the application.
+#'
 #' @noRd
-input_page_ui <- function(id) {
+input_page_ui <- function(id, options) {
     sidebarLayout(
         sidebarPanel(
             width = 3,
-            preset_editor_ui(NS(id, "preset_editor")),
+            preset_editor_ui(NS(id, "preset_editor"), options),
             tabsetPanel(
                 id = NS(id, "apply_panel"),
                 type = "hidden",
@@ -19,7 +22,7 @@ input_page_ui <- function(id) {
                     )
                 )
             ),
-            comparison_editor_ui(NS(id, "comparison_editor"))
+            comparison_editor_ui(NS(id, "comparison_editor"), options)
         ),
         mainPanel(
             width = 9,
@@ -35,21 +38,21 @@ input_page_ui <- function(id) {
 #' Application logic for the input page.
 #'
 #' @param id ID for namespacing the inputs and outputs.
+#' @param options Global options for the application.
+#'
 #' @return A list containing two reactives: the `preset` for the analysis and
 #'   the `comparison_gene_ids`.
 #'
 #' @noRd
-input_page_server <- function(id) {
+input_page_server <- function(id, options) {
     moduleServer(id, function(input, output, session) {
-        current_preset <- reactiveVal(
-            geposan::preset(genes[verified | suggested == TRUE, id])
-        )
-
-        potential_preset <- preset_editor_server("preset_editor")
+        current_preset <- reactiveVal(geposan::preset(options$gene_sets[[1]]))
+        potential_preset <- preset_editor_server("preset_editor", options)
 
         comparison_gene_ids <- comparison_editor_server(
             "comparison_editor",
-            current_preset
+            current_preset,
+            options
         )
 
         output$positions_plot <- plotly::renderPlotly({
