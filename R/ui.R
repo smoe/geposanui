@@ -14,7 +14,7 @@ ui <- function(options) {
                 bootswatch = "united",
                 primary = "#1964bf"
             ),
-            title = "TPE-OLD candidates",
+            title = options$title,
             selected = "Results",
             tabPanel(
                 "Input data",

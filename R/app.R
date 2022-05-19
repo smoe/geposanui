@@ -12,12 +12,14 @@
 #'   performing custom analyses. If this is set to `TRUE`, only the predefined
 #'   gene and species sets are available for customizing the analysis. This may
 #'   be useful to limit resource usage on a publicly available instance.
+#' @param title Set the title of the application.
 #' @param port The port to serve the application on.
 #'
 #' @export
 run_app <- function(gene_sets,
                     species_sets = NULL,
                     locked = FALSE,
+                    title = "Gene Position Analysis",
                     port = 3464) {
     stopifnot(!is.null(gene_sets) & !is.null(gene_sets[[1]]))
 
@@ -29,7 +31,8 @@ run_app <- function(gene_sets,
     options <- list(
         gene_sets = gene_sets,
         species_sets = species_sets,
-        locked = locked
+        locked = locked,
+        title = title
     )
 
     # Actually run the app.
