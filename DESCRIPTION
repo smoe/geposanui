@@ -1,15 +1,17 @@
-Package: tpeold
-Title: Interface for Finding TPE-OLD Candidates
+Package: geposanui
+Title: Graphical user interface for geposan
 Version: 0.0.0.9000
 Authors@R:
     person(
         "Elias",
         "Projahn",
         email = "elias@johrpan.de",
-        role = c("aut", "cre")
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0002-4153-4071")
     )
-Description: This package provides a Shiny interface for analyzing genes and
-    finding TPE-OLD candidates based on known TPE-OLD genes.
+Description: This package provides a graphical user interface for analyzing
+    genes based on position data across species. It is a frontend for the
+    R package "geposan".
 License: AGPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

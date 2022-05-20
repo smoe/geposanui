@@ -51,16 +51,17 @@ preset_editor_ui <- function(id, options) {
             )
         },
         if (options$locked) {
-            HTML(
+            HTML(paste0(
                 "This instance prohibits performing custom analyses ",
                 "to reduce resource usage. Normally, it is possible ",
                 "to use this web application for analyzing any set of ",
                 "reference genes to find patterns in their ",
                 "chromosomal positions. If you would like to apply ",
                 "this method for your own research, see ",
-                "<a href=\"https://code.johrpan.de/johrpan/tpeold\"",
-                "target=\"_blank\">this page</a> for more information."
-            )
+                "<a href=\"https://code.johrpan.de/johrpan/geposanui/src/",
+                "branch/main/README.md\" target=\"_blank\">this page</a> for ",
+                "more information."
+            ))
         }
     )
 }
