@@ -210,7 +210,9 @@ server <- function(options) {
                     gene_names <- results_filtered()[, name]
                     gene_names <- unique(gene_names[gene_names != ""])
 
-                    diseases <- disgenet2r::disease_enrichment(gene_names)
+                    diseases <- suppressMessages(
+                        disgenet2r::disease_enrichment(gene_names)
+                    )
 
                     data <- data.table(diseases@qresult)
 
