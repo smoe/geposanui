@@ -58,6 +58,7 @@ ui <- function(options) {
                                 title = "Comparison",
                                 div(
                                     style = "margin-top: 16px",
+                                    htmlOutput("comparison_text"),
                                     plotly::plotlyOutput(
                                         "boxplot",
                                         width = "100%",

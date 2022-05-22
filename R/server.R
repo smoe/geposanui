@@ -109,6 +109,52 @@ server <- function(options) {
             geposan::plot_rankings(rankings, gene_sets)
         })
 
+        output$comparison_text <- renderUI({
+            reference <- geposan::compare(
+                ranking(),
+                preset()$reference_gene_ids
+            )
+
+            comparison <- if (!is.null(comparison_gene_ids())) {
+                geposan::compare(ranking(), comparison_gene_ids())
+            }
+
+            num <- function(x, digits) {
+                format(
+                    round(x, digits = digits),
+                    nsmall = digits,
+                    scientific = FALSE
+                )
+            }
+
+            comparison_text <- function(name, comparison) {
+                glue::glue(
+                    "The {name} have a mean score of ",
+                    "<b>{num(comparison$mean_score, 4)}</b> ",
+                    "resulting in a mean rank of ",
+                    "<b>{num(comparison$mean_rank, 1)}</b>. ",
+                    "This corresponds to a percent rank of ",
+                    "<b>{num(100 * comparison$mean_percentile, 2)}%</b>. ",
+                    "A Wilcoxon rank sum test with the hypothesis of higher ",
+                    "than usual scores gives a p-value of ",
+                    "<b>{num(comparison$p_value, 4)}</b>."
+                )
+            }
+
+            reference_div <- div(HTML(
+                comparison_text("reference genes", reference)
+            ))
+
+            if (!is.null(comparison)) {
+                div(
+                    reference_div,
+                    div(HTML(comparison_text("comparison genes", comparison)))
+                )
+            } else {
+                reference_div
+            }
+        })
+
         output$boxplot <- plotly::renderPlotly({
             preset <- preset()
             gene_sets <- list("Reference genes" = preset$reference_gene_ids)
