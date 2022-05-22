@@ -187,7 +187,6 @@ server <- function(options) {
                     "Query ratio",
                     "p-value"
                 ),
-                style = "bootstrap",
                 options = list(
                     pageLength = 25
                 )
@@ -227,7 +226,6 @@ server <- function(options) {
                             "Total ratio",
                             "p-value"
                         ),
-                        style = "bootstrap",
                         options = list(
                             pageLength = 25
                         )

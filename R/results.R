@@ -88,7 +88,6 @@ results_server <- function(id, filtered_results) {
                 output_data(),
                 rownames = FALSE,
                 colnames = column_names,
-                style = "bootstrap",
                 options = list(
                     rowCallback = js_link,
                     columnDefs = list(list(visible = FALSE, targets = 2)),
