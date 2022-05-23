@@ -189,9 +189,15 @@ server <- function(options) {
                 )
             }
 
+            chromosome <- if (input$positions_plot_chromosome_name == "all") {
+                NULL
+            } else {
+                input$positions_plot_chromosome_name
+            }
+
             geposan::plot_scores_by_position(
                 ranking(),
-                input$positions_plot_chromosome_name,
+                chromosome_name = chromosome,
                 gene_sets = gene_sets
             )
         })

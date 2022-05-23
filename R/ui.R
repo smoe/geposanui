@@ -73,7 +73,10 @@ ui <- function(options) {
                                     selectInput(
                                         "positions_plot_chromosome_name",
                                         label = NULL,
-                                        choices = chromosome_choices()
+                                        choices = c(
+                                            list("All chromosomes" = "all"),
+                                            chromosome_choices()
+                                        )
                                     ),
                                     plotly::plotlyOutput(
                                         "positions_plot",
