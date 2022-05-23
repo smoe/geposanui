@@ -56,6 +56,7 @@ results_server <- function(id, filtered_results) {
             "gene",
             "name",
             "chromosome",
+            "distance",
             method_ids,
             "score",
             "percentile"
@@ -66,13 +67,22 @@ results_server <- function(id, filtered_results) {
             "Gene",
             "",
             "Chromosome",
+            "Distance",
             method_names,
             "Score",
             "Percentile"
         )
 
         output_data <- reactive({
-            filtered_results()[, ..columns]
+            filtered_results()[, ..columns][,
+                distance := paste0(
+                    format(
+                        round(distance / 1000000, digits = 2),
+                        nsmall = 2,
+                    ),
+                    " Mbp"
+                )
+            ]
         })
 
         output$download <- downloadHandler(

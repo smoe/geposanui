@@ -53,6 +53,14 @@ filters_ui <- function(id) {
             tabPanelBody(
                 value = "none"
             )
+        ),
+        sliderInput(
+            NS(id, "distance"),
+            label = "Distance to telomeres",
+            post = " Mbp",
+            min = 0,
+            max = 150,
+            value = c(0, 150)
         )
     )
 }
@@ -71,7 +79,7 @@ filters_server <- function(id, results) {
         reactive({
             results <- results()
 
-            if (input$method == "percentile")  {
+            results_prefiltered <- if (input$method == "percentile") {
                 n_ranks <- nrow(results)
                 results[rank <= (1 - (input$percentile / 100)) * n_ranks]
             } else if (input$method == "score") {
@@ -81,6 +89,11 @@ filters_server <- function(id, results) {
             } else {
                 results
             }
+
+            results_prefiltered[
+                distance >= 1000000 * input$distance[1] &
+                    distance <= 1000000 * input$distance[2]
+            ]
         })
     })
 }

@@ -45,11 +45,18 @@ server <- function(options) {
         # Rank the results.
         ranking <- methods_server("methods", analysis, comparison_gene_ids)
 
+        genes_with_distances <- merge(
+            geposan::genes,
+            geposan::distances[species == "hsapiens"],
+            by.x = "id",
+            by.y = "gene"
+        )
+
         # Add gene information to the results.
         results <- reactive({
             merge(
                 ranking(),
-                geposan::genes,
+                genes_with_distances,
                 by.x = "gene",
                 by.y = "id",
                 sort = FALSE
