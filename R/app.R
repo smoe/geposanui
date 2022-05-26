@@ -21,23 +21,23 @@ run_app <- function(gene_sets,
                     locked = FALSE,
                     title = "Gene Position Analysis",
                     port = 3464) {
-    stopifnot(!is.null(gene_sets) & !is.null(gene_sets[[1]]))
+  stopifnot(!is.null(gene_sets) & !is.null(gene_sets[[1]]))
 
-    # These function calls make the required java scripts available.
-    shinyjs::useShinyjs()
-    rclipboard::rclipboardSetup()
+  # These function calls make the required java scripts available.
+  shinyjs::useShinyjs()
+  rclipboard::rclipboardSetup()
 
-    # Bundle of global options to redue broilerplate.
-    options <- list(
-        gene_sets = gene_sets,
-        species_sets = species_sets,
-        locked = locked,
-        title = title
-    )
+  # Bundle of global options to redue broilerplate.
+  options <- list(
+    gene_sets = gene_sets,
+    species_sets = species_sets,
+    locked = locked,
+    title = title
+  )
 
-    # Actually run the app.
-    shiny::runApp(
-        shiny::shinyApp(ui(options), server(options)),
-        port = port
-    )
+  # Actually run the app.
+  shiny::runApp(
+    shiny::shinyApp(ui(options), server(options)),
+    port = port
+  )
 }
