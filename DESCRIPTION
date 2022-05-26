@@ -15,12 +15,14 @@ Description: This package provides a graphical user interface for analyzing
 License: AGPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Imports:
+    bslib,
     data.table,
     disgenet2r,
     DT,
     geposan,
+    glue,
     gprofiler2,
     plotly,
     purrr,

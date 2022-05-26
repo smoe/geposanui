@@ -51,6 +51,10 @@ results_server <- function(id, filtered_results) {
       )
     })
 
+    methods <- geposan::all_methods()
+    method_ids <- sapply(methods, function(method) method$id)
+    method_names <- sapply(methods, function(method) method$name)
+
     columns <- c(
       "rank",
       "gene",

@@ -21,7 +21,7 @@ methods_ui <- function(id) {
         "Customize weights" = "custom"
       )
     ),
-    lapply(methods, function(method) {
+    lapply(geposan::all_methods(), function(method) {
       verticalLayout(
         checkboxInput(
           NS(id, method$id),
@@ -52,7 +52,7 @@ methods_ui <- function(id) {
 methods_server <- function(id, analysis, comparison_gene_ids) {
   moduleServer(id, function(input, output, session) {
     # Observe each method's enable button and synchronise the slider state.
-    lapply(methods, function(method) {
+    lapply(geposan::all_methods(), function(method) {
       observeEvent(input[[method$id]], {
         shinyjs::toggleState(
           sprintf("%s_weight", method$id),
@@ -89,7 +89,7 @@ methods_server <- function(id, analysis, comparison_gene_ids) {
 
         included_methods <- NULL
 
-        for (method in methods) {
+        for (method in geposan::all_methods()) {
           if (input[[method$id]]) {
             included_methods <- c(included_methods, method$id)
           }
@@ -105,7 +105,7 @@ methods_server <- function(id, analysis, comparison_gene_ids) {
     }) |> bindCache(
       analysis(),
       optimization_gene_ids(),
-      sapply(methods, function(method) input[[method$id]]),
+      sapply(geposan::all_methods(), function(method) input[[method$id]]),
       input$optimization_target
     )
 
@@ -114,7 +114,7 @@ methods_server <- function(id, analysis, comparison_gene_ids) {
 
       if (length(optimization_gene_ids()) < 1 |
         input$optimization_target == "custom") {
-        for (method in methods) {
+        for (method in geposan::all_methods()) {
           if (input[[method$id]]) {
             weight <- input[[sprintf("%s_weight", method$id)]]
             weights[[method$id]] <- weight
