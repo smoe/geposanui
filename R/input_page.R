@@ -29,7 +29,7 @@ input_page_ui <- function(id, options) {
       plotly::plotlyOutput(
         NS(id, "positions_plot"),
         width = "100%",
-        height = "600px"
+        height = "1200px"
       )
     )
   )
@@ -71,7 +71,11 @@ input_page_server <- function(id, options) {
           )
         }
 
-        geposan::plot_positions(preset$species_ids, gene_sets)
+        geposan::plot_positions(
+          preset$species_ids,
+          gene_sets,
+          reference_gene_ids = preset$reference_gene_ids
+        )
       }
     })
 
