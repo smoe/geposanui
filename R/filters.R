@@ -6,9 +6,9 @@ filters_ui <- function(id) {
       NS(id, "method"),
       "Filter method",
       choices = list(
-        "Percentile" = "percentile",
-        "Cut-off score" = "score",
-        "Maximum number of genes" = "rank",
+        "Percentiles" = "percentile",
+        "Scores" = "score",
+        "Ranks" = "rank",
         "None" = "none"
       )
     ),
@@ -19,35 +19,35 @@ filters_ui <- function(id) {
         value = "percentile",
         sliderInput(
           NS(id, "percentile"),
-          label = "Minimum percentile",
+          label = "Included percentiles",
           post = "%",
           min = 0,
           max = 100,
           step = 1,
-          value = 95
+          value = c(95, 100)
         )
       ),
       tabPanelBody(
         value = "score",
         sliderInput(
           NS(id, "score"),
-          label = "Cut-off score",
+          label = "Included scores",
           post = "%",
           min = 0,
           max = 100,
           step = 1,
-          value = 75
+          value = c(90, 100)
         )
       ),
       tabPanelBody(
         value = "rank",
         sliderInput(
           NS(id, "rank"),
-          label = "Maximum rank",
-          min = 0,
+          label = "Included ranks",
+          min = 1,
           max = 2000,
           step = 10,
-          value = 1000
+          value = c(1, 1000)
         )
       ),
       tabPanelBody(
@@ -76,16 +76,29 @@ filters_server <- function(id, results) {
       updateTabsetPanel(session, "sliders", selected = input$method)
     })
 
+    observeEvent(results(), {
+      updateSliderInput(session, "rank", max = nrow(results()))
+    })
+
     reactive({
       results <- results()
 
       results_prefiltered <- if (input$method == "percentile") {
         n_ranks <- nrow(results)
-        results[rank <= (1 - (input$percentile / 100)) * n_ranks]
+        results[
+          rank <= (1 - (input$percentile[1] / 100)) * n_ranks &
+            rank >= (1 - (input$percentile[2] / 100)) * n_ranks
+        ]
       } else if (input$method == "score") {
-        results[score >= input$score / 100]
+        results[
+          score >= input$score[1] / 100 &
+            score <= input$score[2] / 100
+        ]
       } else if (input$method == "rank") {
-        results[rank <= input$rank]
+        results[
+          rank >= input$rank[1] &
+            rank <= input$rank[2]
+        ]
       } else {
         results
       }
