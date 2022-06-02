@@ -30,4 +30,4 @@ Imports:
     rclipboard,
     shiny,
     shinyjs,
-    shinyvs
+    shinyWidgets

@@ -14,7 +14,6 @@ You can install the development version of `geposanui` using:
 
 ```r
 # install.packages("remotes")
-remotes::install_github("dreamRs/shinyvs")
 remotes::install_git("https://code.johrpan.de/johrpan/geposanui.git")
 ```
 
