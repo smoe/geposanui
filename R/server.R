@@ -142,9 +142,11 @@ server <- function(options) {
           "<b>{num(comparison$mean_rank, 1)}</b>. ",
           "This corresponds to a percent rank of ",
           "<b>{num(100 * comparison$mean_percentile, 2)}%</b>. ",
-          "A Wilcoxon rank sum test with the hypothesis of higher ",
-          "than usual scores gives a p-value of ",
-          "<b>{num(comparison$p_value, 4)}</b>."
+          "A Wilcoxon rank sum test gives an estimated score difference ",
+          "between <b>{num(comparison$test_result$conf.int[1], 3)}</b> and ",
+          "<b>{num(comparison$test_result$conf.int[2], 3)}</b> with a 95% ",
+          "confidence. This corresponds to a p-value of ",
+          "<b>{num(comparison$test_result$p.value, 4)}</b>."
         )
       }
 
