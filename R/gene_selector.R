@@ -29,7 +29,7 @@ gene_selector_ui <- function(id, default_gene_ids = NULL) {
         "list",
         shinyWidgets::virtualSelectInput(
           NS(id, "selected_genes"),
-          label = "Select genes",
+          label = NULL,
           choices = gene_choices,
           multiple = TRUE,
           search = TRUE,
@@ -40,7 +40,7 @@ gene_selector_ui <- function(id, default_gene_ids = NULL) {
         "hgnc",
         textAreaInput(
           NS(id, "hgnc_names_raw"),
-          "Enter HGNC symbols",
+          label = NULL,
           value = paste(
             geposan::genes[
               id %chin% default_gene_ids & name != "",
@@ -55,7 +55,7 @@ gene_selector_ui <- function(id, default_gene_ids = NULL) {
         "ensembl",
         textAreaInput(
           NS(id, "gene_ids_raw"),
-          "Enter Ensembl gene IDs",
+          label = NULL,
           value = paste(default_gene_ids, collapse = "\n"),
           height = "250px"
         )

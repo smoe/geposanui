@@ -5,6 +5,7 @@
 #' @noRd
 ui <- function(options) {
   div(
+    custom_css(),
     shinyjs::useShinyjs(),
     rclipboard::rclipboardSetup(),
     navbarPage(
