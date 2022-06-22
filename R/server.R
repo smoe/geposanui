@@ -13,9 +13,13 @@ js_link <- DT::JS("function(row, data) {
 #' @noRd
 server <- function(options) {
   function(input, output, session) {
-    input_reactives <- input_page_server("input_page", options)
-    preset <- input_reactives$preset
-    comparison_gene_ids <- input_reactives$comparison_gene_ids
+    preset <- input_page_server("input_page", options)
+
+    comparison_gene_ids <- comparison_editor_server(
+      "comparison_editor",
+      preset,
+      options
+    )
 
     observe({
       updateNavbarPage(

@@ -21,8 +21,7 @@ input_page_ui <- function(id, options) {
             style = "margin-top: 16px; margin-bottom: 16px"
           )
         )
-      ),
-      comparison_editor_ui(NS(id, "comparison_editor"), options)
+      )
     ),
     mainPanel(
       width = 9,
@@ -40,8 +39,7 @@ input_page_ui <- function(id, options) {
 #' @param id ID for namespacing the inputs and outputs.
 #' @param options Global options for the application.
 #'
-#' @return A list containing two reactives: the `preset` for the analysis and
-#'   the `comparison_gene_ids`.
+#' @return A reactive containing the `preset` for the analysis.
 #'
 #' @noRd
 input_page_server <- function(id, options) {
@@ -49,31 +47,15 @@ input_page_server <- function(id, options) {
     current_preset <- reactiveVal(geposan::preset(options$gene_sets[[1]]))
     potential_preset <- preset_editor_server("preset_editor", options)
 
-    comparison_gene_ids <- comparison_editor_server(
-      "comparison_editor",
-      current_preset,
-      options
-    )
-
     output$positions_plot <- plotly::renderPlotly({
       preset <- potential_preset()
 
       if (is.null(preset)) {
         NULL
       } else {
-        gene_sets <- list("Reference genes" = preset$reference_gene_ids)
-        comparison_gene_ids <- comparison_gene_ids()
-
-        if (length(comparison_gene_ids) >= 1) {
-          gene_sets <- c(
-            gene_sets,
-            list("Comparison genes" = comparison_gene_ids)
-          )
-        }
-
         geposan::plot_positions(
           preset$species_ids,
-          gene_sets,
+          list("Reference genes" = preset$reference_gene_ids),
           reference_gene_ids = preset$reference_gene_ids
         )
       }
@@ -101,9 +83,6 @@ input_page_server <- function(id, options) {
       current_preset(potential_preset())
     }) |> bindEvent(input$apply_button)
 
-    list(
-      preset = current_preset,
-      comparison_gene_ids = comparison_gene_ids
-    )
+    current_preset
   })
 }

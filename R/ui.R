@@ -25,6 +25,7 @@ ui <- function(options) {
         sidebarLayout(
           sidebarPanel(
             width = 3,
+            comparison_editor_ui("comparison_editor", options),
             methods_ui("methods"),
             filters_ui("filters")
           ),
