@@ -71,7 +71,7 @@ details_server <- function(id, options, filtered_results) {
       "",
       "Gene",
       "",
-      "Chromosome",
+      "Chr.",
       "Distance",
       method_names,
       "Score",
@@ -93,15 +93,18 @@ details_server <- function(id, options, filtered_results) {
 
     output$download <- downloadHandler(
       filename = "geposan_filtered_results.csv",
-      content = function(file) {
-        fwrite(output_data(), file = file)
-      },
+      content = \(file) fwrite(filtered_results()[, ..columns], file = file),
       contentType = "text/csv"
     )
 
     output$genes <- DT::renderDT({
-      dt <- DT::datatable(
-        output_data(),
+      data <- filtered_results()[, ..columns]
+      data[, distance := glue::glue(
+        "{format(round(distance / 1000000, digits = 2), nsmall = 2)} Mbp"
+      )]
+
+      DT::datatable(
+        data,
         rownames = FALSE,
         colnames = column_names,
         options = list(
@@ -109,13 +112,9 @@ details_server <- function(id, options, filtered_results) {
           columnDefs = list(list(visible = FALSE, targets = 2)),
           pageLength = 25
         )
-      )
-
-      DT::formatPercentage(
-        dt,
-        c(method_ids, "score", "percentile"),
-        digits = 2
-      )
+      ) |>
+        DT::formatRound(c(method_ids, "score"), digits = 4) |>
+        DT::formatPercentage("percentile", digits = 2)
     })
   })
 }
