@@ -1,7 +1,7 @@
 # Construct UI for the methods editor.
 methods_ui <- function(id, options) {
   verticalLayout(
-    h3("Methods"),
+    h5("Methods"),
     selectInput(
       NS(id, "optimization_genes"),
       "Genes to optimize for",

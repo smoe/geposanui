@@ -9,7 +9,9 @@ custom_css <- function() {
       "vertical-align: top;",
       "margin-right: 12px;",
       "}",
-      ".shiny-input-container { width: auto !important; min-width: 200px; }"
+      ".shiny-input-container { width: auto !important; min-width: 200px; }",
+      "h5 { margin-top: 0.5rem; margin-bottom: 1rem; font-weight: bold; }",
+      ".navbar-brand { font-weight: bold; }"
     ))
   )
 }

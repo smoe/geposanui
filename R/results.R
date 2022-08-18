@@ -37,7 +37,22 @@ results_ui <- function(id, options) {
           )
         ),
         tabPanel(
-          title = "Method comparison",
+          title = "Gene sets",
+          div(
+            style = "margin-top: 16px",
+            htmlOutput(NS(id, "comparison_text")),
+            div(
+              style = "margin-top: 16px;",
+              plotly::plotlyOutput(
+                NS(id, "boxplot"),
+                width = "100%",
+                height = "600px"
+              )
+            )
+          )
+        ),
+        tabPanel(
+          title = "Methods",
           div(
             style = "margin-top: 16px",
             plotly::plotlyOutput(
@@ -101,29 +116,6 @@ results_ui <- function(id, options) {
           )
         ),
         tabPanel(
-          title = "Comparison",
-          div(
-            style = "margin-top: 16px",
-            htmlOutput(NS(id, "comparison_text")),
-            plotly::plotlyOutput(
-              NS(id, "boxplot"),
-              width = "100%",
-              height = "600px"
-            )
-          )
-        ),
-        tabPanel(
-          title = "Ortholog locations",
-          div(
-            style = "margin-top: 16px",
-            plotly::plotlyOutput(
-              NS(id, "gene_locations_plot"),
-              width = "100%",
-              height = "1200px"
-            )
-          )
-        ),
-        tabPanel(
           title = "Scores by position",
           div(
             class = "flow-layout",
@@ -140,6 +132,17 @@ results_ui <- function(id, options) {
               NS(id, "positions_plot"),
               width = "100%",
               height = "600px"
+            )
+          )
+        ),
+        tabPanel(
+          title = "Ortholog locations",
+          div(
+            style = "margin-top: 16px",
+            plotly::plotlyOutput(
+              NS(id, "gene_locations_plot"),
+              width = "100%",
+              height = "1200px"
             )
           )
         ),
@@ -330,7 +333,10 @@ results_server <- function(id, options, analysis) {
       if (!is.null(comparison)) {
         div(
           reference_div,
-          div(HTML(comparison_text("comparison genes", comparison)))
+          div(
+            style = "margin-top: 16px;",
+            HTML(comparison_text("comparison genes", comparison))
+          )
         )
       } else {
         reference_div

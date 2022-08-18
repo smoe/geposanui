@@ -8,11 +8,15 @@ details_ui <- function(id) {
       splitLayout(
         cellWidths = "auto",
         uiOutput(NS(id, "copy")),
-        downloadButton(NS(id, "download"), "Download CSV")
+        downloadButton(
+          NS(id, "download"),
+          "Download CSV",
+          class = "btn-outline-primary"
+        )
       )
     ),
     div(
-      style = "margin-top: 16px",
+      style = "margin-top: 16px; margin-bottom: 8px;",
       DT::DTOutput(NS(id, "genes"))
     )
   )
@@ -43,13 +47,15 @@ details_server <- function(id, options, results) {
           "copy_ids_button",
           "Copy gene IDs",
           genes_text,
-          icon = icon("clipboard")
+          icon = icon("clipboard"),
+          class = "btn-outline-primary"
         ),
         rclipboard::rclipButton(
           "copy_names_button",
           "Copy gene names",
           names_text,
-          icon = icon("clipboard")
+          icon = icon("clipboard"),
+          class = "btn-outline-primary"
         )
       )
     })

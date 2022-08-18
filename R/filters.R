@@ -2,18 +2,22 @@
 filters_ui <- function(id) {
   div(
     class = "well",
-    style = "margin-top: 24px; margin-bottom: 16px; padding-top: 24px;",
+    style = "margin-top: 24px; margin-bottom: 16px;",
     verticalLayout(
-      radioButtons(
-        NS(id, "method"),
-        label = NULL,
-        choices = list(
-          "Filter percentiles" = "percentile",
-          "Filter scores" = "score",
-          "Filter ranks" = "rank",
-          "No filtering" = "none"
-        ),
-        inline = TRUE
+      h5("Filter criteria"),
+      div(
+        style = "margin-top: 8px;",
+        radioButtons(
+          NS(id, "method"),
+          label = NULL,
+          choices = list(
+            "Filter percentiles" = "percentile",
+            "Filter scores" = "score",
+            "Filter ranks" = "rank",
+            "No filtering" = "none"
+          ),
+          inline = TRUE
+        )
       ),
       tabsetPanel(
         id = NS(id, "sliders"),

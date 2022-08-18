@@ -4,7 +4,7 @@
 #' @noRd
 comparison_editor_ui <- function(id, options) {
   verticalLayout(
-    h3("Comparison"),
+    h5("Comparison"),
     selectInput(
       NS(id, "comparison_genes"),
       "Comparison genes",

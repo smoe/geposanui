@@ -16,7 +16,7 @@ preset_editor_ui <- function(id, options) {
   }
 
   verticalLayout(
-    h3("Inputs"),
+    h5("Inputs"),
     selectInput(
       NS(id, "species"),
       "Species to include",
