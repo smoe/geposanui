@@ -111,7 +111,8 @@ preset_editor_server <- function(id, options) {
       tryCatch(
         geposan::preset(
           reference_gene_ids,
-          species_ids = species_ids
+          species_ids = species_ids,
+          methods = options$methods
         ),
         error = function(err) NULL
       )

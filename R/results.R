@@ -7,7 +7,7 @@
 #'
 #' @noRd
 results_ui <- function(id, options) {
-  ranking_choices <- purrr::lmap(geposan::all_methods(), function(method) {
+  ranking_choices <- purrr::lmap(options$methods, function(method) {
     l <- list()
     l[[method[[1]]$name]] <- method[[1]]$id
     l
@@ -19,7 +19,7 @@ results_ui <- function(id, options) {
     sidebarPanel(
       width = 3,
       comparison_editor_ui(NS(id, "comparison_editor"), options),
-      methods_ui(NS(id, "methods")),
+      methods_ui(NS(id, "methods"), options),
       filters_ui(NS(id, "filters"))
     ),
     mainPanel(
@@ -182,7 +182,7 @@ results_server <- function(id, options, analysis) {
     )
 
     # Rank the results.
-    ranking <- methods_server("methods", analysis, comparison_gene_ids)
+    ranking <- methods_server("methods", options, analysis, comparison_gene_ids)
 
     genes_with_distances <- merge(
       geposan::genes,
@@ -206,7 +206,7 @@ results_server <- function(id, options, analysis) {
     results_filtered <- filters_server("filters", results)
 
     # Server for the detailed results panel.
-    details_server("results", results_filtered)
+    details_server("results", options, results_filtered)
 
     output$rank_plot <- plotly::renderPlotly({
       preset <- preset()
@@ -281,7 +281,7 @@ results_server <- function(id, options, analysis) {
         )
       }
 
-      method_names <- geposan::all_methods() |> purrr::lmap(function(method) {
+      method_names <- options$methods |> purrr::lmap(function(method) {
         l <- list()
         l[[method[[1]]$id]] <- method[[1]]$name
         l

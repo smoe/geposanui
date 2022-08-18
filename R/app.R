@@ -7,6 +7,8 @@
 #' @param species_sets A list of predefined species sets. This should be a named
 #'   list containing vectors of species IDs for each set. The names will be used
 #'   to present the species set throughout the user interface.
+#' @param methods A list of [`geposan::method`] objects to be used for all
+#'   presets. By default, all available methods will be used.
 #' @param comparison_gene_sets A named list of predefined gene sets to be used
 #'   as comparison genes.
 #' @param locked Whether the application should be locked and prohibit
@@ -19,6 +21,7 @@
 #' @export
 run_app <- function(reference_gene_sets,
                     species_sets = NULL,
+                    methods = geposan::all_methods(),
                     comparison_gene_sets = NULL,
                     locked = FALSE,
                     title = "Gene Position Analysis",
@@ -33,6 +36,7 @@ run_app <- function(reference_gene_sets,
   options <- list(
     reference_gene_sets = reference_gene_sets,
     species_sets = species_sets,
+    methods = methods,
     comparison_gene_sets = comparison_gene_sets,
     locked = locked,
     title = title

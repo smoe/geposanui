@@ -19,11 +19,12 @@ details_ui <- function(id) {
 
 #' Server for the detailed results panel.
 #'
+#' @param options Global options for the application.
 #' @param filtered_results A reactive containing the prefiltered results to be
 #'   displayed.
 #'
 #' @noRd
-details_server <- function(id, filtered_results) {
+details_server <- function(id, options, filtered_results) {
   moduleServer(id, function(input, output, session) {
     output$copy <- renderUI({
       results <- filtered_results()
@@ -51,7 +52,7 @@ details_server <- function(id, filtered_results) {
       )
     })
 
-    methods <- geposan::all_methods()
+    methods <- options$methods
     method_ids <- sapply(methods, function(method) method$id)
     method_names <- sapply(methods, function(method) method$name)
 

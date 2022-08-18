@@ -44,9 +44,10 @@ input_page_ui <- function(id, options) {
 #' @noRd
 input_page_server <- function(id, options) {
   moduleServer(id, function(input, output, session) {
-    current_preset <- reactiveVal(
-      geposan::preset(options$reference_gene_sets[[1]])
-    )
+    current_preset <- reactiveVal(geposan::preset(
+      options$reference_gene_sets[[1]],
+      methods = options$methods
+    ))
 
     potential_preset <- preset_editor_server("preset_editor", options)
 
