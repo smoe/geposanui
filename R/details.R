@@ -2,6 +2,7 @@
 #' @noRd
 details_ui <- function(id) {
   verticalLayout(
+    filters_ui(NS(id, "filters")),
     div(
       style = "margin-top: 16px",
       splitLayout(
@@ -20,12 +21,13 @@ details_ui <- function(id) {
 #' Server for the detailed results panel.
 #'
 #' @param options Global options for the application.
-#' @param filtered_results A reactive containing the prefiltered results to be
-#'   displayed.
+#' @param results A reactive containing the results to be displayed.
 #'
 #' @noRd
-details_server <- function(id, options, filtered_results) {
+details_server <- function(id, options, results) {
   moduleServer(id, function(input, output, session) {
+    filtered_results <- filters_server("filters", results)
+
     output$copy <- renderUI({
       results <- filtered_results()
 

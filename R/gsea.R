@@ -2,6 +2,12 @@
 #' @noRd
 gsea_ui <- function(id) {
   verticalLayout(
+    filters_ui(NS(id, "filters")),
+    actionButton(
+      NS(id, "gsea_run"),
+      "Update analysis",
+      class = "btn-primary"
+    ),
     div(
       style = "margin-top: 16px",
       plotly::plotlyOutput(NS(id, "plot")),
@@ -21,6 +27,8 @@ gsea_ui <- function(id) {
 #' @noRd
 gsea_server <- function(id, ranking) {
   moduleServer(id, function(input, output, session) {
+    ranking_filtered <- filters_server("filters", ranking)
+
     gsea_analysis <- reactive({
       withProgress(
         message = "Querying g:Profiler",
@@ -28,13 +36,15 @@ gsea_server <- function(id, ranking) {
         { # nolint
           setProgress(0.2)
           gprofiler2::gost(
-            ranking()[, gene],
-            custom_bg = NULL, # TODO
+            ranking_filtered()$gene,
+            custom_bg = ranking()$gene,
             domain_scope = "custom_annotated"
           )
         }
       )
-    }) |> bindCache(ranking())
+    }) |>
+      bindCache(ranking_filtered()) |>
+      bindEvent(input$gsea_run, ignoreNULL = FALSE)
 
     output$plot <- plotly::renderPlotly({
       gprofiler2::gostplot(

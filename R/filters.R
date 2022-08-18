@@ -1,66 +1,69 @@
 # Construct UI for the filter editor.
 filters_ui <- function(id) {
-  verticalLayout(
-    h3("Filter criteria"),
-    selectInput(
-      NS(id, "method"),
-      "Filter method",
-      choices = list(
-        "Percentiles" = "percentile",
-        "Scores" = "score",
-        "Ranks" = "rank",
-        "None" = "none"
+  div(
+    class = "well",
+    style = "margin-top: 24px; margin-bottom: 16px; padding-top: 24px;",
+    verticalLayout(
+      radioButtons(
+        NS(id, "method"),
+        label = NULL,
+        choices = list(
+          "Filter percentiles" = "percentile",
+          "Filter scores" = "score",
+          "Filter ranks" = "rank",
+          "No filtering" = "none"
+        ),
+        inline = TRUE
+      ),
+      tabsetPanel(
+        id = NS(id, "sliders"),
+        type = "hidden",
+        tabPanelBody(
+          value = "percentile",
+          sliderInput(
+            NS(id, "percentile"),
+            label = NULL,
+            post = "%",
+            min = 0,
+            max = 100,
+            step = 1,
+            value = c(95, 100)
+          )
+        ),
+        tabPanelBody(
+          value = "score",
+          sliderInput(
+            NS(id, "score"),
+            label = NULL,
+            min = 0,
+            max = 1,
+            step = 0.01,
+            value = c(0.9, 1.0)
+          )
+        ),
+        tabPanelBody(
+          value = "rank",
+          sliderInput(
+            NS(id, "rank"),
+            label = NULL,
+            min = 1,
+            max = 2000,
+            step = 10,
+            value = c(1, 1000)
+          )
+        ),
+        tabPanelBody(
+          value = "none"
+        )
+      ),
+      sliderInput(
+        NS(id, "distance"),
+        label = "Distance to telomeres",
+        post = " Mbp",
+        min = 0,
+        max = 150,
+        value = c(0, 150)
       )
-    ),
-    tabsetPanel(
-      id = NS(id, "sliders"),
-      type = "hidden",
-      tabPanelBody(
-        value = "percentile",
-        sliderInput(
-          NS(id, "percentile"),
-          label = "Included percentiles",
-          post = "%",
-          min = 0,
-          max = 100,
-          step = 1,
-          value = c(95, 100)
-        )
-      ),
-      tabPanelBody(
-        value = "score",
-        sliderInput(
-          NS(id, "score"),
-          label = "Included scores",
-          post = "%",
-          min = 0,
-          max = 100,
-          step = 1,
-          value = c(90, 100)
-        )
-      ),
-      tabPanelBody(
-        value = "rank",
-        sliderInput(
-          NS(id, "rank"),
-          label = "Included ranks",
-          min = 1,
-          max = 2000,
-          step = 10,
-          value = c(1, 1000)
-        )
-      ),
-      tabPanelBody(
-        value = "none"
-      )
-    ),
-    sliderInput(
-      NS(id, "distance"),
-      label = "Distance to telomeres",
-      post = " Mbp",
-      min = 0,
-      max = 150,
-      value = c(0, 150)
     )
   )
 }
@@ -90,15 +93,9 @@ filters_server <- function(id, results) {
             rank >= (1 - (input$percentile[2] / 100)) * n_ranks
         ]
       } else if (input$method == "score") {
-        results[
-          score >= input$score[1] / 100 &
-            score <= input$score[2] / 100
-        ]
+        results[score >= input$score[1] & score <= input$score[2]]
       } else if (input$method == "rank") {
-        results[
-          rank >= input$rank[1] &
-            rank <= input$rank[2]
-        ]
+        results[rank >= input$rank[1] & rank <= input$rank[2]]
       } else {
         results
       }

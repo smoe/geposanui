@@ -19,8 +19,7 @@ results_ui <- function(id, options) {
     sidebarPanel(
       width = 3,
       comparison_editor_ui(NS(id, "comparison_editor"), options),
-      methods_ui(NS(id, "methods"), options),
-      filters_ui(NS(id, "filters"))
+      methods_ui(NS(id, "methods"), options)
     ),
     mainPanel(
       width = 9,
@@ -150,10 +149,7 @@ results_ui <- function(id, options) {
         ),
         tabPanel(
           title = "g:Profiler",
-          div(
-            style = "margin-top: 16px",
-            gsea_ui(NS(id, "gsea"))
-          )
+          gsea_ui(NS(id, "gsea"))
         )
       )
     )
@@ -198,11 +194,8 @@ results_server <- function(id, options, analysis) {
       )
     })
 
-    # Apply the filters.
-    results_filtered <- filters_server("filters", results)
-
     # Server for the detailed results panel.
-    details_server("results", options, results_filtered)
+    details_server("results", options, results)
 
     output$rank_plot <- plotly::renderPlotly({
       preset <- preset()
@@ -403,7 +396,7 @@ results_server <- function(id, options, analysis) {
       )
     })
 
-    gsea_server("gsea", results_filtered)
+    gsea_server("gsea", results)
   })
 }
 
