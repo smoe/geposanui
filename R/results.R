@@ -152,11 +152,7 @@ results_ui <- function(id, options) {
           title = "g:Profiler",
           div(
             style = "margin-top: 16px",
-            plotly::plotlyOutput("gost_plot"),
-          ),
-          div(
-            style = "margin-top: 16px",
-            DT::DTOutput(NS(id, "gost_details"))
+            gsea_ui(NS(id, "gsea"))
           )
         )
       )
@@ -407,67 +403,7 @@ results_server <- function(id, options, analysis) {
       )
     })
 
-    gost <- reactive({
-      withProgress(
-        message = "Querying g:Profiler",
-        value = 0.0,
-        { # nolint
-          setProgress(0.2)
-          gprofiler2::gost(
-            results_filtered()[, gene],
-            custom_bg = preset()$gene_ids,
-            domain_scope = "custom_annotated"
-          )
-        }
-      )
-    }) |> bindCache(results_filtered(), preset())
-
-    output$gost_plot <- plotly::renderPlotly({
-      gprofiler2::gostplot(
-        gost(),
-        capped = FALSE,
-        interactive = TRUE
-      )
-    })
-
-    output$gost_details <- DT::renderDT({
-      data <- data.table(gost()$result)
-      setorder(data, p_value)
-
-      data[, total_ratio := term_size / effective_domain_size]
-      data[, query_ratio := intersection_size / query_size]
-      data[, increase := (query_ratio - total_ratio) / total_ratio]
-
-      data <- data[, .(
-        source,
-        term_name,
-        total_ratio,
-        query_ratio,
-        increase,
-        p_value
-      )]
-
-      dt <- DT::datatable(
-        data,
-        rownames = FALSE,
-        colnames = c(
-          "Source",
-          "Term",
-          "Total ratio",
-          "Query ratio",
-          "Increase",
-          "p-value"
-        ),
-        options = list(
-          pageLength = 25
-        )
-      ) |>
-        DT::formatRound("p_value", digits = 4) |>
-        DT::formatPercentage(
-          c("total_ratio", "query_ratio", "increase"),
-          digits = 2
-        )
-    })
+    gsea_server("gsea", results_filtered)
   })
 }
 
