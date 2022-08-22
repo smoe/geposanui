@@ -3,10 +3,19 @@
 gsea_ui <- function(id) {
   verticalLayout(
     filters_ui(NS(id, "filters")),
-    actionButton(
-      NS(id, "gsea_run"),
-      "Update analysis",
-      class = "btn-primary"
+    div(
+      class = "flow-layout",
+      actionButton(
+        NS(id, "gsea_run"),
+        "Update analysis",
+        class = "btn-primary"
+      ),
+      a(
+        "Powered by g:Profiler",
+        href = "https://biit.cs.ut.ee/gprofiler/gost",
+        target = "_blank",
+        style = "margin-left: 16px"
+      )
     ),
     div(
       style = "margin-top: 16px",
