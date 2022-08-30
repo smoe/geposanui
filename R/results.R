@@ -109,6 +109,7 @@ results_ui <- function(id, options) {
               )
             )
           ),
+          htmlOutput(NS(id, "method_correlation")),
           plotly::plotlyOutput(
             NS(id, "ranking_correlation_plot"),
             width = "100%",
@@ -243,25 +244,57 @@ results_server <- function(id, options, analysis) {
       geposan::plot_rankings(rankings, gene_sets)
     })
 
-    output$ranking_correlation_plot <- plotly::renderPlotly({
-      preset <- preset()
-      ranking <- ranking()
-
-      ranking_x <- if (input$ranking_x == "combined") {
-        ranking
+    ranking_x <- reactive({
+      if (input$ranking_x == "combined") {
+        ranking()
       } else {
         weights <- list()
         weights[[input$ranking_x]] <- 1.0
-        geposan::ranking(ranking, weights)
+        geposan::ranking(ranking(), weights)
       }
+    })
 
-      ranking_y <- if (input$ranking_y == "combined") {
-        ranking
+    ranking_y <- reactive({
+      if (input$ranking_y == "combined") {
+        ranking()
       } else {
         weights <- list()
         weights[[input$ranking_y]] <- 1.0
-        geposan::ranking(ranking, weights)
+        geposan::ranking(ranking(), weights)
       }
+    })
+
+    output$method_correlation <- renderText({
+      data <- merge(
+        ranking_x()[, c("gene", "score")],
+        ranking_y()[, c("gene", "score")],
+        by = "gene"
+      )
+
+      c <- stats::cor(
+        data$score.x,
+        data$score.y,
+        method = "spearman"
+      ) |>
+        round(digits = 4) |>
+        format(nsmall = 4)
+
+      p <- stats::cor.test(
+        data$score.x,
+        data$score.y,
+        method = "spearman"
+      )$p.value |>
+        round(digits = 4) |>
+        format(nsmall = 4)
+
+      HTML(glue::glue(
+        "Spearman's rank correlation coefficient: ",
+        "<b>{c}</b>, p = <b>{p}</b>"
+      ))
+    })
+
+    output$ranking_correlation_plot <- plotly::renderPlotly({
+      preset <- preset()
 
       gene_sets <- list("Reference genes" = preset$reference_gene_ids)
       comparison_gene_ids <- comparison_gene_ids()
@@ -282,8 +315,8 @@ results_server <- function(id, options, analysis) {
       method_names[["combined"]] <- "Combined"
 
       geposan::plot_rankings_correlation(
-        ranking_x,
-        ranking_y,
+        ranking_x(),
+        ranking_y(),
         method_names[[input$ranking_x]],
         method_names[[input$ranking_y]],
         gene_sets = gene_sets,
