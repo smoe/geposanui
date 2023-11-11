@@ -184,7 +184,7 @@ results_server <- function(id, options, analysis) {
 
     genes_with_distances <- merge(
       geposan::genes,
-      geposan::distances[species == "hsapiens"],
+      geposan::distances[species == 9606, .(gene, distance)],
       by.x = "id",
       by.y = "gene"
     )
