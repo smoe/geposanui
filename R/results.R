@@ -125,14 +125,16 @@ results_ui <- function(id, options) {
               NS(id, "positions_plot_chromosome_name"),
               label = NULL,
               choices = c(
-                list("All chromosomes" = "all"),
+                list(
+                  "Chromosome overview" = "overview",
+                  "All chromosomes" = "all"
+                ),
                 chromosome_choices()
               )
             ),
-            plotly::plotlyOutput(
+            htmlOutput(
               NS(id, "positions_plot"),
-              width = "100%",
-              height = "600px"
+              container = \(...) div(style = "width: 100%; height: 600px", ...)
             )
           )
         ),
@@ -410,29 +412,34 @@ results_server <- function(id, options, analysis) {
       )
     })
 
-    output$positions_plot <- plotly::renderPlotly({
+    output$positions_plot <- renderUI({
       preset <- preset()
-      gene_sets <- list("Reference genes" = preset$reference_gene_ids)
-      comparison_gene_ids <- comparison_gene_ids()
 
-      if (length(comparison_gene_ids) >= 1) {
-        gene_sets <- c(
-          gene_sets,
-          list("Comparison genes" = comparison_gene_ids)
+      if (input$positions_plot_chromosome_name == "overview") {
+        geposan::plot_chromosomes(ranking())
+      } else {
+        gene_sets <- list("Reference genes" = preset$reference_gene_ids)
+        comparison_gene_ids <- comparison_gene_ids()
+
+        if (length(comparison_gene_ids) >= 1) {
+          gene_sets <- c(
+            gene_sets,
+            list("Comparison genes" = comparison_gene_ids)
+          )
+        }
+
+        chromosome <- if (input$positions_plot_chromosome_name == "all") {
+          NULL
+        } else {
+          input$positions_plot_chromosome_name
+        }
+
+        geposan::plot_scores_by_position(
+          ranking(),
+          chromosome_name = chromosome,
+          gene_sets = gene_sets
         )
       }
-
-      chromosome <- if (input$positions_plot_chromosome_name == "all") {
-        NULL
-      } else {
-        input$positions_plot_chromosome_name
-      }
-
-      geposan::plot_scores_by_position(
-        ranking(),
-        chromosome_name = chromosome,
-        gene_sets = gene_sets
-      )
     })
 
     gsea_server("gsea", results)
