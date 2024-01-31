@@ -23,13 +23,24 @@ methods_ui <- function(id, options) {
     ),
     lapply(options$methods, function(method) {
       verticalLayout(
-        checkboxInput(
-          NS(id, method$id),
-          span(
-            method$description,
-            class = "control-label"
+        div(
+          style = "display: flex;",
+          checkboxInput(
+            NS(id, method$id),
+            span(
+              method$description,
+              class = "control-label"
+            ),
+            value = TRUE
           ),
-          value = TRUE
+          div(
+            style = "margin-left: 5px;",
+            bslib::popover(
+              bsicons::bs_icon("question-circle"),
+              title = method$name,
+              method$help
+            )
+          )
         ),
         sliderInput(
           NS(id, sprintf("%s_weight", method$id)),

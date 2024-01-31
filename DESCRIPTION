@@ -19,6 +19,7 @@ RoxygenNote: 7.2.0
 Depends:
     R (>= 4.1)
 Imports:
+    bsicons,
     bslib,
     data.table,
     DT,
