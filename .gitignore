@@ -1,2 +1,5 @@
 /cache
 .Rproj.user
+.vscode
+.DS_Store
+manual.html
