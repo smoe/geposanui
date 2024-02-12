@@ -1,0 +1,23 @@
+= geposan UI
+
+This document describes the user interaction with the the geposan infrastructure as installed at https://tpe-old.uni-rostock.de.
+
+== Motivation
+
+The motivation to using this web interface is a ranking of any number of human genes for their presume association with the ends of chromosomes (telomeres). These are repetitive DNA sequences of tens of kBp in length that shorten with every cellular division. Much like a gene set enrichment analysis can yield terms of the Gene Ontology to be associated with a gene set, this tool yields a description about what genes in a preselection are associated with telomeres.
+
+The regulation of an increasing number of genes has been reported to depend on the length of telomeres, those are said to be under a telomere position effect (TPE). The telomeres may fold back over large stretches of the chromosome, thus that the TPE can also be reported over long distances (TPE-OLD).
+
+Information on TPE-OLD is still limited. With providing this tool we hope to direct the community towards those geens that may be more likely than others to experience a controlled telomeric interaction, based on the distance to the telomeres to appear evolutionary conserved.
+
+== How to get help
+
+If you use case does not match the scenarios outlined in this document then please create an issue on the GitHub project page: https://github.com/smoe/geposanui/issues . Please also be aware of the context-sensitive help made available via the "?" aside many options.
+
+== Specification of input
+
+The landing page of http://tpe-old.uni-rostock.de is also where the input (genes and weighting of heuristics) is specified.
+
+== References
+
+A paper accompanying this development is currently under peer review. 
