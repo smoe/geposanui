@@ -14,9 +14,92 @@ Information on TPE-OLD is still limited. With providing this tool we hope to dir
 
 If you use case does not match the scenarios outlined in this document then please create an issue on the GitHub project page: https://github.com/smoe/geposanui/issues . Please also be aware of the context-sensitive help made available via the "?" aside many options.
 
-== Specification of input
+== Overall concept of GUI
 
-The landing page of http://tpe-old.uni-rostock.de is also where the input (genes and weighting of heuristics) is specified.
+Input data tab::
+  The blue bar at the top introduces a separation of more systemic paramters of the heuristics. Most dominantly these are the
+  * Species to include. +
+    The web site uses all species in Ensembl with a minimal genome size.  When selecting "Customize" fromt the selection, another selection box opens for a selection of species of interest.
+  * Reference genes. +
+    Some heuristics will compare the chromosomal distance of a candidate gene to telomeres with the same of a set of reference genes for which an effect was already described. Those genes are then marked in orange in the plots of the results tab.
+  +
+  Most users will not want to modify the settings of the 'input data tab'.
+Results tab::
+  * Overview +
+    This is the landing page of the web site. The user specifies their genes of interest and for those genes the plots will indicate the ranking and/or details in the other tabs. Changing the input genes in the overview does not have an effect on the scoring of the genes, just the display of the green dots and the summary statistics will be affected.
+  * Gene sets +
+    Displays a bar pot for the scores of the user-selected genes and the reference genes.
+  * Methods +
+    Violin plots present for each heuristic ("method") the score distribution of all genes, user-selected genes marked in green.
+  * Method correlation +
+    The scores determined by arbitrary two methods (which are to be selected by the user) are shown as a scatter plot.
+  * Scores by position
+    - Overview +
+      The overall score assigned for each gene is averaged by a density plot, all chromosomes are shown.
+    - Individual chromosome selected +
+      For all genes of the selected human chromosome, a scatter plot of the score against the distance in base pairs to the nearest end of the chromosome is plotted. All genes are show an can be identified with a mouse-over.
+    - All chromsosomes +
+      The scatter plot _score ~ telomeric distance_ is shown for genes of all 
+  * Ortholog location +
+    For all species contributing to the scoring, the telomeric distance of user-selected genes and reference genes is indicated.
+  * Detailed results +
+    The score of all genes are listed. The table is interactive, filters are prepared.
+  * g:Profiler +
+    Top-ranked genes, users specify the exact constraints, are submitted to g:Profiler and results are displayed in situ.
+
+== Details on selected tabs
+
+=== Overview
+
+The landing page of http://tpe-old.uni-rostock.de is also where the user-centric input (genes and weighting of heuristics) is specified.
+
+Comparison genes:: The user selectes their genes of interest to be one of
+ * Random genes - to become familiar with the system without any biological input. 
+ * Established TPE-OLD genes - a set of seven genes for which a TPE-OLD effect was established.
+ * Suggested TPE-OLD genes - a set of another five genes for which a TPE-OLD effect is presumed likely but not yet wet-lab confirmed
+ * "Your genes" - a custom selection, to be performed in a then appearing selection box below. Most users will have this field as their only input.
++
+When selected, different means are offered to specify the gene set, specified via the upper selection box:
+ * HGNC Names - the official human gene names
+ * Ensembl IDs - as provided by https://www.ensembl.org
+
+Genes to optimize for::
+ As the weights of methods change, it naturally affects the scoring of genes, which is calculated as the weighted sum of scores obtained from each individual method. For the majority of users, the default setting will involve reference genes, carefully chosen to represent a specific biological feature of interest (highlighted in orange) - typically the TPE-OLD effect. However, users also have the option to submit a set of custom genes (highlighted in green). In such cases, to observe how the ranking is influenced by scoring prepared specifically for this custom gene set, the system provides the option for ad hoc optimization on the "Comparison genes".
+
+Optmization target::
+ The reference genes (default) or custom genes (if selected above) will be evaluated based on their scores, which are determined by the weights assigned to each method. This optimization process is carried out using a dedicated function in R that implements gradient descent (geraten, Elias?). Users have several options to guide this weight optimization:
+ * Mean rank: Aiming for the highest possible average score assignment.
+ * Median rank: Striving for optimal performance of the gene positioned in the middle.
+ * First rank: Prioritizing the best-performing gene.
+ * Last rank: Focusing on improving the performance of the worst-performing gene.
+ * Customized weights: Allowing users to adjust the weights according to their preferences.
+
+==== Methods
+
+ Distance to telomeres::
+  The chromosomal distance of a gene to the nearest chromosome.
+ Adjacency to reference genes::
+  Another gene of the reference set has a similar distance.
+ Clustering of genes::
+  The distance of a gene to the telomere does not change much across many species.
+ Correlation with reference genes::
+  When (and only when) reference genes are close to the telomeres, so is this gene.
+ Assessment by random forest::
+  @Elias.
+ 
+=== Gene sets
+
+=== Methods
+
+=== Method correlation
+
+=== Scores by position
+
+=== Ortholog location
+
+=== Detailed results
+
+=== g:Profiler
 
 == References
 
