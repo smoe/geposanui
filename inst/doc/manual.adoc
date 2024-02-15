@@ -1,5 +1,30 @@
 = geposan UI
 
+ifdef::backend-html5[]
+:twoinches: width=144
+// using a role requires adding a corresponding rule to the CSS
+:full-width: role=full-width
+:half-width: role=half-width
+:half-size: role=half-size
+:thumbnail: width=60
+endif::[]
+ifdef::backend-pdf[]
+:twoinches: pdfwidth=2in
+// NOTE use pdfwidth=100vw to make the image stretch edge to edge
+:full-width: pdfwidth=100%
+:half-width: pdfwidth=50%
+// NOTE scale is not yet supported by the PDF converter
+:half-size: pdfwidth=50%
+:thumbnail: pdfwidth=20mm
+endif::[]
+ifdef::backend-docbook5[]
+:twoinches: scaledwidth=2in
+:full-width: scaledwidth=100%
+:half-width: scaledwidth=50%
+:half-size: scale=50
+:thumbnail: scaledwidth=20mm
+endif::[]
+
 This document describes the user interaction with the the geposan infrastructure as installed at https://tpe-old.uni-rostock.de.
 
 == Motivation
@@ -51,7 +76,8 @@ Results tab::
 
 === Overview
 
-The landing page of http://tpe-old.uni-rostock.de is also where the user-centric input (genes and weighting of heuristics) is specified.
+.*Overview:* The landing page of http://tpe-old.uni-rostock.de is also where the user-centric input (genes and weighting of heuristics) is specified.
+image::images/tpeold_results_overview.png[alt="Overview",width=1024,height=512,pdfwidth="90%"]
 
 Comparison genes:: The user selectes their genes of interest to be one of
  * Random genes - to become familiar with the system without any biological input. 
@@ -86,21 +112,102 @@ Optmization target::
   When (and only when) reference genes are close to the telomeres, so is this gene.
  Assessment by random forest::
   @Elias.
- 
+
+The sliders, i.e. the weighting of the contribution of the scores yielded by each method, are auto-adjusted but a custom setting is allowed if so selselected, as described above. If there is a method that is not to your liking then we suggest to set the weight of tha method to 0. How well the method is performing can be inspected by the plots presented in the Methods and Method correlaton tabs, explained below.
+
 === Gene sets
+
+.*Gene sets:* The bar plot show the scores of the user-selected genes and the reference genes. User-selected genes are marked in green, reference genes in orange, in blue the scores of all human genes are represented.
+image::images/tpeold_results_genesets.png[alt="Gene sets",width=1024,height=512,pdfwidth="90%"]
+
+The page displays a bar plot to representt the scoring of human genes. A comparison of the user-selected scores with the scores of all genes also yields a P value by a Wilcoxon rank sum test. 
 
 === Methods
 
+.*Methods:* The violin plots present for each heuristic ("method") the score distribution of all genes, user-selected genes are marked in green.
+image::images/tpeold_results_methods.png[alt="Methods",width=1024,height=512,pdfwidth="90%"]
+
+The effect of the method on the scoring of the genes is shown as a violin plot. The user-selected genes are marked in green. The method is selected by the user and the sliders in the input data tab are auto-adjusted to the performance of the method. The user can also set the weight of the method to 0, if the method is not to their liking or to assess the contributio of an individual method to the overall score. The method is selected by the user and the sliders in the input data tab are auto-adjusted to the performance of the method.
+
+The genes are represented by small dots and identify themseselves when the mouse pointer hovers over them. We consider those insights to be important for the user to chase up unexpected findings, e.g. genes with good scores that are remote to the telomeres.
+
 === Method correlation
+
+.*Method correlation:* The scores determined by arbitrary two methods (which are to be selected by the user) are shown as a scatter plot.
+image::images/tpeold_results_methodcorrelation.png[alt="Method correlation",width=1024,height=512,pdfwidth="90%"]
+
+The user can choose between any two methods that shall determine the X and Y axes of a scatter plot. As for the other graphs, a mouse-over identifies the genes. We are particularly intrigued by the sudden changes to the gene density observed both at the upper and lower extrema of the scores.
 
 === Scores by position
 
+.*Overview on Scores by position for all chromosomes:* The combined score (as determined by the slider settings) is shown as a density plot for all the genes, separated by chromosomes. The centromere is indicated, the p-arm to the left, score on the Y axis.
+image::images/tpeold_results_scores_overview.png[alt="Overview on Scores by position for all chromosomes",width=1024,height=512,pdfwidth="90%"]
+
+.*_Score ~ Telomere distance_ for genes of an individual chromosome*: With a constraint of the display on a single chromosome, the individual genes are now identifiable by a mouse-over."
+image::images/tpeold_results_scores_chromosome_X.png[alt="_Score ~ Telomere distance_ for genes of an individual chromosome",width=1024,height=512,pdfwidth="90%"]
+
+.*_Score ~ Telomere distance_ for all genes:* Same plot, accumulating data from all chromosomes.
+image::images/tpeold_results_scores_chromosome_all.png[alt="_Score ~ Telomere distance_ for all gene",width=1024,height=512,pdfwidth="90%"]
+
 === Ortholog location
+
+.*Ortholog location:* The telomeric distance of user-selected genes and reference genes is indicated for all species contributing to the scoring.
+image::images/tpeold_results_orthologlocations.png[alt="Ortholog location",width=1024,height=512,pdfwidth="90%"]
 
 === Detailed results
 
+.*Detailed results:* Table of all human genes and their respective score. The table is interactive. Filters are made available to constrain the list to genes of particular interest.
+image::images/tpeold_results_detailedresults.png[alt="Detailed results",width=1024,height=512,pdfwidth="90%"]
+
 === g:Profiler
+
+.*g:Profiler:* The best-ranking genes can be filtered for their scores and telomeric distance, are then sent to g:Profiler to investigate enrichments.
+image::images/tpeold_reults_gprofiler.png[alt="g:Profiler",width=1024,height=512,pdfwidth="90%"]
+
+Please remain aware that the genes selected for the plots of the _g:Profiler_ tab and the _detailed results_ are not depending on any set of custom genes that have been submitted but on the scoring. And that scoring is derived from the reference set of genes that affect the auto-adjustment of sliders.
+
+== Technicalities
+
+=== Export of image data from plots
+
+This web interface relies on JavaScript libraries of plotly for rendering the plots. The top-right of those plots present as series of modifying bars:
+
+image::images/tpeold_technicalities_plot_bar.png[]
+
+of which the most left is These offer an export a PNG.
+
+=== Export of data from tables
+
 
 == References
 
 A paper accompanying this development is currently under peer review. 
+
+Software packages contributing to the web site are:
+
+*https://www.r-project.org[R] and its https://cran.r-project.org[libraries]*
+
+ * https://shiny.posit.co/[shiny] and associated developments
+   - https://cran.r-project.org/web/packages/shinyWidgets/[shinyWidgets]
+   - https://cran.r-project.org/web/packages/shinyjs/[shinyjs]
+   - https://cran.r-project.org/web/packages/shinyBS/[shinyBS]
+   - https://cran.r-project.org/web/packages/shinythemes/[shinythemes]
+   - https://cran.r-project.org/web/packages/shinydashboard/[shinydashboard]
+   - https://cran.r-project.org/web/packages/shinydashboardPlus/[shinydashboardPlus]
+   - https://cran.r-project.org/web/packages/shinyFiles/[shinyFiles]
+   - https://cran.r-project.org/web/packages/shinyalert/[shinyalert]
+   - https://cran.r-project.org/web/packages/shinybusy/index.html[shinybusy]
+   - https://cran.r-project.org/web/packages/shinyFeedback/vignettes/shinyFeedback-intro.html[shinyFeedback]
+   - https://cran.r-project.org/web/packages/shiny.semantic/[shiny.semantic]
+ * https://ggplot2.tidyverse.org/[ggplot2]
+ * https://cran.r-project.org/web/packages/gprofiler2/index.html[gprofiler2]
+ * https://rstudio.github.io/DT/[DT] which wraps the JavaScript library DataTables
+
+*JavaScript libraries*
+
+ * https://plotly.com/javascript/[plotly.js]
+ * https://datatables.net/[DataTables] together with https://jquery.com/[jQuery]
+
+== Acknowledgements
+
+We thank all our users for their encouragement and feedback, special thanks go to our colleagues at the Institutes for https://ilab.med.uni-rostock.de/[Clinical Chemistry and Laboratory Medicine] and https://ibima.med.uni-rostock.de[Biostatics and Informatics in Medicine and Aging Research] in Rostock. The service is hosted on a cloud instance generously provided by the https://www.itmz.uni-rostock.de/[Rostock University ITMZ], for which we are grateful.
