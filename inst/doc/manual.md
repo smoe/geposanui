@@ -70,7 +70,7 @@ We thus cannot prepare a blacklist of species.
 ### Overview
 
 <img src="images/tpeold_results_overview.png" alt="Overview" style="width:1024px;height:auto;"><br>
-.*Overview:* The landing page of http://tpe-old.uni-rostock.de is also where the user-centric input (genes and weighting of heuristics) is specified.
+*Overview:* The landing page of http://tpe-old.uni-rostock.de is also where the user-centric input (genes and weighting of heuristics) is specified.
 
 <dl>
 <dt>Comparison genes</dt>
@@ -134,14 +134,14 @@ The sliders, i.e. the weighting of the contribution of the scores yielded by eac
 ### Gene sets
 
 <img src="images/tpeold_results_genesets.png" alt="Gene sets" style="width:1024px;height:auto;"><br>
-.*Gene sets:* The bar plot show the scores of the user-selected genes and the reference genes. User-selected genes are marked in green, reference genes in orange, in blue the scores of all human genes are represented.
+*Gene sets:* The bar plot show the scores of the user-selected genes and the reference genes. User-selected genes are marked in green, reference genes in orange, in blue the scores of all human genes are represented.
 
 The page displays a bar plot to representt the scoring of human genes. A comparison of the user-selected scores with the scores of all genes also yields a P value by a Wilcoxon rank sum test. 
 
 ### Methods
 
 <img src="images/tpeold_results_methods.png" alt="Methods" style="width:1024px;height:auto;"><br>
-.*Methods:* The violin plots present for each heuristic ("method") the score distribution of all genes, user-selected genes are marked in green.
+*Methods:* The violin plots present for each heuristic ("method") the score distribution of all genes, user-selected genes are marked in green.
 
 The effect of the method on the scoring of the genes is shown as a violin plot. The user-selected genes are marked in green. The method is selected by the user and the sliders in the input data tab are auto-adjusted to the performance of the method. The user can also set the weight of the method to 0, if the method is not to their liking or to assess the contributio of an individual method to the overall score. The method is selected by the user and the sliders in the input data tab are auto-adjusted to the performance of the method.
 
@@ -150,35 +150,35 @@ The genes are represented by small dots and identify themseselves when the mouse
 ### Method correlation
 
 <img src="images/tpeold_results_methodcorrelation.png" alt="Method correlation" style="width:1024px;height:auto;"><br>
-.*Method correlation:* The scores determined by arbitrary two methods (which are to be selected by the user) are shown as a scatter plot.
+*Method correlation:* The scores determined by arbitrary two methods (which are to be selected by the user) are shown as a scatter plot.
 
 The user can choose between any two methods that shall determine the X and Y axes of a scatter plot. As for the other graphs, a mouse-over identifies the genes. We are particularly intrigued by the sudden changes to the gene density observed both at the upper and lower extrema of the scores.
 
 ### Scores by position
 
 <img src="images/tpeold_results_scores_overview.png" alt="Overview on Scores by position for all chromosomes" style="width:1024px;height:auto;"><br>
-.*Overview on Scores by position for all chromosomes:* The combined score (as determined by the slider settings) is shown as a density plot for all the genes, separated by chromosomes. The centromere is indicated, the p-arm to the left, score on the Y axis.
+*Overview on Scores by position for all chromosomes:* The combined score (as determined by the slider settings) is shown as a density plot for all the genes, separated by chromosomes. The centromere is indicated, the p-arm to the left, score on the Y axis.
 
 <img src="images/tpeold_results_scores_chromosome_X.png" alt="_Score ~ Telomere distance_ for genes of an individual chromosome" style="width:1024px;height:auto;"><br>
-.*_Score ~ Telomere distance_ for genes of an individual chromosome*: With a constraint of the display on a single chromosome, the individual genes are now identifiable by a mouse-over."
+*_Score ~ Telomere distance_ for genes of an individual chromosome*: With a constraint of the display on a single chromosome, the individual genes are now identifiable by a mouse-over."
 
 <img src="images/tpeold_results_scores_chromosome_all.png" alt="_Score ~ Telomere distance_ for all gene" style="width:1024px;height:auto;"><br>
-.*_Score ~ Telomere distance_ for all genes:* Same plot, accumulating data from all chromosomes.
+*_Score ~ Telomere distance_ for all genes:* Same plot, accumulating data from all chromosomes.
 
 ### Ortholog location
 
 <img src="images/tpeold_results_orthologlocations.png" alt="Ortholog location" style="width:1024px;height:auto;"><br>
-.*Ortholog location:* The telomeric distance of user-selected genes and reference genes is indicated for all species contributing to the scoring.
+*Ortholog location:* The telomeric distance of user-selected genes and reference genes is indicated for all species contributing to the scoring.
 
 ### Detailed results
 
 <img src="images/tpeold_results_detailedresults.png" alt="Detailed results" style="width:1024px;height:auto;"><br>
-.*Detailed results:* Table of all human genes and their respective score. The table is interactive. Filters are made available to constrain the list to genes of particular interest.
+*Detailed results:* Table of all human genes and their respective score. The table is interactive. Filters are made available to constrain the list to genes of particular interest.
 
 ### g:Profiler
 
 <img src="images/tpeold_reults_gprofiler.png" alt="g:Profiler" style="width:1024px;height:auto;"><br>
-.*g:Profiler:* The best-ranking genes can be filtered for their scores and telomeric distance, are then sent to g:Profiler to investigate enrichments.
+*g:Profiler:* The best-ranking genes can be filtered for their scores and telomeric distance, are then sent to g:Profiler to investigate enrichments.
 
 Please remain aware that the genes selected for the plots of the _g:Profiler_ tab and the _detailed results_ are not depending on any set of custom genes that have been submitted but on the scoring. And that scoring is derived from the reference set of genes that affect the auto-adjustment of sliders.
 
