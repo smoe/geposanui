@@ -16,7 +16,9 @@ If you use case does not match the scenarios outlined in this document then plea
 
 ## Overall concept of GUI
 
-Input data tab::
+<dl>
+<dt>Input data tab</dt>
+<dd>
   The blue bar at the top introduces a separation of more systemic paramters of the heuristics. Most dominantly these are the
   * Species to include.<br>
     The web site uses all species in Ensembl with a minimal genome size.  When selecting "Customize" fromt the selection, another selection box opens for a selection of species of interest.
@@ -24,7 +26,9 @@ Input data tab::
     Some heuristics will compare the chromosomal distance of a candidate gene to telomeres with the same of a set of reference genes for which an effect was already described. Those genes are then marked in orange in the plots of the results tab.
  <br>
   Most users will not want to modify the settings of the 'input data tab'.
-Results tab::
+</dd>
+<dt>Results tab</dt>
+<dd>
   * Overview<br>
     This is the landing page of the web site. The user specifies their genes of interest and for those genes the plots will indicate the ranking and/or details in the other tabs. Changing the input genes in the overview does not have an effect on the scoring of the genes, just the display of the green dots and the summary statistics will be affected.
   * Gene sets<br>
@@ -46,6 +50,8 @@ Results tab::
     The score of all genes are listed. The table is interactive, filters are prepared.
   * g:Profiler<br>
     Top-ranked genes, users specify the exact constraints, are submitted to g:Profiler and results are displayed in situ.
+</dd>
+</dl>
 
 ## Datails on species selection ("input data")
 
@@ -66,7 +72,9 @@ We thus cannot prepare a blacklist of species.
 <img src="images/tpeold_results_overview.png" alt="Overview" style="width:1024px;height:auto;"><br>
 .*Overview:* The landing page of http://tpe-old.uni-rostock.de is also where the user-centric input (genes and weighting of heuristics) is specified.
 
-Comparison genes:: The user selectes their genes of interest to be one of
+<dl>
+<dt>Comparison genes</dt>
+<dd>The user selectes their genes of interest to be one of
 
 * Random genes - to become familiar with the system without any biological input. 
 * Established TPE-OLD genes - a set of seven genes for which a TPE-OLD effect was established.
@@ -77,11 +85,15 @@ When selected, different means are offered to specify the gene set, specified vi
 
 * HGNC Names - the official human gene names
 * Ensembl IDs - as provided by <https://www.ensembl.org>
+</dd>
 
-Genes to optimize for::
+<dt>Genes to optimize for</dt>
+<dd>
  As the weights of methods change, it naturally affects the scoring of genes, which is calculated as the weighted sum of scores obtained from each individual method. For the majority of users, the default setting will involve reference genes, carefully chosen to represent a specific biological feature of interest (highlighted in orange) - typically the TPE-OLD effect. However, users also have the option to submit a set of custom genes (highlighted in green). In such cases, to observe how the ranking is influenced by scoring prepared specifically for this custom gene set, the system provides the option for ad hoc optimization on the "Comparison genes".
+</dd>
 
-Optmization target::
+<dt>Optmization target</dt>
+<dd>
  The reference genes (default) or custom genes (if selected above) will be evaluated based on their scores, which are determined by the weights assigned to each method. This optimization process is carried out using a dedicated function in R that implements gradient descent (geraten, Elias?). Users have several options to guide this weight optimization:
 
 * Mean rank: Aiming for the highest possible average score assignment.
@@ -89,19 +101,33 @@ Optmization target::
 * First rank: Prioritizing the best-performing gene.
 * Last rank: Focusing on improving the performance of the worst-performing gene.
 * Customized weights: Allowing users to adjust the weights according to their preferences.
+</dd>
+</dl>
 
 #### Methods
 
- Distance to telomeres::
+<dl>
+<dt>Distance to telomeres</dt>
+<dd>
   The chromosomal distance of a gene to the nearest chromosome.
- Adjacency to reference genes::
+</dd>
+<dt>Adjacency to reference genes</dt>
+<dd>
   Another gene of the reference set has a similar distance.
- Clustering of genes::
+</dd>
+<dt>Clustering of genes</dt>
+<dd>
   The distance of a gene to the telomere does not change much across many species.
- Correlation with reference genes::
+</dd>
+<dt>Correlation with reference genes</dt>
+<dd>
   When (and only when) reference genes are close to the telomeres, so is this gene.
- Assessment by random forest::
+</dd>
+<dt>Assessment by random forest</dt>
+<dd>
   @Elias.
+</dd>
+</dl>
 
 The sliders, i.e. the weighting of the contribution of the scores yielded by each method, are auto-adjusted but a custom setting is allowed if so selselected, as described above. If there is a method that is not to your liking then we suggest to set the weight of tha method to 0. How well the method is performing can be inspected by the plots presented in the Methods and Method correlaton tabs, explained below.
 
