@@ -1,30 +1,5 @@
 = geposan UI
 
-ifdef::backend-html5[]
-:twoinches: width=144
-// using a role requires adding a corresponding rule to the CSS
-:full-width: role=full-width
-:half-width: role=half-width
-:half-size: role=half-size
-:thumbnail: width=60
-endif::[]
-ifdef::backend-pdf[]
-:twoinches: pdfwidth=2in
-// NOTE use pdfwidth=100vw to make the image stretch edge to edge
-:full-width: pdfwidth=100%
-:half-width: pdfwidth=50%
-// NOTE scale is not yet supported by the PDF converter
-:half-size: pdfwidth=50%
-:thumbnail: pdfwidth=20mm
-endif::[]
-ifdef::backend-docbook5[]
-:twoinches: scaledwidth=2in
-:full-width: scaledwidth=100%
-:half-width: scaledwidth=50%
-:half-size: scale=50
-:thumbnail: scaledwidth=20mm
-endif::[]
-
 This document describes the user interaction with the the geposan infrastructure as installed at https://tpe-old.uni-rostock.de.
 
 == Motivation
@@ -71,6 +46,17 @@ Results tab::
     The score of all genes are listed. The table is interactive, filters are prepared.
   * g:Profiler +
     Top-ranked genes, users specify the exact constraints, are submitted to g:Profiler and results are displayed in situ.
+
+== Datails on species selection ("input data")
+
+.*Species selection:* By default, all species in Ensembl with a minimal genome size are included.
+image::images/tpeold_inputdata.png[alt="Input data",width=1024,height=512,pdfwidth="90%"]
+
+You are unlikely to need to change the selection of species for your purpose. If you disagree then please kindly drop us a note. Once we have more of an understanding on what combinations of species shall are considered important, other than "all", we would likely prepare such sets of species. When selecting "Customize" fromt the selection, another selection box opens for a selection of species of interest.
+
+A basic requirement for the here aggregated heuristics to work is to have access to the functional and evolutionary equivalent genes, i.e. orthologs, in other species. The web site uses all species in Ensembl with a minimal genome size and at least 50% of its genes must be orthologous to the gene set already established. The quality of the assembly of a genome is thus important, since for yet unassembled fragments the distances to the ends of the chromosomes cannot be interpreted as a distance to a telomere.
+
+It should also be noted that the number of orthologs depends on the set of species already selected.  We thus cannot prepare a blacklist of species.
 
 == Details on selected tabs
 
